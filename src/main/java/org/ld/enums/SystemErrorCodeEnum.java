@@ -2,7 +2,8 @@ package org.ld.enums;
 
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
-import org.ld.utils.Logger;
+import org.ld.utils.LoggerUtil;
+import org.slf4j.Logger;
 import org.springframework.dao.DataAccessException;
 
 import java.io.FileNotFoundException;
@@ -68,7 +69,7 @@ public enum SystemErrorCodeEnum {
     int code;
     Class<?> clazz;
     String msg;
-    private static final Logger logger = Logger.newInstance();
+    private static final Logger logger = LoggerUtil.newInstance();
 
     <T> SystemErrorCodeEnum(int code, Class<T> clazz, String msg) {
         this.code = code;
@@ -88,7 +89,7 @@ public enum SystemErrorCodeEnum {
         if (t instanceof CodeStackException) return (CodeStackException) t;
         return Stream.of(values()).filter(e -> e.clazz.isInstance(t)).findFirst()
                 .map(e -> {
-                    logger.info(() -> "ErrorCode:" + e.code + " Reason:" + e.msg);
+                    logger.info("ErrorCode:" + e.code + " Reason:" + e.msg);
                     return new CodeStackException(new ErrorCode(e));
                 })
                 .orElseGet(() -> new CodeStackException(

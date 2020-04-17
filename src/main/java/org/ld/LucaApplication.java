@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LucaApplication {
 
 	public static void main(String[] args) {
-		var a = "sss";
 		SpringApplication.run(LucaApplication.class, args);
 	}
 

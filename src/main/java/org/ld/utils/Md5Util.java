@@ -55,8 +55,7 @@ public class Md5Util {
 
     private static String byteHEX(byte ib) {
         char[] ob = new char[]{hexDigits[ib >>> 4 & 15], hexDigits[ib & 15]};
-        String s = new String(ob);
-        return s;
+        return new String(ob);
     }
 
     static {

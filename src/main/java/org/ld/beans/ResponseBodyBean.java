@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ResponseBodyBean<T> {
-
     private Integer errorCode ;
     private String message;
     private T data;

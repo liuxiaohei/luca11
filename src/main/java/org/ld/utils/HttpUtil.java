@@ -1,6 +1,7 @@
 package org.ld.utils;
 
 import org.ld.exception.CodeStackException;
+import org.slf4j.Logger;
 import org.springframework.http.MediaType;
 
 import java.io.*;
@@ -15,7 +16,7 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class HttpUtil {
 
-    private static final Logger LOG = Logger.newInstance();
+    private static final Logger LOG = LoggerUtil.newInstance();
     public static String STREAM_TYPE = "application/octet-stream";
 
     /**
@@ -92,7 +93,7 @@ public class HttpUtil {
                         if (!((conn1.getResponseCode() == 200)
                                 || (conn1.getResponseCode() == 201)
                                 || (conn1.getResponseCode() == 202))) {
-                            LOG.error(() -> "请求失败----Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
+                            LOG.error("请求失败----Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
                         }
                     } finally {
                         conn1.disconnect();

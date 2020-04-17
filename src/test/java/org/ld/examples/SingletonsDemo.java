@@ -1,7 +1,7 @@
 package org.ld.examples;
 
 import org.junit.Test;
-import org.ld.utils.Logger;
+import org.ld.utils.LoggerUtil;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -19,8 +19,6 @@ public class SingletonsDemo {
         System.out.println(aaa);
     }
 
-    private static Logger logger = Logger.newInstance();
-
     public SingletonsDemo() {
     }
 
@@ -35,11 +33,5 @@ public class SingletonsDemo {
         System.out.println("step1");                                         // 继续
         SingletonsDemo singletonsDemo1 = SingletonsDemoHolder.singletonsDemo;// 已经懒加载不会重复new
         System.out.println("end");                                           // 结束
-    }
-
-    public static void main(String... args) {
-        CompletableFuture.runAsync(() ->
-                Logger.newInstance().info(() -> "aaa")).join();
-        Logger.newInstance().info(() -> "bbb");
     }
 }

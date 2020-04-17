@@ -18,7 +18,7 @@ public class UuidUtils {
      * 返回8位uuid
      */
     public static String getShortUuid() {
-        final String uuid = UUID.randomUUID().toString().replace("-", "");
+        final var uuid = UUID.randomUUID().toString().replace("-", "");
         return IntStream.rangeClosed(0,7).boxed()
                 .map(i -> uuid.substring(i * 4, i * 4 + 4))
                 .map(str -> Integer.parseInt(str,16))

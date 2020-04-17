@@ -6,10 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  */
@@ -21,9 +18,9 @@ public class DemoController {
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
     public Object demo() {
-        Map<String, Object> a = new HashMap<>();
-        Map<String, Object> b = new HashMap<>();
-        b.put("wer", Arrays.asList("234", "333", "eee"));
+        var a = new HashMap<>();
+        var b = new HashMap<>();
+        b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
         return a;
     }
