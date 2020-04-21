@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * ld
  */
 @SuppressWarnings("unused")
-public class ServiceUtil {
+public class ObjectUtil {
 
     /**
      * 遍历对象的属性并转换成 指定泛型的ConfigList 对象

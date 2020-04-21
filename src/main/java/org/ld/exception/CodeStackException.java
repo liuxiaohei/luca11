@@ -5,7 +5,6 @@ import org.ld.enums.SystemErrorCodeEnum;
 /**
  * ld
  */
-@SuppressWarnings("unused")
 public class CodeStackException extends RuntimeException {
 
     private ErrorCode errorCode;
@@ -25,11 +24,4 @@ public class CodeStackException extends RuntimeException {
         return errorCode;
     }
 
-    public static void throwException(ErrorCode info) {
-        throw new CodeStackException(info);
-    }
-
-    public static void throwException(Throwable e) {
-        throw new CodeStackException(e);
-    }
 }

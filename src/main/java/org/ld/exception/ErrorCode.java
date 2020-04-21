@@ -2,7 +2,6 @@ package org.ld.exception;
 
 import org.ld.enums.SystemErrorCodeEnum;
 
-@SuppressWarnings("unused")
 public class ErrorCode {
 
     private Integer code;
