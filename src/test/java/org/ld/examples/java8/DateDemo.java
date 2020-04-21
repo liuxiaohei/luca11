@@ -7,6 +7,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class DateDemo {
 
@@ -160,6 +161,14 @@ public class DateDemo {
         Long localDateTimeSecond = localDateTime.toEpochSecond(ZoneOffset.of("+8"));
         Long dateSecond = date.toInstant().atOffset(ZoneOffset.of("+8")).toEpochSecond();
         Assert.assertTrue(dateSecond.equals(localDateTimeSecond));
+        long day = TimeUnit.DAYS.convert(Duration.ofHours(24));
+        System.out.println(day == 1);
+
+        // 1 天
+        System.out.println(TimeUnit.DAYS.convert(Duration.ofHours(26)));
+
+        // 1 分钟
+        System.out.println(TimeUnit.MINUTES.convert(Duration.ofSeconds(60)));
     }
 
 

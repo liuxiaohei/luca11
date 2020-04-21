@@ -40,7 +40,7 @@ public class SocketTest {
         }).start();
         try {
             final var socket = new ServerSocket(port);
-            for (;;) {
+            for (; ; ) {
                 new Thread(() -> {
                     OutputStream out;
                     try (final var clientSocket = socket.accept()) {
@@ -106,14 +106,14 @@ public class SocketTest {
                         System.out.println("Accepted connection from " + client);
                     }
                     if (key.isWritable()) {
-                        var client = (SocketChannel) key.channel();
-                        var buffer = (ByteBuffer) key.attachment();
-                        while (buffer.hasRemaining()) {
-                            if (client.write(buffer) == 0) {
-                                break;
+                        try (var client = (SocketChannel) key.channel()) {
+                            var buffer = (ByteBuffer) key.attachment();
+                            while (buffer.hasRemaining()) {
+                                if (client.write(buffer) == 0) {
+                                    break;
+                                }
                             }
                         }
-                        client.close();
                     }
                 } catch (IOException ex) {
                     key.cancel();

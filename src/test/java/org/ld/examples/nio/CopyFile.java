@@ -47,17 +47,17 @@ public class CopyFile {
                 System.out.println("创建文件失败");
             }
         }
-        var fos = new FileOutputStream(file);
-        var channel = fos.getChannel();
-        var buffer = ByteBuffer.allocate(200 * 1024 * 1024);
-        int i = 1;
-        while (buffer.position() < buffer.limit() - 50) {
-            buffer.putInt(i++);
+        try (var fos = new FileOutputStream(file)) {
+            var channel = fos.getChannel();
+            var buffer = ByteBuffer.allocate(200 * 1024 * 1024);
+            int i = 1;
+            while (buffer.position() < buffer.limit() - 50) {
+                buffer.putInt(i++);
+            }
+            buffer.flip();
+            channel.write(buffer);
+            fos.flush();
         }
-        buffer.flip();
-        channel.write(buffer);
-        fos.flush();
-        fos.close();
     }
 
     /**
@@ -73,36 +73,33 @@ public class CopyFile {
                 System.out.println("创建文件失败");
             }
         }
-        var fos = new FileOutputStream(file);
-        var b = new byte[1024 * 4];
-        for (var i = 0; i < 1024; i++) {
-            b[i] = (byte) (i % 2);
+        try (var fos = new FileOutputStream(file)) {
+            var b = new byte[1024 * 4];
+            for (var i = 0; i < 1024; i++) {
+                b[i] = (byte) (i % 2);
+            }
+            for (var i = 1; i < size / b.length; i++) {
+                fos.write(b);
+            }
+            fos.flush();
         }
-        for (var i = 1; i < size / b.length; i++) {
-            fos.write(b);
-        }
-        fos.flush();
-        fos.close();
     }
 
     public static void copyFileUseNIO(String src, String dst) throws IOException {
-        var fi = new FileInputStream(new File(src));
-        var fo = new FileOutputStream(new File(dst));
-        var inChannel = fi.getChannel();//获得传输通道channel
-        var outChannel = fo.getChannel();
-        var buffer = ByteBuffer.allocate(1024); //创建buffer
-        while (true) {
-            int eof = inChannel.read(buffer);
-            if (eof == -1) {
-                break;
+        try (var fi = new FileInputStream(new File(src));
+             var fo = new FileOutputStream(new File(dst));
+             var inChannel = fi.getChannel();//获得传输通道channel
+             var outChannel = fo.getChannel()) {
+            var buffer = ByteBuffer.allocate(1024); //创建buffer
+            while (true) {
+                int eof = inChannel.read(buffer);
+                if (eof == -1) {
+                    break;
+                }
+                buffer.flip(); //重设一下buffer的position=0，limit=position
+                outChannel.write(buffer);
+                buffer.clear();//写完要重置buffer，重设position=0,limit=capacity
             }
-            buffer.flip();//重设一下buffer的position=0，limit=position
-            outChannel.write(buffer);
-            buffer.clear();//写完要重置buffer，重设position=0,limit=capacity
         }
-        inChannel.close();
-        outChannel.close();
-        fi.close();
-        fo.close();
     }
 }
