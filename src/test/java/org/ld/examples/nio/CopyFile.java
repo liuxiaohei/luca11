@@ -69,7 +69,6 @@ public class CopyFile {
             file.createNewFile();
         }
         FileOutputStream fos = new FileOutputStream(file);
-
         byte[] b = new byte[1024 * 4];
         for (int i = 0; i < 1024; i++) {
             b[i] = (byte) (i % 2);

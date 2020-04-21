@@ -18,24 +18,21 @@ public class AIOSocket {
     private AsynchronousServerSocketChannel server;
 
     public static void main(String[] args) throws IOException {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    sleep(1000);
-                    Socket socket = new Socket("localhost", 8887);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-                    BufferedReader resp = null;
-                    String line = reader.readLine();
-                    socket.getOutputStream().write(line.getBytes());
-                    resp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    System.out.println(" 接收到的响应 " + resp.readLine());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                System.exit(1);
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                Socket socket = new Socket("localhost", 8887);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                BufferedReader resp = null;
+                String line = reader.readLine();
+                socket.getOutputStream().write(line.getBytes());
+                resp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                System.out.println(" 接收到的响应 " + resp.readLine());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }.start();
+            System.exit(1);
+        }).start();
 
         AIOSocket aioServer = new AIOSocket();
         aioServer.init("localhost", 8887);
@@ -71,9 +68,7 @@ public class AIOSocket {
                     //把收到的直接返回给客户端
                     buffer.flip();
                     result.write(buffer);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 } finally {
                     try {
