@@ -23,7 +23,6 @@ public class StringExample {
      */
     private static void writeHeader(final String headerText) {
         final String headerSeparator = "=".repeat(headerText.length() + 4);
-
         System.out.println("\n" + headerSeparator);
         System.out.println(headerText);
         System.out.println(headerSeparator);

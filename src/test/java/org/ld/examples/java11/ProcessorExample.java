@@ -10,14 +10,11 @@ package org.ld.examples.java11;
  * <p>
  * - java.lang.ProcessHandle
  * - java.lang.ProcessHandle.Info
- *
- * @author biezhi
- * @date 2018/7/10
  */
 public class ProcessorExample {
 
     public static void main(String[] args) {
-        ProcessHandle currentProcess = ProcessHandle.current();
+        var currentProcess = ProcessHandle.current();
         System.out.println("当前进程的 PID = " + currentProcess.pid());
     }
 

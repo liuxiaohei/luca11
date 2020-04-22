@@ -15,15 +15,15 @@ import java.util.*;
 public class JsonUtil {
 
     public static <T> List<T> json2List(String json, Class<T> cls) {
-        JsonNode jsonNode = toJsonNode(json);
+        var jsonNode = toJsonNode(json);
         if (jsonNode == null) return Collections.emptyList();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaType type = objectMapper.getTypeFactory().constructCollectionType(List.class, cls);
+        var objectMapper = new ObjectMapper();
+        var type = objectMapper.getTypeFactory().constructCollectionType(List.class, cls);
         return objectMapper.convertValue(jsonNode, type);
     }
 
     public static String obj2Json(Object obj) {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(obj);
         } catch (Exception e) {
@@ -32,9 +32,9 @@ public class JsonUtil {
     }
 
     public static <T> T json2Obj(String json, Class<T> cls) {
-        JsonNode jsonNode = toJsonNode(json);
+        var jsonNode = toJsonNode(json);
         if (jsonNode == null) return null;
-        ObjectMapper objectMapper = new ObjectMapper();
+        var objectMapper = new ObjectMapper();
         return objectMapper.convertValue(jsonNode, cls);
     }
 

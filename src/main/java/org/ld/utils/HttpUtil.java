@@ -23,7 +23,7 @@ public class HttpUtil {
      * 根据url 获取 Http 连接默认30s超时
      */
     private static HttpURLConnection getUrlConnection(String url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        var conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setConnectTimeout(30000);
         conn.setReadTimeout(30000);
         conn.setRequestProperty("Content-Type", MediaType.APPLICATION_JSON_VALUE);
@@ -37,17 +37,17 @@ public class HttpUtil {
      */
     public static String postReq(String u,Object params) {
         try {
-            final URL url = new URL(u);
+            final var url = new URL(u);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("POST");
             httpURLConnection.setRequestProperty("Content-Type","application/json; charset=UTF-8");
             httpURLConnection.setDoOutput(true);
             httpURLConnection.setDoInput(true);
-            final PrintWriter printWriter = new PrintWriter(httpURLConnection.getOutputStream());
+            final var printWriter = new PrintWriter(httpURLConnection.getOutputStream());
             printWriter.write(JsonUtil.obj2Json(params));
             printWriter.flush();
-            InputStream in = httpURLConnection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            var in = httpURLConnection.getInputStream();
+            var reader = new BufferedReader(new InputStreamReader(in));
             return bufferedReader2json(reader);
         } catch (Exception e) {
             throw new CodeStackException(e);
@@ -58,7 +58,7 @@ public class HttpUtil {
      * I/O 将BufferedReader转化成json格式
      */
     private static String bufferedReader2json(BufferedReader bufferedReader) {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         String line;
         try {
             while (Objects.nonNull(line = bufferedReader.readLine())) {
@@ -75,7 +75,7 @@ public class HttpUtil {
         conn.setInstanceFollowRedirects(false);
         conn.setChunkedStreamingMode(32 << 10); //32kB-chunk
         if (conn.getResponseCode() == 307) {
-            String location = conn.getHeaderField("location");
+            var location = conn.getHeaderField("location");
             conn.disconnect();
             conn = getUrlConnection(location);
             conn.setInstanceFollowRedirects(false);

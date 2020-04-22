@@ -12,9 +12,6 @@ package org.ld.examples.java11;
  * 将复用代码创建为一个默认方法不是一个好的选择，因为该辅助方法会成为公共API的一部分。
  * <p>
  * Java9 支持向接口添加私有方法来解决这个问题。
- *
- * @author biezhi
- * @date 2018/7/10
  */
 public interface InterfaceExample {
 

@@ -11,7 +11,7 @@ public class Md5Util {
 
     public static String getMD5Format(String data) {
         try {
-            MessageDigest message = (MessageDigest)messageDigestHolder.get();
+            var message = (MessageDigest)messageDigestHolder.get();
             if (message == null) {
                 message = MessageDigest.getInstance("MD5");
                 messageDigestHolder.set(message);
@@ -33,7 +33,7 @@ public class Md5Util {
 
     public static String getMD5Format(byte[] data) {
         try {
-            MessageDigest message = (MessageDigest)messageDigestHolder.get();
+            var message = (MessageDigest)messageDigestHolder.get();
             if (message == null) {
                 message = MessageDigest.getInstance("MD5");
                 messageDigestHolder.set(message);
@@ -54,13 +54,13 @@ public class Md5Util {
     }
 
     private static String byteHEX(byte ib) {
-        char[] ob = new char[]{hexDigits[ib >>> 4 & 15], hexDigits[ib & 15]};
+        var ob = new char[]{hexDigits[ib >>> 4 & 15], hexDigits[ib & 15]};
         return new String(ob);
     }
 
     static {
         try {
-            MessageDigest message = MessageDigest.getInstance("MD5");
+            var message = MessageDigest.getInstance("MD5");
             messageDigestHolder.set(message);
         } catch (NoSuchAlgorithmException var1) {
             throw new RuntimeException("MD5格式化时发生异常");

@@ -3,7 +3,7 @@ package org.ld.examples.java11;
 /**
  * 你可以在当前源码的目录下执行
  * <p>
- * java HelloWorld.java 运行这个文件的 main 方法
+ * java SingleFileHelloWorld.java 运行这个文件的 main 方法
  *
  * 该命令相当于
  *
