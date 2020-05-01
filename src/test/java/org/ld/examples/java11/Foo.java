@@ -1,12 +1,13 @@
 package org.ld.examples.java11;
 
-/**
- * @author biezhi
- * @date 2018/7/10
- */
-public class Foo {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class Foo {
     String name;
     String url;
-
 }

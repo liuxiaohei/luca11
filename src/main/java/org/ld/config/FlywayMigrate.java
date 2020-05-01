@@ -2,6 +2,7 @@ package org.ld.config;
 
 import lombok.Data;
 import org.flywaydb.core.Flyway;
+import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import java.sql.Statement;
 import java.util.Optional;
 
 /**
+ * flyway
  */
 @Component
 @Data
@@ -56,7 +58,7 @@ public class FlywayMigrate {
             log.info("迁移结束");
         } catch (Exception e) {
             log.error("", e);
-            throw new RuntimeException(e);
+            throw new CodeStackException(e);
         }
     }
 

@@ -1,6 +1,6 @@
 package org.ld.controller;
 
-import org.ld.utils.UuidUtils;
+import org.ld.utils.JsonUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +25,7 @@ public class FileUpLoadController {
     public Object upload(@RequestParam MultipartFile file) throws IOException {
         final var fileName = file.getOriginalFilename();
         final var suffix = Optional.ofNullable(fileName).filter(e -> e.contains(".")).map(e -> e.substring(e.lastIndexOf(".") + 1)).orElse("");
-        final var key = UuidUtils.getShortUuid() + "_" + (file.getSize() / 1024) + Optional.of(suffix).map(e -> "." + e).orElse("");
+        final var key = JsonUtil.getShortUuid() + "_" + (file.getSize() / 1024) + Optional.of(suffix).map(e -> "." + e).orElse("");
         final var inputStream = file.getInputStream();
         return null;
     }

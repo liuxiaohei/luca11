@@ -12,4 +12,5 @@ public class ResponseBodyBean<T> {
     private String message;
     private T data;
     private String[] stackTrace;
+    private Boolean success;
 }

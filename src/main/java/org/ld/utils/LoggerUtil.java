@@ -1,6 +1,7 @@
 package org.ld.utils;
 
 import org.ld.exception.CodeStackException;
+import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 public class LoggerUtil {
 
-    private static Map<String, org.slf4j.Logger> cache = new ConcurrentHashMap<>();
+    private static final Map<String, Logger> cache = new ConcurrentHashMap<>();
 
-    public static org.slf4j.Logger newInstance() {
+    public static Logger newInstance() {
         return cache.computeIfAbsent(Thread.currentThread().getStackTrace()[2].getClassName(), className -> {
             try {
                 return org.slf4j.LoggerFactory.getLogger(ClassLoader.getSystemClassLoader().loadClass(className));

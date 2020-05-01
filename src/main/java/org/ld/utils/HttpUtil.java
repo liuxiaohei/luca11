@@ -10,7 +10,8 @@ import java.net.URL;
 import java.util.Objects;
 
 /**
- * http工具未完善
+ * todo http工具未完善
+ * todo 用jdk 默认方式实现
  * https://blog.csdn.net/xiaojin21cen/article/details/86713894
  */
 @SuppressWarnings("unused")
