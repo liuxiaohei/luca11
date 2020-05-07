@@ -1,12 +1,14 @@
 package org.ld.config;
 
-import org.ld.beans.ResponseBodyBean;
+import org.ld.beans.RespBean;
 import org.ld.enums.SystemErrorCodeEnum;
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
 import org.ld.utils.LoggerUtil;
 import org.slf4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.PrintWriter;
@@ -24,7 +26,8 @@ public class GlobalExceptionHandler {
 
     // TODO 加jwt https://www.cnblogs.com/gdjlc/p/12081701.html
     @ExceptionHandler(Throwable.class)
-    public ResponseBodyBean<Object> exceptionHandler(Throwable e) {
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public RespBean<Object> exceptionHandler(Throwable e) {
         try {
             LOG.error(AroundController.UUIDS.get(), e);
         } finally {
@@ -40,7 +43,7 @@ public class GlobalExceptionHandler {
                     return null;
                 })
                 .orElseGet(() -> SystemErrorCodeEnum.getSystemError(e));
-        final var result = new ResponseBodyBean<>();
+        final var result = new RespBean<>();
         result.setErrorCode(Optional.of(se)
                 .map(CodeStackException::getErrorCode)
                 .map(ErrorCode::getCode)

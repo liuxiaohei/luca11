@@ -38,7 +38,10 @@ public class FlywayMigrate {
                 .map(strs -> strs[strs.length - 1])
                 .map(str -> str.split("[?]"))
                 .map(strs -> strs[0]).orElse("");
-        final String rawJdbcUrl = Optional.ofNullable(jdbcUrl).map(e -> e.split(targetDb)[0]).orElse("");
+        final String rawJdbcUrl = Optional.ofNullable(jdbcUrl)
+                .map(e -> e.split(targetDb)[0])
+                .filter(e -> !e.contains("useSSL")).map(e -> e + "?useSSL=false")
+                .orElse("");
         final String initSql = "CREATE DATABASE IF NOT EXISTS " + targetDb;
         final Flyway flyway = Flyway
                 .configure()

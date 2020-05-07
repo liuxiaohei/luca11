@@ -1,6 +1,6 @@
 package org.ld.config;
 
-import org.ld.beans.ResponseBodyBean;
+import org.ld.beans.RespBean;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.LoggerUtil;
 import org.slf4j.Logger;
@@ -38,7 +38,11 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> aClass,
                                   ServerHttpRequest request,
                                   ServerHttpResponse serverHttpResponse) {
-        if (o instanceof ResponseBodyBean) {
+        if (request.getURI().getPath().contains("swagger")) {
+            return o; // 防止结构化时swagger 相关的接口被结构化 而不能正常加载资源
+        }
+
+        if (o instanceof RespBean) {
             return o;
         }
         try {

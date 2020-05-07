@@ -17,17 +17,17 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if(!(handler instanceof HandlerMethod)){
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-        var handlerMethod=(HandlerMethod)handler;
-        var method=handlerMethod.getMethod();
+        var handlerMethod = (HandlerMethod) handler;
+        var method = handlerMethod.getMethod();
         if (method.isAnnotationPresent(NeedToken.class)) {
             var loginToken = method.getAnnotation(NeedToken.class);
             if (loginToken.required()) {
                 // 执行认证
                 var tokenHeader = request.getHeader(JwtUtils.TOKEN_HEADER);
-                if(tokenHeader == null){
+                if (tokenHeader == null) {
                     throw UserErrorCodeEnum.EMPTY_TOKEN.getException();
                 }
                 var token = tokenHeader.replace(JwtUtils.TOKEN_PREFIX, "");

@@ -3,7 +3,7 @@ package org.ld.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.ld.annotation.NeedToken;
-import org.ld.beans.ResponseBodyBean;
+import org.ld.beans.RespBean;
 import org.ld.utils.JwtUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +32,7 @@ public class DemoController {
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "demo")
-    public Map<Object, Object> postDemo(@RequestBody ResponseBodyBean<String> aaa) {
+    public Map<Object, Object> postDemo(@RequestBody RespBean<String> aaa) {
         var a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));

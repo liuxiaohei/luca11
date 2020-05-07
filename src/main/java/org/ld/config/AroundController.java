@@ -14,7 +14,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
-@SuppressWarnings("unused")
 @Aspect
 @Component
 public class AroundController {
@@ -26,7 +25,7 @@ public class AroundController {
     /**
      * 打印日志等操作
      */
-    @Around("@within(org.springframework.web.bind.annotation.RestController)")
+    @Around("@within(org.springframework.stereotype.Controller)")
     public Object mapResponseBodyAdvice(ProceedingJoinPoint point) throws Throwable {
         final var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         final var request = Optional.ofNullable(attributes).map(ServletRequestAttributes::getRequest);

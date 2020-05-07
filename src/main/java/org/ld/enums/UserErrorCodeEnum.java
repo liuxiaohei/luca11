@@ -3,6 +3,9 @@ package org.ld.enums;
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
 
+/**
+ * 自定义异常类型
+ */
 public enum UserErrorCodeEnum {
 
     EMPTY_TOKEN(1000, "没有Token"),

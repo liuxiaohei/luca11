@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ResponseBodyBean<T> {
+public class RespBean<T> {
     private Integer errorCode ;
     private String message;
     private T data;

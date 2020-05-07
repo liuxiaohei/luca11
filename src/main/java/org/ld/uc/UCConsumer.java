@@ -1,4 +1,4 @@
-package org.ld.functions;
+package org.ld.uc;
 
 @FunctionalInterface
 public interface UCConsumer<T> {
