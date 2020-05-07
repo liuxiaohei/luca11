@@ -2,7 +2,6 @@ package org.ld.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -20,6 +19,7 @@ import java.util.stream.Stream;
 /**
  * json工具
  */
+@SuppressWarnings("unused")
 public class JsonUtil {
 
     public static <T> List<T> json2List(String json, Class<T> cls) {
@@ -28,6 +28,13 @@ public class JsonUtil {
         var objectMapper = new ObjectMapper();
         var type = objectMapper.getTypeFactory().constructCollectionType(List.class, cls);
         return objectMapper.convertValue(jsonNode, type);
+    }
+
+    public static <T> T copyObj(T t, Class<T> clazz) {
+        if (null == t) {
+            return null;
+        }
+        return json2Obj(obj2Json(t),clazz);
     }
 
     public static String obj2Json(Object obj) {
@@ -49,7 +56,7 @@ public class JsonUtil {
     public static Map<String, String> json2Map(String json) {
         if (StringUtil.isBlank(json)) return Collections.emptyMap();
         try {
-            return new ObjectMapper().readValue(json, new TypeReference<Map<String, String>>() {
+            return new ObjectMapper().readValue(json, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new CodeStackException(e);
@@ -72,7 +79,7 @@ public class JsonUtil {
     public static <T> List<T> toConfigList(Object o, Class<?> clazz, BiFunction<String, String, T> fieldTFunction) {
         try {
             final String str = new ObjectMapper().writeValueAsString(o);
-            final JsonNode node =  new ObjectMapper().readTree(str);
+            final JsonNode node = new ObjectMapper().readTree(str);
             if (null == node) {
                 return new ArrayList<>();
             }
@@ -123,7 +130,7 @@ public class JsonUtil {
             }
         }));
         try {
-            final JsonNode node =  new ObjectMapper().readTree(new ObjectMapper().writeValueAsString(stringObjectMap));
+            final JsonNode node = new ObjectMapper().readTree(new ObjectMapper().writeValueAsString(stringObjectMap));
             return new ObjectMapper().convertValue(node, clazz);
         } catch (Exception e) {
             throw new CodeStackException(e);
@@ -142,9 +149,9 @@ public class JsonUtil {
      */
     public static String getShortUuid() {
         final var uuid = UUID.randomUUID().toString().replace("-", "");
-        return IntStream.rangeClosed(0,7).boxed()
+        return IntStream.rangeClosed(0, 7).boxed()
                 .map(i -> uuid.substring(i * 4, i * 4 + 4))
-                .map(str -> Integer.parseInt(str,16))
+                .map(str -> Integer.parseInt(str, 16))
                 .map(i -> i % 0x3E)
                 .map(i -> chars[i])
                 .collect(Collectors.joining());
@@ -154,14 +161,13 @@ public class JsonUtil {
      * 生成随机字母
      */
     private String randomChar() {
-        String chars = "abcdefghijklmnopqrstuvwxyz";
-        return "" + chars.charAt((int)(Math.random() * 26));
+        var chars = "abcdefghijklmnopqrstuvwxyz";
+        return "" + chars.charAt((int) (Math.random() * 26));
     }
 
     private String stuffix(String fileName) {
-        String suffix = Optional.ofNullable(fileName)
+        return Optional.ofNullable(fileName)
                 .filter(e -> e.contains("."))
                 .map(e -> e.substring(e.lastIndexOf(".") + 1)).orElse("jpg");
-        return suffix;
     }
 }

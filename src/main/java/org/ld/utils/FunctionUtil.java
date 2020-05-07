@@ -19,6 +19,8 @@ public class FunctionUtil {
     /**
      */
     public static <T> void whenNonNullDo(Consumer<List<T>> c, List<T> list) {
-        Optional.ofNullable(list).filter(StringUtil::isNotEmpty).ifPresent(c);
+        Optional.ofNullable(list)
+                .filter(StringUtil::isNotEmpty)
+                .ifPresent(c);
     }
 }
