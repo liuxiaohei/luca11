@@ -28,8 +28,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
     }
 
     /**
-     * 封装会影响swagger的展示
-     * so 默认不做封装 只打印一行日志
+     *
      */
     @Override
     public Object beforeBodyWrite(Object o,
@@ -38,18 +37,19 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> aClass,
                                   ServerHttpRequest request,
                                   ServerHttpResponse serverHttpResponse) {
-        if (request.getURI().getPath().contains("swagger")) {
-            return o; // 防止结构化时swagger 相关的接口被结构化 而不能正常加载资源
-        }
-
-        if (o instanceof RespBean) {
-            return o;
+        final var path = request.getURI().getPath();
+        if (o instanceof RespBean
+                || path.contains("swagger")
+                || path.equals("/error")
+                || path.equals("/v2/api-docs")
+        ) {
+            return o; // 防止多余的封装
         }
         try {
             LOG.info(Optional.ofNullable(AroundController.UUIDS.get()).map(e -> e + ":").orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
         } finally {
             AroundController.UUIDS.remove();
         }
-        return o;
+        return new RespBean<>(0, "成功", o, null, true);
     }
 }
