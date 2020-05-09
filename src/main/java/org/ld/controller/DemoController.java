@@ -1,10 +1,14 @@
 package org.ld.controller;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
+import org.ld.config.SpringExtProvider;
 import org.ld.utils.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +23,9 @@ import java.util.Objects;
 @RestController
 @SuppressWarnings("unused")
 public class DemoController {
+
+    @Autowired
+    private ActorSystem actorSystem;
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
@@ -62,10 +69,25 @@ public class DemoController {
         return "用户名或密码错误";
     }
 
+    @GetMapping("stringdemo")
+    public String getStringDemo(){
+        return "获取数据...";
+    }
+
     @NeedToken
     @GetMapping("getData")
     public String getData() {
         return "获取数据...";
+    }
+
+    @GetMapping("akkademo")
+    public String getAkkaDemo(){
+        var ref = actorSystem
+                .actorOf(SpringExtProvider.getInstance()
+                        .get(actorSystem)
+                        .create("testActor"), "testActor");
+        ref.tell("hello",ActorRef.noSender());
+        return "success";
     }
 
 }

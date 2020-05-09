@@ -39,6 +39,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                                   ServerHttpResponse serverHttpResponse) {
         final var path = request.getURI().getPath();
         if (o instanceof RespBean
+                || o instanceof String
                 || path.contains("swagger")
                 || path.equals("/error")
                 || path.equals("/v2/api-docs")
