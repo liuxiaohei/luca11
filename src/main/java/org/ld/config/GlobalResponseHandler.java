@@ -39,7 +39,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                                   ServerHttpResponse serverHttpResponse) {
         final var path = request.getURI().getPath();
         if (o instanceof RespBean
-                || o instanceof String
+//                || o instanceof String
                 || path.contains("swagger")
                 || path.equals("/error")
                 || path.equals("/v2/api-docs")
@@ -51,6 +51,6 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
         } finally {
             AroundController.UUIDS.remove();
         }
-        return new RespBean<>(0, "成功", o, null, true);
+        return new RespBean<>(true, o, null, "成功", null, null);
     }
 }

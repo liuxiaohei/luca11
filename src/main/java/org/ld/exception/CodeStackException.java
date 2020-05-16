@@ -18,7 +18,7 @@ public class CodeStackException extends RuntimeException {
     public CodeStackException(Throwable e) {
         super(e.getMessage(), e);
         super.setStackTrace(e.getStackTrace());
-        this.errorCode = SystemErrorCodeEnum.getSystemError(e).errorCode;
+        this.errorCode = SystemErrorCodeEnum.getSystemErrorCode(e);
     }
 
     public CodeStackException(UserErrorCodeEnum userErrorCodeEnum, Throwable e) {

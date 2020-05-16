@@ -85,15 +85,15 @@ public enum SystemErrorCodeEnum {
         return msg;
     }
 
-    public static CodeStackException getSystemError(Throwable t) {
-        if (t instanceof CodeStackException) return (CodeStackException) t;
+    public static ErrorCode getSystemErrorCode(Throwable t) {
+        if (t instanceof CodeStackException) return ((CodeStackException) t).getErrorCode();
         return Stream.of(values()).filter(e -> e.clazz.isInstance(t)).findFirst()
                 .map(e -> {
                     logger.info("ErrorCode:" + e.code + " Reason:" + e.msg);
-                    return new CodeStackException(new ErrorCode(e));
+                    return new ErrorCode(e);
                 })
-                .orElseGet(() -> new CodeStackException(
+                .orElseGet(() ->
                         new ErrorCode(SystemErrorCodeEnum.UNKNOWN)
-                                .setMsg(t.getMessage())));
+                                .setMsg(t.getMessage()));
     }
 }

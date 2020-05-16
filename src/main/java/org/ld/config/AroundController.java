@@ -31,19 +31,9 @@ public class AroundController {
         final var request = Optional.ofNullable(attributes).map(ServletRequestAttributes::getRequest);
         final var shortUUid = Optional.ofNullable(UUIDS.get()).orElseGet(JsonUtil::getShortUuid);
         UUIDS.set(shortUUid);
-        final var start = System.currentTimeMillis();
         LOG.info(shortUUid + ":接口地址:" + request.map(HttpServletRequest::getRequestURI).orElse(null));
         LOG.info(shortUUid + ":请求IP:" + request.map(ServletRequest::getRemoteAddr).orElse(null));
         LOG.info(shortUUid + ":CLASS_METHOD : " + point.getSignature().getDeclaringTypeName() + "." + point.getSignature().getName());
-        try {
-            var object = point.proceed();
-            final var end = System.currentTimeMillis();
-            LOG.info(shortUUid + ":执行时间: " + (end - start) + " ms!");
-            return object;
-        } catch (Throwable e) {
-            final var end = System.currentTimeMillis();
-            LOG.info(shortUUid + ":执行时间: " + (end - start) + " ms!");
-            throw e;
-        }
+        return point.proceed();
     }
 }

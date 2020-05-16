@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
                     }
                     return null;
                 })
-                .orElseGet(() -> SystemErrorCodeEnum.getSystemError(e));
+                .orElseGet(() -> new CodeStackException(e));
         final var result = new RespBean<>();
         result.setErrorCode(Optional.of(se)
                 .map(CodeStackException::getErrorCode)
@@ -57,11 +57,12 @@ public class GlobalExceptionHandler {
                             .map(str -> str.replace("\n", ""))
                             .toArray(String[]::new);
                 }).orElse(null));
-        result.setMessage(Optional.of(se)
+        result.setErrorMsgDescription(Optional.of(se)
                 .map(CodeStackException::getErrorCode)
                 .filter(i -> !i.getCode().equals(SystemErrorCodeEnum.UNKNOWN.getCode()))
                 .map(ErrorCode::getMessage)
                 .orElseGet(e::getMessage));
+        result.setMessage(e.getMessage());
         result.setSuccess(false);
         return result;
     }

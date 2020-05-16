@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class RespBean<T> {
-    private Integer errorCode ;
-    private String message;
-    private T data;
-    private String[] stackTrace;
     private Boolean success;
+    private T data;
+    private Integer errorCode ;
+    private String errorMsgDescription;
+    private String message;
+    private String[] stackTrace;
 }
