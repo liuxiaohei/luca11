@@ -5,8 +5,7 @@ import akka.actor.ActorRef;
 import org.ld.examples.akka.akkafsm.actor.message.*;
 import org.ld.examples.akka.akkafsm.actor.state.ProcessData;
 import org.ld.examples.akka.akkafsm.actor.state.ProcessState;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -15,7 +14,7 @@ import static org.ld.examples.akka.akkafsm.actor.state.ProcessState.*;
 
 public class ProcessDispatcher extends AbstractFSM<ProcessState, ProcessData> {
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     public ProcessDispatcher(
             ProcessState initState,

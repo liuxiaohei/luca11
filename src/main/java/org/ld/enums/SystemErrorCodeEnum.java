@@ -2,8 +2,7 @@ package org.ld.enums;
 
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 import org.springframework.dao.DataAccessException;
 
 import java.io.FileNotFoundException;
@@ -69,7 +68,7 @@ public enum SystemErrorCodeEnum {
     int code;
     Class<?> clazz;
     String msg;
-    private static final Logger logger = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger logger = ZLogger.newInstance();
 
     <T> SystemErrorCodeEnum(int code, Class<T> clazz, String msg) {
         this.code = code;

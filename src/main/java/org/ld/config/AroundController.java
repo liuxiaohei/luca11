@@ -4,8 +4,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ld.utils.JsonUtil;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -18,14 +17,15 @@ import java.util.Optional;
 @Component
 public class AroundController {
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     public static final ThreadLocal<String> UUIDS = new ThreadLocal<>();
 
     /**
      * 打印日志等操作
      */
-    @Around("@within(org.springframework.stereotype.Controller)")
+//    @Around("@within(org.springframework.stereotype.Controller)")
+    @Around("@within(org.springframework.web.bind.annotation.RestController)")
     public Object mapResponseBodyAdvice(ProceedingJoinPoint point) throws Throwable {
         final var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         final var request = Optional.ofNullable(attributes).map(ServletRequestAttributes::getRequest);

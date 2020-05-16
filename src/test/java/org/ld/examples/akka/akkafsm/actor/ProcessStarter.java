@@ -5,13 +5,12 @@ import org.ld.examples.akka.akkafsm.actor.message.ProcessFailure;
 import org.ld.examples.akka.akkafsm.actor.message.ProcessStarted;
 import org.ld.examples.akka.akkafsm.actor.message.StartProcess;
 import org.ld.examples.akka.akkafsm.service.ProcessExecutorAdapter;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 
 public class ProcessStarter extends AbstractActor {
     private final ProcessExecutorAdapter processExecutorAdapter;
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     public ProcessStarter(ProcessExecutorAdapter processExecutorAdapter) {
         this.processExecutorAdapter = processExecutorAdapter;

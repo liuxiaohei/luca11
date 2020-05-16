@@ -1,8 +1,7 @@
 package org.ld.config;
 
 import org.ld.utils.JsonUtil;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -18,7 +17,7 @@ import java.util.Optional;
 @RestControllerAdvice
 public class GlobalRequestBodyHandler implements RequestBodyAdvice {
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     @Override
     public boolean supports(
@@ -44,7 +43,6 @@ public class GlobalRequestBodyHandler implements RequestBodyAdvice {
             Type targetType,
             Class<? extends HttpMessageConverter<?>> converterType) {
         final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(JsonUtil::getShortUuid);
-        AroundController.UUIDS.set(shortUUid);
         LOG.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(body));
         return body;
     }

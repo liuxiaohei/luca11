@@ -5,13 +5,12 @@ import org.ld.examples.akka.akkafsm.actor.message.CheckProcessStatus;
 import org.ld.examples.akka.akkafsm.actor.message.ProcessInProgress;
 import org.ld.examples.akka.akkafsm.actor.message.ProcessStatus;
 import org.ld.examples.akka.akkafsm.service.ProcessExecutorAdapter;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 
 public class ProcessChecker extends AbstractActor {
     private final ProcessExecutorAdapter processExecutorAdapter;
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     public ProcessChecker(ProcessExecutorAdapter processExecutorAdapter) {
         this.processExecutorAdapter = processExecutorAdapter;

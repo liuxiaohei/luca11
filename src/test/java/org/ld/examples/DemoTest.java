@@ -2,7 +2,7 @@ package org.ld.examples;
 
 import org.junit.Test;
 import org.ld.utils.JsonUtil;
-import org.ld.utils.LoggerUtil;
+import org.ld.utils.ZLogger;
 
 import java.util.stream.Stream;
 
@@ -13,7 +13,7 @@ public class DemoTest {
      */
     @Test
     public void infiniteStream() {
-        Stream.generate(JsonUtil::getShortUuid).limit(1000000).forEach(e -> LoggerUtil.newInstance().info("" + e));
+        Stream.generate(JsonUtil::getShortUuid).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
     }
 
     /**
@@ -21,6 +21,6 @@ public class DemoTest {
      */
     @Test
     public void infiniteStream1() {
-        Stream.iterate(0, i -> ++i).limit(1000).forEach(e -> LoggerUtil.newInstance().info("" + e));
+        Stream.iterate(0, i -> ++i).limit(1000).forEach(e -> ZLogger.newInstance().info("" + e));
     }
 }

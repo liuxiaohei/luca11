@@ -4,8 +4,7 @@ import org.ld.beans.RespBean;
 import org.ld.enums.SystemErrorCodeEnum;
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,17 +21,13 @@ import java.util.stream.Stream;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     // TODO 加jwt https://www.cnblogs.com/gdjlc/p/12081701.html
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public RespBean<Object> exceptionHandler(Throwable e) {
-        try {
-            LOG.error(AroundController.UUIDS.get(), e);
-        } finally {
-            AroundController.UUIDS.remove();
-        }
+        LOG.error(AroundController.UUIDS.get(), e);
         final var se = Optional.of(e)
                 .map(t -> {
                     var t1 = t;

@@ -1,7 +1,6 @@
 package org.ld.utils;
 
 import org.ld.exception.CodeStackException;
-import org.slf4j.Logger;
 import org.springframework.http.MediaType;
 
 import java.io.*;
@@ -17,7 +16,7 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class HttpUtil {
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
     public static String STREAM_TYPE = "application/octet-stream";
 
     /**

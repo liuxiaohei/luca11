@@ -2,8 +2,7 @@ package org.ld.config;
 
 import org.ld.beans.RespBean;
 import org.ld.utils.JsonUtil;
-import org.ld.utils.LoggerUtil;
-import org.slf4j.Logger;
+import org.ld.utils.ZLogger;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -17,7 +16,7 @@ import java.util.Optional;
 @RestControllerAdvice
 public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
-    private static final Logger LOG = LoggerUtil.newInstance();
+    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     /**
      * 判断支持的类型
@@ -46,11 +45,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
         ) {
             return o; // 防止多余的封装
         }
-        try {
-            LOG.info(Optional.ofNullable(AroundController.UUIDS.get()).map(e -> e + ":").orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
-        } finally {
-            AroundController.UUIDS.remove();
-        }
+        LOG.info(Optional.ofNullable(AroundController.UUIDS.get()).map(e -> e + ":").orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
         return new RespBean<>(true, o, null, "成功", null, null);
     }
 }
