@@ -51,14 +51,12 @@ public class FlywayMigrate {
                                 .orElse(jdbcUrl)
                         , userName
                         , passWord).load();
-        log.info("开始迁移数据");
         log.info("init Db jdbcurl:" + rawJdbcUrl + " database:" + targetDb); //自动创建database
         try (final Connection connection = DriverManager.getConnection(rawJdbcUrl, userName, passWord);
              final Statement statement = connection.createStatement()) {
             statement.execute(initSql);
             flyway.repair();
             flyway.migrate();
-            log.info("迁移结束");
         } catch (Exception e) {
             log.error("", e);
             throw new CodeStackException(e);

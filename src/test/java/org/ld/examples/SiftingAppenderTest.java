@@ -1,0 +1,34 @@
+package org.ld.examples;
+
+import org.ld.utils.ZLogger;
+import org.slf4j.Logger;
+import org.slf4j.MDC;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
+
+public class SiftingAppenderTest {
+
+    public static Logger logger = ZLogger.newInstance();
+
+    public static void main(String[] args) throws InterruptedException {
+        ExecutorService taskExecutors = Executors.newCachedThreadPool();
+        // 运行10个task，启动了10个线程
+        IntStream.rangeClosed(1, 10).forEach(i ->
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        MDC.put("LogUuid", i + "");
+                        logger.info("taskId={}, threadNo={}", i, Thread.currentThread());
+                    } finally {
+                        MDC.remove(i + "");
+                    }
+
+                }));
+        Thread.sleep(1000L);
+        taskExecutors.shutdown();
+
+
+    }
+}

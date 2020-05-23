@@ -7,17 +7,22 @@ import io.swagger.annotations.ApiOperation;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
 import org.ld.config.SpringExtProvider;
+import org.ld.enums.Events;
+import org.ld.enums.States;
 import org.ld.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
+ *
  */
 @Api(tags = {"事例API"})
 @RestController
@@ -58,19 +63,19 @@ public class DemoController {
     @ApiOperation(value = "时间", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "time")
     public Long time() {
-        return (1575021600000L - System.currentTimeMillis())/1000;
+        return (1575021600000L - System.currentTimeMillis()) / 1000;
     }
 
     @PostMapping("getToken")
-    public String getToken(@RequestParam String userName, @RequestParam String password){
-        if(userName.equals("admin") && password.equals("123456")){
+    public String getToken(@RequestParam String userName, @RequestParam String password) {
+        if (userName.equals("admin") && password.equals("123456")) {
             return JwtUtils.sign("admin");
         }
         return "用户名或密码错误";
     }
 
     @GetMapping("stringdemo")
-    public String getStringDemo(){
+    public String getStringDemo() {
         return "获取数据...";
     }
 
@@ -81,13 +86,24 @@ public class DemoController {
     }
 
     @GetMapping("akkademo")
-    public String getAkkaDemo(){
+    public String getAkkaDemo() {
         var ref = actorSystem
                 .actorOf(SpringExtProvider.getInstance()
                         .get(actorSystem)
                         .create("testActor"), "testActor");
-        ref.tell("hello",ActorRef.noSender());
+        ref.tell("hello", ActorRef.noSender());
         return "success";
+    }
+
+    @Resource
+    StateMachine<States, Events> stateMachine;
+
+    @GetMapping("fsmdemo")
+    public void run(String... args) throws Exception {
+        stateMachine.start();
+        stateMachine.sendEvent(Events.ONLINE);
+        stateMachine.sendEvent(Events.PUBLISH);
+        stateMachine.sendEvent(Events.ROLLBACK);
     }
 
 }
