@@ -99,7 +99,7 @@ public class DemoController {
     StateMachine<States, Events> stateMachine;
 
     @GetMapping("fsmdemo")
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         stateMachine.start();
         stateMachine.sendEvent(Events.ONLINE);
         stateMachine.sendEvent(Events.PUBLISH);

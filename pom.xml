@@ -167,6 +167,29 @@
 					<argLine>--add-modules=jdk.incubator.httpclient</argLine>
 				</configuration>
 			</plugin>
+<!--			mvn mybatis-generator:generate-->
+			<plugin>
+				<groupId>org.mybatis.generator</groupId>
+				<artifactId>mybatis-generator-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<configuration>
+					<configurationFile>src/main/resources/generatorConfig.xml</configurationFile>
+					<verbose>true</verbose>
+					<overwrite>true</overwrite>
+				</configuration>
+				<dependencies>
+<!--					<dependency>-->
+<!--						<groupId>org.mybatis.generator</groupId>-->
+<!--						<artifactId>mybatis-generator-core</artifactId>-->
+<!--						<version>1.4.0</version>-->
+<!--					</dependency>-->
+					<dependency>
+						<groupId>mysql</groupId>
+						<artifactId>mysql-connector-java</artifactId>
+						<version>5.1.45</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 
