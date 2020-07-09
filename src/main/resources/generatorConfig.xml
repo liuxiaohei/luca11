@@ -2,23 +2,18 @@
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-    <!--     配置文件路径-->
     <properties resource="config.properties"/>
     <!--数据库驱动包路径 -->
-<!--    <classPathEntry location="./mysql-connector-java-5.1.22-bin.jar"/>-->
     <context id="DB2Tables" targetRuntime="MyBatis3">
-        <!-- Mysql分页插件 -->
-<!--        <plugin type="org.mybatis.generator.plugins.MySQLLimitPlugin"/>-->
+        <!-- 分页-->
+        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"></plugin>
         <!--关闭注释 -->
         <commentGenerator>
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
-
-        <!-- -数据库连接信息 -->
         <jdbcConnection driverClass="${jdbc_driver}"
                         connectionURL="${jdbc_url}" userId="${jdbc_user}"
                         password="${jdbc_password}"/>
-
         <!-- false：JDBC DECIMAL、NUMERIC類型解析為Integer，默認方式 -->
         <!-- true：JDBC DECIMAL、NUMERIC類型解析為java.math.BigDecimal -->
         <javaTypeResolver>
@@ -29,11 +24,9 @@
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
-        <!--生成xml mapper文件 路径 -->
         <sqlMapGenerator targetPackage="${targetSqlMapperPackage}" targetProject="src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
-        <!-- 生成的Dao接口 的包路径 -->
         <javaClientGenerator type="XMLMAPPER" targetPackage="${targetJavaMapperPackage}"
                              targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
