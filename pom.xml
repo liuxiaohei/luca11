@@ -142,7 +142,11 @@
             <artifactId>flyway-core</artifactId>
             <version>6.3.3</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.mybatis.generator</groupId>
+            <artifactId>mybatis-generator-core</artifactId>
+            <version>1.3.5</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -182,11 +186,6 @@
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
                         <version>5.1.45</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.mybatis.generator</groupId>
-                        <artifactId>mybatis-generator-core</artifactId>
-                        <version>1.3.5</version>
                     </dependency>
 <!--                    https://www.jianshu.com/p/7f57be69bb94-->
 <!--                    https://github.com/GuoGuiRong/mybatis-generator-lombok-plugin-->

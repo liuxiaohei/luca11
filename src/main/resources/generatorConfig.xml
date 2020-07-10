@@ -6,7 +6,7 @@
     <!--数据库驱动包路径 -->
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <!-- 分页-->
-        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"></plugin>
+        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
         <!--关闭注释 -->
         <plugin type="com.itfsw.mybatis.generator.plugins.SelectOneByExamplePlugin"/>
         <!-- MySQL分页插件 -->

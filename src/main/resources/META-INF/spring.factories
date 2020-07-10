@@ -1,3 +1,0 @@
-# Bootstrap components
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.sean.framework.context.SpringApplicationContext
