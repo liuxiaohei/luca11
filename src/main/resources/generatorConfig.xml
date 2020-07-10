@@ -18,7 +18,7 @@
         <!-- Example 目标包修改插件 -->
         <plugin type="com.itfsw.mybatis.generator.plugins.ExampleTargetPlugin">
             <!-- 修改Example类生成到目标包下 -->
-            <property name="targetPackage" value="com.itfsw.mybatis.generator.dao.example"/>
+            <property name="targetPackage" value="org.ld.pojo.example"/>
         </plugin>
         <!-- 批量插入插件 -->
         <plugin type="com.itfsw.mybatis.generator.plugins.BatchInsertPlugin"/>
@@ -26,7 +26,21 @@
         <plugin type="com.itfsw.mybatis.generator.plugins.ModelColumnPlugin"/>
         <!-- 存在即更新插件 -->
         <plugin type="com.itfsw.mybatis.generator.plugins.UpsertPlugin"/>
-
+        <!-- 带上序列化接口 -->
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <!-- 自定义的注释生成插件-->
+        <plugin type="com.chrm.mybatis.generator.plugins.CommentPlugin">
+            <!-- 抑制警告 -->
+            <property name="suppressTypeWarnings" value="true"/>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="false"/>
+            <!-- 是否生成注释代时间戳-->
+            <property name="suppressDate" value="true"/>
+        </plugin>
+        <!-- 整合lombok-->
+        <plugin type="com.chrm.mybatis.generator.plugins.LombokPlugin">
+            <property name="hasLombok" value="true"/>
+        </plugin>
         <commentGenerator>
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
