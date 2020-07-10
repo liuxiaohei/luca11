@@ -187,18 +187,10 @@
                         <artifactId>mysql-connector-java</artifactId>
                         <version>5.1.45</version>
                     </dependency>
-<!--                    https://www.jianshu.com/p/7f57be69bb94-->
-<!--                    https://github.com/GuoGuiRong/mybatis-generator-lombok-plugin-->
                     <dependency>
-                        <groupId>com.chrm</groupId>
-                        <artifactId>mybatis-generator-lombok-plugin</artifactId>
-                        <version>1.0-SNAPSHOT</version>
-                    </dependency>
-                    <!-- https://gitee.com/whan0216/mybatis-generator-plugin-->
-                    <dependency>
-                        <groupId>com.itfsw</groupId>
+                        <groupId>com.luca</groupId>
                         <artifactId>mybatis-generator-plugin</artifactId>
-                        <version>1.0.6</version>
+                        <version>1.0-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
             </plugin>
