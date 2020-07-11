@@ -5,6 +5,7 @@
     <properties resource="config.properties"/>
     <!--数据库驱动包路径 -->
     <context id="DB2Tables" targetRuntime="MyBatis3">
+        <plugin type="com.luca.mybatis.generator.plugins.AddMapperAnnotationPlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.BatchInsertPlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.AddCriteriaActionsPlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.AnyCriteriaPlugin"/>
