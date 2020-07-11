@@ -5,15 +5,29 @@
     <properties resource="config.properties"/>
     <!--数据库驱动包路径 -->
     <context id="DB2Tables" targetRuntime="MyBatis3">
-        <!-- 分页-->
-        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
-        <!--关闭注释 -->
+
+<!--        <plugin type="com.luca.mybatis.generator.plugins.AddComplexCriteriaPlugin"/> 不可用 -->
+        <plugin type="com.luca.mybatis.generator.plugins.AddCriteriaActionsPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.AnyCriteriaPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.CommonTablePropertiesPlugin"/>
+<!--        <plugin type="com.luca.mybatis.generator.plugins.DistinctPlugin"/>-->
+        <plugin type="com.luca.mybatis.generator.plugins.ExampleMethodsChainPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.JoinPlugin"/>
+<!--        <plugin type="com.luca.mybatis.generator.plugins.LogicalDeletePlugin"/>-->
+        <plugin type="com.luca.mybatis.generator.plugins.MinMaxPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.NullableInCriteriaPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.OptimisticLockAutoIncreasePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.SelectiveWithNullPlugin"/>
+<!--        <plugin type="com.luca.mybatis.generator.plugins.ServicePlugin"/>-->
+        <plugin type="com.luca.mybatis.generator.plugins.SimpleOrCriteriaPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.SumSelectivePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.UpdateSqlTextOfUpdateSelectivePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.WhereSqlTextPlugin"/>
+        <!-- 原生的每次执行xml 会在后面添加内容 加入这个插件后用覆盖代替添加-->
+        <plugin type="com.luca.mybatis.generator.plugins.OverIsMergeablePlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.SelectOneByExamplePlugin"/>
-        <!-- MySQL分页插件 -->
         <plugin type="com.luca.mybatis.generator.plugins.LimitPlugin"/>
-        <!-- Example Criteria 增强插件 -->
         <plugin type="com.luca.mybatis.generator.plugins.ExampleEnhancedPlugin"/>
-        <!-- Example 目标包修改插件 -->
         <plugin type="com.luca.mybatis.generator.plugins.ExampleTargetPlugin">
             <!-- 修改Example类生成到目标包下 -->
             <property name="targetPackage" value="org.ld.pojo.example"/>
