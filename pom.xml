@@ -187,6 +187,7 @@
                         <artifactId>mysql-connector-java</artifactId>
                         <version>5.1.45</version>
                     </dependency>
+<!--                    https://github.com/liuxiaohei/mybatis-generator-plugin-->
                     <dependency>
                         <groupId>com.luca</groupId>
                         <artifactId>mybatis-generator-plugin</artifactId>

@@ -20,6 +20,10 @@
             <property name="targetProject" value="src/main/java"/>
             <property name="targetPackage" value="org.ld.service"/>
         </plugin>
+        <plugin type="com.luca.mybatis.generator.plugins.ControllerPlugin">
+            <property name="targetProject" value="src/main/java"/>
+            <property name="targetPackage" value="org.ld.controller"/>
+        </plugin>
         <plugin type="com.luca.mybatis.generator.plugins.SimpleOrCriteriaPlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.SumSelectivePlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.UpdateSqlTextOfUpdateSelectivePlugin"/>
