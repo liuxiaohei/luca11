@@ -4,6 +4,7 @@ import org.ld.beans.RespBean;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.ZLogger;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -38,6 +39,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                                   ServerHttpResponse serverHttpResponse) {
         final var path = request.getURI().getPath();
         if (o instanceof RespBean
+                || o instanceof FileSystemResource // 不包装文件流
 //                || o instanceof String
                 || path.contains("swagger")
                 || path.equals("/error")

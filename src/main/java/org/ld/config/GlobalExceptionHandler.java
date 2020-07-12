@@ -46,11 +46,14 @@ public class GlobalExceptionHandler {
         result.setStackTrace(Optional.of(e)
                 .map(error -> {
                     final var sw = new StringWriter();
-                    e.printStackTrace(new PrintWriter(sw));
-                    return Stream.of(sw.toString().split("\n\t"))
+                    final var pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    var strings = Stream.of(sw.toString().split("\n\t"))
                             .skip(1)
                             .map(str -> str.replace("\n", ""))
                             .toArray(String[]::new);
+                    pw.flush();
+                    return strings;
                 }).orElse(null));
         result.setErrorMsgDescription(Optional.of(se)
                 .map(CodeStackException::getErrorCode)

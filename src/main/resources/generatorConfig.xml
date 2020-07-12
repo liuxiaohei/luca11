@@ -2,7 +2,7 @@
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-    <properties resource="config.properties"/>
+    <properties resource="db.properties"/>
     <!--数据库驱动包路径 -->
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <plugin type="com.luca.mybatis.generator.plugins.AddMapperAnnotationPlugin"/>
