@@ -1,5 +1,8 @@
 package org.ld.examples.executor;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.ld.utils.ZLogger;
+
 import java.util.concurrent.*;
 
 public class ExecutorDemo {
@@ -28,5 +31,22 @@ public class ExecutorDemo {
         var executorService1 = new ForkJoinPool();
         var cf1 = CompletableFuture.runAsync(() -> System.out.println("又一个样例"), executorService1);
         cf.join();
+
+        var executorService2 = new ThreadPoolExecutor(
+                4,
+                4,
+                60L,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder()
+                        .setDaemon(true)
+                        .setNameFormat("luca-thread-%d").build(),
+                (r, e) -> {
+                    throw new RejectedExecutionException("Task " + r.toString() +
+                            " rejected from " +
+                            e.toString());
+                });
+        var cf2 = CompletableFuture.runAsync(() -> ZLogger.newInstance().info("又又一个样例"), executorService2);
+        cf2.join();
     }
 }

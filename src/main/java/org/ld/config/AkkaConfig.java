@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
  * https://www.infoq.cn/article/Building-Reactive-Applications-with-Akka
  * https://blog.csdn.net/p_programmer/article/details/85041603
  * http://www.manongjc.com/article/43738.html
- *
  * https://blog.csdn.net/qq_35246620/article/details/70157794
  * http://www.hackerav.com/?post=48681
  * https://www.cnblogs.com/yxwkf/p/4613036.html
