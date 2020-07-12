@@ -22,6 +22,6 @@ target/
 /nbdist/
 /.nb-gradle/
 mybatisGen/target/
-*.yml
+#*.yml
 .DS_Store
 Icon

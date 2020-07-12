@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -18,27 +19,29 @@ import java.util.Optional;
  * flyway
  */
 @Component
-@Data
 public class FlywayMigrate {
     private static Logger log = LoggerFactory.getLogger(FlywayMigrate.class);
 
-    @Value("${spring.datasource.url}")
-    private String jdbcUrl;
+    @Resource
+    private DataSourceConfig dataSourceConfig;
 
-    @Value("${spring.datasource.username}")
-    private String userName;
-
-    @Value("${spring.datasource.password}")
-    private String passWord;
+//    @Value("${spring.datasource.url}")
+//    private String jdbcUrl;
+//
+//    @Value("${spring.datasource.username}")
+//    private String userName;
+//
+//    @Value("${spring.datasource.password}")
+//    private String passWord;
 
     @PostConstruct
     public void init() {
-        final String targetDb = Optional.ofNullable(jdbcUrl)
+        final String targetDb = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
                 .map(str -> str.split("/"))
                 .map(strs -> strs[strs.length - 1])
                 .map(str -> str.split("[?]"))
                 .map(strs -> strs[0]).orElse("");
-        final String rawJdbcUrl = Optional.ofNullable(jdbcUrl)
+        final String rawJdbcUrl = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
                 .map(e -> e.split(targetDb)[0])
                 .filter(e -> !e.contains("useSSL")).map(e -> e + "?useSSL=false")
                 .orElse("");
@@ -46,13 +49,13 @@ public class FlywayMigrate {
         final Flyway flyway = Flyway
                 .configure()
                 .dataSource(
-                        Optional.of(jdbcUrl)
+                        Optional.of(dataSourceConfig.getJdbcUrl())
                                 .filter(e -> !e.contains("useSSL")).map(e -> e + "&useSSL=false")
-                                .orElse(jdbcUrl)
-                        , userName
-                        , passWord).load();
+                                .orElse(dataSourceConfig.getJdbcUrl())
+                        , dataSourceConfig.getUserName()
+                        , dataSourceConfig.getPassWord()).load();
         log.info("init Db jdbcurl:" + rawJdbcUrl + " database:" + targetDb); //自动创建database
-        try (final Connection connection = DriverManager.getConnection(rawJdbcUrl, userName, passWord);
+        try (final Connection connection = DriverManager.getConnection(rawJdbcUrl, dataSourceConfig.getUserName(), dataSourceConfig.getPassWord());
              final Statement statement = connection.createStatement()) {
             statement.execute(initSql);
             flyway.repair();

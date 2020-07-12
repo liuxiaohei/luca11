@@ -1,6 +1,7 @@
 package org.ld.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.*;
 
 import javax.sql.DataSource;
 
+@Getter
 @Configuration
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)
 @PropertySources( value = {@PropertySource( value = "classpath:db.properties")})
@@ -25,18 +27,16 @@ public class DataSourceConfig {
     @Value("${db.password}")
     private String passWord;
 
-//    @Value("${db.poolPingQuery}")
-//    private String poolPingQuery;
-
     @Bean
     @Primary
     public DataSource dataSource() {
+        // Hikari 日语 光
         HikariDataSource datasource = new HikariDataSource();
         datasource.setJdbcUrl(jdbcUrl);
         datasource.setUsername(userName);
         datasource.setPassword(passWord);
         datasource.setDriverClassName(driver);
-//        datasource.setConnectionTestQuery(poolPingQuery);
+        datasource.setConnectionTestQuery("select 1");
         datasource.setAutoCommit(true);
         datasource.setMaximumPoolSize(30);
         datasource.setMinimumIdle(5);
