@@ -7,15 +7,18 @@ import io.swagger.annotations.ApiOperation;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
 import org.ld.config.SpringExtProvider;
+import org.ld.engine.Descriptor;
 import org.ld.enums.Events;
 import org.ld.enums.States;
 import org.ld.utils.JwtUtils;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +35,19 @@ public class DemoController {
     @Autowired
     private ActorSystem actorSystem;
 
+    @Autowired
+    private Descriptor descriptor;
+
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
-    public Map<Object, Object> demo() {
-        var a = new HashMap<>();
+    public Map<String, Object> demo() throws SchedulerException {
+        Map<String,Object> a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
+        Map<String,Runnable> demo = new HashMap<>();
+        demo.put("aaa",(Runnable & Serializable)() -> System.out.println("测试"));
+        descriptor.submit(demo);
         return a;
     }
 
