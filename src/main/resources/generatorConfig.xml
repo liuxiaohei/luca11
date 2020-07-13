@@ -15,7 +15,7 @@
         <plugin type="com.luca.mybatis.generator.plugins.MinMaxPlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.NullableInCriteriaPlugin"/>
         <plugin type="com.luca.mybatis.generator.plugins.OptimisticLockAutoIncreasePlugin"/>
-        <plugin type="com.luca.mybatis.generator.plugins.SelectiveWithNullPlugin"/>
+<!--        <plugin type="com.luca.mybatis.generator.plugins.SelectiveWithNullPlugin"/>-->
         <plugin type="com.luca.mybatis.generator.plugins.ServicePlugin">
             <property name="targetProject" value="src/main/java"/>
             <property name="targetPackage" value="org.ld.service"/>
@@ -69,11 +69,18 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="cd_cube" domainObjectName="CdCube" enableUpdateByPrimaryKey="true"
+        <table tableName="aaa"
+               domainObjectName="Aaa"
+               enableUpdateByPrimaryKey="true"
                enableDeleteByPrimaryKey="true"
-               enableInsert="true" enableSelectByPrimaryKey="true" selectByPrimaryKeyQueryId="true"
-               enableCountByExample="true" enableUpdateByExample="true" enableDeleteByExample="true"
-               enableSelectByExample="true" selectByExampleQueryId="true">
+               enableInsert="true"
+               enableSelectByPrimaryKey="true"
+               selectByPrimaryKeyQueryId="true"
+               enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
             <!-- ibatis id 在返回值里   mybatis id 在对象中获取-->
             <generatedKey column="id" sqlStatement="JDBC"/>
             <!-- 忽略时间字段 -->

@@ -25,12 +25,11 @@ public class JwtUtils {
     public static String sign(String name) {
         Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
         Algorithm algorithm = Algorithm.HMAC256(SECRET); //使用HS256算法
-        String token = JWT.create() //创建令牌实例
+        return JWT.create() //创建令牌实例
                 .withClaim("name", name) //指定自定义声明，保存一些信息
                 //.withSubject(name) //信息直接放在这里也行
                 .withExpiresAt(date) //过期时间
-                .sign(algorithm); //签名
-        return token;
+                .sign(algorithm);
     }
 
     /**
