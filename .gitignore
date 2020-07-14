@@ -25,3 +25,4 @@ mybatisGen/target/
 #*.yml
 .DS_Store
 Icon
+LOG_FILE_IS_UNDEFINED

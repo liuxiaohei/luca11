@@ -11,7 +11,6 @@ import org.ld.engine.Descriptor;
 import org.ld.enums.Events;
 import org.ld.enums.States;
 import org.ld.utils.JwtUtils;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.statemachine.StateMachine;
@@ -39,7 +38,7 @@ public class DemoController {
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
-    public Map<String, Object> demo() throws SchedulerException {
+    public Map<String, Object> demo() {
         Map<String,Object> a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
