@@ -1,14 +1,18 @@
 package org.ld.engine;
 
+import lombok.SneakyThrows;
+import org.ld.uc.UCRunnable;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 public class RunnableQuartzJob extends QuartzJobBean {
+
+    @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
-        Runnable runnable = (Runnable)jobDataMap.get("Runnable");
+        UCRunnable runnable = (UCRunnable)jobDataMap.get("Runnable");
         runnable.run();
     }
 }

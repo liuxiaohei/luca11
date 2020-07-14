@@ -1,5 +1,6 @@
 package org.ld.engine;
 
+import org.ld.uc.UCRunnable;
 import org.ld.utils.JsonUtil;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class Descriptor {
     /**
      * runnable 中的任务 会立刻被调度执行
      */
-    public void runAsync(SerializableRunnable runnable) throws SchedulerException {
+    public void runAsync(UCRunnable runnable) throws SchedulerException {
         runAsync(runnable, TriggerBuilder.newTrigger()
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule())
                 .startNow()
@@ -27,8 +28,8 @@ public class Descriptor {
     /**
      * runnable 中的任务 会按照 Trigger 的要求执行
      */
-    public void runAsync(SerializableRunnable runnable, Trigger trigger) throws SchedulerException {
-        final Map<String, SerializableRunnable> params = new HashMap<>();
+    public void runAsync(UCRunnable runnable, Trigger trigger) throws SchedulerException {
+        final Map<String, UCRunnable> params = new HashMap<>();
         params.put("Runnable", runnable);
         final JobDataMap jobDataMap = new JobDataMap(params);
         JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
