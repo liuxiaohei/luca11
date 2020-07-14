@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.RestTemplate;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -60,5 +61,14 @@ public class LucaConfig {
                         .contact(new Contact("ld", "", "2297598383@qq.com"))
                         .version("1.0")
                         .build());
+    }
+
+    /**
+     * https://www.cnblogs.com/javazhiyin/p/9851775.html
+     * 在Spring 环境下优先使用 RestTemplate 来发送Http请求
+     */
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
