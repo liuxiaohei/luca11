@@ -1,11 +1,14 @@
 package org.ld.engine;
 
+import org.ld.exception.CodeStackException;
 import org.ld.uc.UCRunnable;
 import org.ld.utils.JsonUtil;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +21,7 @@ public class Descriptor {
     /**
      * runnable 中的任务 会立刻被调度执行
      */
-    public void runAsync(UCRunnable runnable) throws SchedulerException {
+    public void runAsync(UCRunnable runnable) {
         runAsync(runnable, TriggerBuilder.newTrigger()
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule())
                 .startNow()
@@ -28,16 +31,20 @@ public class Descriptor {
     /**
      * runnable 中的任务 会按照 Trigger 的要求执行
      */
-    public void runAsync(UCRunnable runnable, Trigger trigger) throws SchedulerException {
+    public void runAsync(UCRunnable runnable, Trigger trigger) {
         final Map<String, UCRunnable> params = new HashMap<>();
         params.put("Runnable", runnable);
         final JobDataMap jobDataMap = new JobDataMap(params);
-        JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
-                .withIdentity(JsonUtil.getShortUuid(), "DefaultGroup")
-                .withDescription("[Nothing]")
-                .setJobData(jobDataMap)
-                .storeDurably()
-                .build();
-        scheduler.scheduleJob(jobDetail, trigger);
+        try {
+            JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
+                    .withIdentity(JsonUtil.getShortUuid(), InetAddress.getLocalHost().getHostName())
+                    .withDescription("[Nothing]")
+                    .setJobData(jobDataMap)
+                    .storeDurably()
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (Exception e) {
+            throw new CodeStackException(e);
+        }
     }
 }
