@@ -38,12 +38,12 @@ public class DemoController {
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
-    public Map<String, Object> demo() {
+    public Map<String, Object> demo(@RequestParam String param) {
         Map<String,Object> a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
-        descriptor.runAsync(() -> System.out.println("测试"));
+        descriptor.runAsync(() -> System.out.println(param));
         return a;
     }
 
