@@ -31,7 +31,7 @@ public class Descriptor {
         final Map<String, SerializableRunnable> params = new HashMap<>();
         params.put("Runnable", runnable);
         final JobDataMap jobDataMap = new JobDataMap(params);
-        JobDetail jobDetail = JobBuilder.newJob(BaseQuartzJobBean.class)
+        JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
                 .withIdentity(JsonUtil.getShortUuid(), "DefaultGroup")
                 .withDescription("[Nothing]")
                 .setJobData(jobDataMap)
