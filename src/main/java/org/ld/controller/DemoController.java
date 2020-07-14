@@ -18,7 +18,6 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,7 @@ import java.util.Objects;
 /**
  *
  */
-@Api(tags = {"事例API"})
+@Api(tags = {"样例API"})
 @RestController
 @SuppressWarnings("unused")
 public class DemoController {

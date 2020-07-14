@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.ResponseMessage;
@@ -50,8 +51,8 @@ public class LucaConfig {
                 .globalResponseMessage(RequestMethod.PUT, responseMessages)
                 .globalResponseMessage(RequestMethod.DELETE, responseMessages)
                 .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(url -> !"/error".equals(url)) // 屏蔽 这个api
+                .apis(RequestHandlerSelectors.basePackage("org.ld.controller"))
+                .paths(PathSelectors.any())
                 .build()
                 .apiInfo(new ApiInfoBuilder()
                         .title("LUCA")

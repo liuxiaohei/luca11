@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
-@RestController
+//@RestController
 public class MyApp {
     ThreadLocal<StateMachine> stateMachineThreadLocal = new ThreadLocal<StateMachine>();
 

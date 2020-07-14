@@ -14,8 +14,8 @@ import java.util.Optional;
 /**
  * @author ld
  */
-@RestController
-@RequestMapping("/file")
+//@RestController
+//@RequestMapping("/file")
 public class FileUpLoadController {
 
     /**
