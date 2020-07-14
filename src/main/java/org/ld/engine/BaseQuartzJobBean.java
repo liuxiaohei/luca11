@@ -8,7 +8,7 @@ public class BaseQuartzJobBean extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
-        Runnable runnable = (Runnable)jobDataMap.get("aaa");
+        Runnable runnable = (Runnable)jobDataMap.get("Runnable");
         runnable.run();
     }
 }

@@ -5,7 +5,6 @@ import org.quartz.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,16 +14,25 @@ public class Descriptor {
     @Resource
     private Scheduler scheduler;
 
-    public void submit(SerializableRunnable runnable) throws SchedulerException {
-        final Map<String,SerializableRunnable> params = new HashMap<>();
-        params.put("aaa", runnable);
-        final Trigger trigger = TriggerBuilder.newTrigger()
+    /**
+     * runnable 中的任务 会立刻被调度执行
+     */
+    public void runAsync(SerializableRunnable runnable) throws SchedulerException {
+        runAsync(runnable, TriggerBuilder.newTrigger()
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule())
                 .startNow()
-                .build();
+                .build());
+    }
+
+    /**
+     * runnable 中的任务 会按照 Trigger 的要求执行
+     */
+    public void runAsync(SerializableRunnable runnable, Trigger trigger) throws SchedulerException {
+        final Map<String, SerializableRunnable> params = new HashMap<>();
+        params.put("Runnable", runnable);
         final JobDataMap jobDataMap = new JobDataMap(params);
         JobDetail jobDetail = JobBuilder.newJob(BaseQuartzJobBean.class)
-                .withIdentity("aaa", JsonUtil.getShortUuid())
+                .withIdentity(JsonUtil.getShortUuid(), "DefaultGroup")
                 .withDescription("[Nothing]")
                 .setJobData(jobDataMap)
                 .storeDurably()
