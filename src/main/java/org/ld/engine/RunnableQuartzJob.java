@@ -2,10 +2,15 @@ package org.ld.engine;
 
 import lombok.SneakyThrows;
 import org.ld.uc.UCRunnable;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+/**
+ * https://blog.csdn.net/fly_captain/article/details/83029440
+ */
+@DisallowConcurrentExecution
 public class RunnableQuartzJob extends QuartzJobBean {
 
     @SneakyThrows
