@@ -45,9 +45,7 @@ public class DemoController {
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
-        Map<String,Runnable> demo = new HashMap<>();
-        demo.put("aaa",(Runnable & Serializable)() -> System.out.println("测试"));
-        descriptor.submit(demo);
+        descriptor.submit(() -> System.out.println("测试"));
         return a;
     }
 
