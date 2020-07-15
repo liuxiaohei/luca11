@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
 import org.ld.config.SpringExtProvider;
-import org.ld.engine.Descriptor;
+import org.ld.engine.ExecutorEngine;
 import org.ld.enums.Events;
 import org.ld.enums.States;
 import org.ld.utils.JwtUtils;
@@ -34,7 +34,7 @@ public class DemoController {
     private ActorSystem actorSystem;
 
     @Autowired
-    private Descriptor descriptor;
+    private ExecutorEngine descriptor;
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")

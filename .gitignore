@@ -26,3 +26,4 @@ mybatisGen/target/
 .DS_Store
 Icon
 LOG_FILE_IS_UNDEFINED
+LOG_FILE_IS_UNDEFINED.*.gz

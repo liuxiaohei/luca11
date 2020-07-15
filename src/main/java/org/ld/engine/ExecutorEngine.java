@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class Descriptor {
+public class ExecutorEngine {
 
     @Resource
     private Scheduler scheduler;
