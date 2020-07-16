@@ -7,7 +7,7 @@ import org.quartz.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.net.InetAddress;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +20,7 @@ public class ExecutorEngine {
     /**
      * runnable 中的任务 会立刻被调度执行
      */
+    // todo misfire 处理
     public void runAsync(UCRunnable runnable) {
         runAsync(runnable, TriggerBuilder.newTrigger()
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule())
@@ -36,7 +37,7 @@ public class ExecutorEngine {
         final JobDataMap jobDataMap = new JobDataMap(params);
         try {
             JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
-                    .withIdentity(JsonUtil.getShortUuid(), InetAddress.getLocalHost().getHostName())
+                    .withIdentity(JsonUtil.getShortUuid(), LocalDateTime.now().toString())
                     .withDescription("[Nothing]")
                     .setJobData(jobDataMap)
                     .storeDurably()

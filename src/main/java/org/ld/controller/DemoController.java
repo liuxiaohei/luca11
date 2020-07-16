@@ -11,6 +11,7 @@ import org.ld.engine.ExecutorEngine;
 import org.ld.enums.Events;
 import org.ld.enums.States;
 import org.ld.utils.JwtUtils;
+import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.statemachine.StateMachine;
@@ -43,7 +44,7 @@ public class DemoController {
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
-        descriptor.runAsync(() -> System.out.println(param));
+        descriptor.runAsync(() -> ZLogger.newInstance().info(param));
         return a;
     }
 
