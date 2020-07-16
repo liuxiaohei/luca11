@@ -10,6 +10,7 @@ public class ForkJoinDemo {
         ServiceExecutor.getInstance().submit(() -> IntStream.rangeClosed(1,100).parallel().forEach(e -> {
             System.out.println(Thread.currentThread().getName() + " " + e);
         })).join();
+        // 亲测CFucture不可以这么玩
         System.out.println("Main is over");
     }
 }
