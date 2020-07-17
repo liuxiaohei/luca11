@@ -25,15 +25,6 @@ public class FlywayMigrate {
     @Resource
     private DataSourceConfig dataSourceConfig;
 
-//    @Value("${spring.datasource.url}")
-//    private String jdbcUrl;
-//
-//    @Value("${spring.datasource.username}")
-//    private String userName;
-//
-//    @Value("${spring.datasource.password}")
-//    private String passWord;
-
     @PostConstruct
     public void init() {
         final String targetDb = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
