@@ -1,11 +1,9 @@
 package org.ld.config;
 
-import lombok.Data;
 import org.flywaydb.core.Flyway;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +18,8 @@ import java.util.Optional;
  */
 @Component
 public class FlywayMigrate {
-    private static Logger log = LoggerFactory.getLogger(FlywayMigrate.class);
+
+    private static final Logger log = LoggerFactory.getLogger(FlywayMigrate.class);
 
     @Resource
     private DataSourceConfig dataSourceConfig;
