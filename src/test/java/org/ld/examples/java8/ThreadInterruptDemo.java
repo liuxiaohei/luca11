@@ -3,6 +3,9 @@ package org.ld.examples.java8;
 import org.junit.jupiter.api.Test;
 import org.ld.exception.CodeStackException;
 
+/**
+ * https://www.cnblogs.com/panchanggui/p/9668284.html
+ */
 public class ThreadInterruptDemo {
 
     // 如何停掉一个处在await状态的IO任务
