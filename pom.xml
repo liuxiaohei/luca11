@@ -61,6 +61,7 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+<!--        https://blog.csdn.net/kmesky/article/details/102984592-->
 <!--        SpringBoot2.2.X 使用junit.test会有问题建议使用这个-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
