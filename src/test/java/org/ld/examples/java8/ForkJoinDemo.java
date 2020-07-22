@@ -1,5 +1,6 @@
 package org.ld.examples.java8;
 
+import org.junit.Test;
 import org.ld.utils.ServiceExecutor;
 
 import java.util.stream.IntStream;
@@ -12,5 +13,10 @@ public class ForkJoinDemo {
         })).join();
         // 亲测CFucture不可以这么玩
         System.out.println("Main is over");
+    }
+
+    @Test
+    public void demo() {
+        System.out.println("Hello");
     }
 }
