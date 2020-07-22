@@ -1,5 +1,6 @@
 package org.ld.examples.java11;
 
+import org.junit.jupiter.api.Test;
 import org.ld.utils.JsonUtil;
 
 import java.net.*;
@@ -51,8 +52,8 @@ public class HttpExample {
         }).join();
     }
 
-    // 异步调用 POST
-    public static void asyncPost() throws Exception {
+    @Test
+    public void asyncPost() throws Exception {
         var client = HttpClient.newHttpClient();
         var foo = new Foo();
         foo.name = "王爵nice";
@@ -172,11 +173,11 @@ public class HttpExample {
                 .join();
     }
 
-    public static void main(String[] args) throws Exception {
-//        syncGet("https://biezhi.me");
-//        asyncGet("https://biezhi.me");
-        asyncPost();
-//        http2();
-    }
+//    public static void main(String[] args) throws Exception {
+////        syncGet("https://biezhi.me");
+////        asyncGet("https://biezhi.me");
+//        asyncPost();
+////        http2();
+//    }
 
 }
