@@ -28,7 +28,8 @@ public class ThreadInterruptDemo {
         });
         a.start();
         Thread.sleep(2000);
-        a.interrupt();
+        Thread.currentThread().getId();
+        a.interrupt(); // 如果调到这个方法 有 InterruptedException 的方法如Sleep await会抛 InterruptedException
         Thread.sleep(10000);
     }
 }
