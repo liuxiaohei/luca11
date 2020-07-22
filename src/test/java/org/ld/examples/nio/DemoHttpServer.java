@@ -1,6 +1,6 @@
 package org.ld.examples.nio;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ld.utils.StringUtil;
 
 import java.io.IOException;

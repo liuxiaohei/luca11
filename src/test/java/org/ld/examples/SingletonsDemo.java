@@ -1,6 +1,6 @@
 package org.ld.examples;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 单例模式，确保一个类只有一个实例，它又分为饿单例模式（类加载时实例化一个对象给自己的引用，如果对象很大是对内存一种巨大的浪费）和

@@ -1,6 +1,6 @@
 package org.ld.examples;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;

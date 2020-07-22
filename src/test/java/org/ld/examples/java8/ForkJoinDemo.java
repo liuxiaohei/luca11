@@ -1,6 +1,6 @@
 package org.ld.examples.java8;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test;;
 import org.ld.utils.ServiceExecutor;
 
 import java.util.stream.IntStream;
