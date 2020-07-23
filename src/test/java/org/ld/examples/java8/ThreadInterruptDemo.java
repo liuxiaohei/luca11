@@ -6,7 +6,6 @@ import org.ld.exception.CodeStackException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 /**
  * Thread.interrupt()不会中断线程，但会影响sleep，wait等方法的逻辑
@@ -34,7 +33,7 @@ public class ThreadInterruptDemo {
         });
         a.start();
         Thread.sleep(2000);
-        Thread.currentThread().getId();
+//        Thread.currentThread().getId();
         a.interrupt(); // 如果调到这个方法 有 InterruptedException 的方法如Sleep await会抛 InterruptedException
         Thread.sleep(10000);
     }
