@@ -19,7 +19,7 @@ public class AkkaConfig {
 
     @Bean
     public ActorSystem actorSystem() {
-        return ActorSystem.create("system");
+        return ActorSystem.create("lucaSystem");
     }
 
     public Props create(String beanName) {
@@ -30,6 +30,7 @@ public class AkkaConfig {
      * 可通过bean的名称找到对应的Actor
      */
     public static class DIProducer implements IndirectActorProducer {
+
         private final String beanName;
 
         public DIProducer(String beanName) {
