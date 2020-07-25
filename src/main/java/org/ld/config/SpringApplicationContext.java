@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @SuppressWarnings("unused")
 @Configuration
 public class SpringApplicationContext implements ApplicationContextAware {
+
     private static ApplicationContext applicationContext;
 
     /**

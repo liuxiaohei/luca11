@@ -6,7 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
-import org.ld.config.SpringExtProvider;
+import org.ld.config.AkkaConfig;
 import org.ld.engine.ExecutorEngine;
 import org.ld.enums.Events;
 import org.ld.enums.States;
@@ -91,12 +91,19 @@ public class DemoController {
         return "获取数据...";
     }
 
+    @Autowired
+    AkkaConfig akkaConfig;
+
     @GetMapping("akkademo")
     public String getAkkaDemo() {
-        var ref = actorSystem
-                .actorOf(SpringExtProvider.getInstance()
-                        .get(actorSystem)
-                        .create("testActor"), "testActor");
+        var ref = actorSystem.actorOf(akkaConfig.create("testActor"), "testActor");
+        ref.tell("hello", ActorRef.noSender());
+        return "success";
+    }
+
+    @GetMapping("akkademo1")
+    public String getAkkaDemo1() {
+        var ref = actorSystem.actorOf(akkaConfig.create("testActor"), "testActor1");
         ref.tell("hello", ActorRef.noSender());
         return "success";
     }

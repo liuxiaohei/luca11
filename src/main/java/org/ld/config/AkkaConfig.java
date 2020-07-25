@@ -1,6 +1,6 @@
 package org.ld.config;
 
-import akka.actor.ActorSystem;
+import akka.actor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -19,17 +19,48 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AkkaConfig {
 
-    private final ApplicationContext context;
+    private static ApplicationContext context;
+
+    private static final AbstractExtensionId<Extension> provider = new AbstractExtensionId<>() {
+        @Override
+        public Extension createExtension(ExtendedActorSystem extendedActorSystem) {
+            return new Extension() {
+            };
+        }
+    };
 
     @Autowired
-    public AkkaConfig(ApplicationContext context) {
-        this.context = context;
+    public AkkaConfig(ApplicationContext c) {
+        context = c;
     }
 
     @Bean
-    public ActorSystem createSystem() {
+    public ActorSystem actorSystem() {
         ActorSystem system = ActorSystem.create("system");
-        SpringExtProvider.getInstance().get(system).init(context);
+        provider.get(system);
         return system;
     }
+
+    public Props create(String beanName) {
+        return Props.create(DIProducer.class, beanName);
+    }
+
+    public static class DIProducer implements IndirectActorProducer {
+        private final String beanName;
+
+        public DIProducer(String beanName) {
+            this.beanName = beanName;
+        }
+
+        @Override
+        public Actor produce() {
+            return (Actor) context.getBean(beanName);
+        }
+
+        @Override
+        public Class<? extends Actor> actorClass() {
+            return (Class<? extends Actor>) context.getType(beanName);
+        }
+    }
+
 }
