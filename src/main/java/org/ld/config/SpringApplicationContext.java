@@ -23,6 +23,28 @@ public class SpringApplicationContext implements ApplicationContextAware {
         }
     }
 
+    /**
+     * 获取Bean 实例 需要自己强转
+     */
+    public static Object getBean(String name) {
+        try {
+            return applicationContext.getBean(name);
+        } catch (BeansException e) {
+            throw new CodeStackException(e);
+        }
+    }
+
+    /**
+     * 获取Bean 类型 需要自己强转
+     */
+    public static Class<?> getType(String name) {
+        try {
+            return applicationContext.getType(name);
+        } catch (BeansException e) {
+            throw new CodeStackException(e);
+        }
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
         applicationContext = context;
