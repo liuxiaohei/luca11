@@ -38,13 +38,13 @@ public class AkkaConfig {
 
         @Override
         public Actor produce() {
-            return (Actor) SpringApplicationContext.getBean(beanName);
+            return (Actor) StaticApplicationContext.getBean(beanName);
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public Class<? extends Actor> actorClass() {
-            return (Class<? extends Actor>) SpringApplicationContext.getType(beanName);
+            return (Class<? extends Actor>) StaticApplicationContext.getType(beanName);
         }
     }
 
