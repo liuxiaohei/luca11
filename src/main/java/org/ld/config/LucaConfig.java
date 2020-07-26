@@ -1,6 +1,7 @@
 package org.ld.config;
 
 import org.ld.enums.ResponseMessageEnum;
+import org.ld.utils.ServiceExecutor;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.servlet.MultipartConfigElement;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * 获取配置中心的自定义配置信息
@@ -71,4 +73,13 @@ public class LucaConfig {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+    /**
+     * Spring 的方式获取线程池
+     */
+    @Bean
+    public ForkJoinPool pool() {
+        return ServiceExecutor.getInstance();
+    }
+
 }

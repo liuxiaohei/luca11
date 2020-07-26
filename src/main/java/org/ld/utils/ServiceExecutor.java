@@ -6,7 +6,7 @@ public class ServiceExecutor {
 
     private static class ServiceExecutorHolder {
         private static final ForkJoinPool Executor = new ForkJoinPool(
-                200,
+                20,
                 ForkJoinPool.defaultForkJoinWorkerThreadFactory,
                 null,
                 false);

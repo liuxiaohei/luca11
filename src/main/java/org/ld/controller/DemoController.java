@@ -2,12 +2,20 @@ package org.ld.controller;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.routing.RandomPool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.ld.actors.ProcessChecker;
+import org.ld.actors.ProcessDispatcher;
+import org.ld.actors.ProcessExecutorAdapter;
+import org.ld.actors.ProcessStarter;
 import org.ld.annotation.NeedToken;
+import org.ld.beans.ProcessData;
 import org.ld.beans.RespBean;
 import org.ld.config.AkkaConfig;
 import org.ld.engine.ExecutorEngine;
+import org.ld.enums.ProcessState;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  *
@@ -33,6 +42,9 @@ public class DemoController {
 
     @Autowired
     private ExecutorEngine descriptor;
+
+    @Autowired
+    private ForkJoinPool forkJoinPool;
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
@@ -101,6 +113,28 @@ public class DemoController {
                         key));
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
+        return "success";
+    }
+
+    @GetMapping("fsmdemo")
+    public String getFSMDemo() {
+        var processExecutorAdapter = new ProcessExecutorAdapter();
+        var processStarter = actorSystem.actorOf(new RandomPool(10)
+                .props(Props.create(ProcessStarter.class, processExecutorAdapter)));
+        var processChecker = actorSystem.actorOf(new RandomPool(10)
+                .props(Props.create(ProcessChecker.class, processExecutorAdapter)));
+        actorSystem.actorOf(Props.create(
+                ProcessDispatcher.class,
+                ProcessState.CREATED,
+                new ProcessData().setParams("5000", ""),
+                processStarter,
+                processChecker));
+        return "success";
+    }
+
+    @GetMapping("fjdemo")
+    public String fjDemo() {
+        forkJoinPool.submit(() -> System.out.println("aaaaa"));
         return "success";
     }
 
