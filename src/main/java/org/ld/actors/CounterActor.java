@@ -6,16 +6,21 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("counter")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class TestActor extends AbstractActor {
+public class CounterActor extends AbstractActor {
+
+    private int counter = 0;
 
     private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .matchAny(o -> LOG.info("接受到消息：" + o))
+                .match(Object.class, e -> {
+                    counter++;
+                    LOG.info("Increased counter " + counter);
+                })
                 .build();
     }
 }

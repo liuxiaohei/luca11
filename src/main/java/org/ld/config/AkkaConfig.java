@@ -22,7 +22,7 @@ public class AkkaConfig {
         return ActorSystem.create("lucaSystem");
     }
 
-    public Props create(String beanName) {
+    public Props createPropsByName(String beanName) {
         return Props.create(DIProducer.class, beanName);
     }
 

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -40,7 +41,7 @@ public class DemoController {
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
     public Map<String, Object> demo(@RequestParam String param) {
-        Map<String,Object> a = new HashMap<>();
+        Map<String, Object> a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
@@ -94,16 +95,14 @@ public class DemoController {
     @Autowired
     AkkaConfig akkaConfig;
 
+    Map<String, ActorRef> actorMap = new ConcurrentHashMap<>();
+
     @GetMapping("akkademo")
     public String getAkkaDemo() {
-        var ref = actorSystem.actorOf(akkaConfig.create("testActor"), "testActor");
-        ref.tell("hello", ActorRef.noSender());
-        return "success";
-    }
-
-    @GetMapping("akkademo1")
-    public String getAkkaDemo1() {
-        var ref = actorSystem.actorOf(akkaConfig.create("testActor"), "testActor1");
+        var ref = actorMap.computeIfAbsent("testActor",
+                key -> actorSystem.actorOf(
+                        akkaConfig.createPropsByName("counter"),
+                        key));
         ref.tell("hello", ActorRef.noSender());
         return "success";
     }
