@@ -17,10 +17,11 @@ public class CounterActor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Object.class, e -> {
+                .match(String.class, e -> {
                     counter++;
                     LOG.info("Increased counter " + counter);
                 })
+                .matchAny(e -> LOG.info("接收到消息:{}", e))
                 .build();
     }
 }

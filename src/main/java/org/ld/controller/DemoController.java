@@ -104,6 +104,7 @@ public class DemoController {
                         akkaConfig.createPropsByName("counter"),
                         key));
         ref.tell("hello", ActorRef.noSender());
+        //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";
     }
 
