@@ -8,16 +8,12 @@ import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
 import org.ld.config.AkkaConfig;
 import org.ld.engine.ExecutorEngine;
-import org.ld.enums.Events;
-import org.ld.enums.States;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,17 +102,6 @@ public class DemoController {
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";
-    }
-
-    @Resource
-    StateMachine<States, Events> stateMachine;
-
-    @GetMapping("fsmdemo")
-    public void run(String... args) {
-        stateMachine.start();
-        stateMachine.sendEvent(Events.ONLINE);
-        stateMachine.sendEvent(Events.PUBLISH);
-        stateMachine.sendEvent(Events.ROLLBACK);
     }
 
 }
