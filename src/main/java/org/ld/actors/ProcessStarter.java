@@ -1,10 +1,9 @@
-package org.ld.examples.akka.akkafsm.actor;
+package org.ld.actors;
 
 import akka.actor.AbstractActor;
-import org.ld.examples.akka.akkafsm.actor.message.ProcessFailure;
-import org.ld.examples.akka.akkafsm.actor.message.ProcessStarted;
-import org.ld.examples.akka.akkafsm.actor.message.StartProcess;
-import org.ld.examples.akka.akkafsm.service.ProcessExecutorAdapter;
+import org.ld.beans.ProcessFailure;
+import org.ld.beans.ProcessStarted;
+import org.ld.beans.StartProcess;
 import org.ld.utils.ZLogger;
 
 public class ProcessStarter extends AbstractActor {

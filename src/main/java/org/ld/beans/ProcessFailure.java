@@ -1,4 +1,4 @@
-package org.ld.examples.akka.akkafsm.actor.message;
+package org.ld.beans;
 
 public final class ProcessFailure implements ProcessStatus {
     public final Throwable error;

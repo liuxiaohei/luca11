@@ -1,10 +1,9 @@
-package org.ld.examples.akka.akkafsm.actor;
+package org.ld.actors;
 
 import akka.actor.AbstractActor;
-import org.ld.examples.akka.akkafsm.actor.message.CheckProcessStatus;
-import org.ld.examples.akka.akkafsm.actor.message.ProcessInProgress;
-import org.ld.examples.akka.akkafsm.actor.message.ProcessStatus;
-import org.ld.examples.akka.akkafsm.service.ProcessExecutorAdapter;
+import org.ld.beans.CheckProcessStatus;
+import org.ld.beans.ProcessInProgress;
+import org.ld.beans.ProcessStatus;
 import org.ld.utils.ZLogger;
 
 public class ProcessChecker extends AbstractActor {

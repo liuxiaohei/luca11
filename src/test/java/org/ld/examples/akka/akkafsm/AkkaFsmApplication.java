@@ -3,12 +3,12 @@ package org.ld.examples.akka.akkafsm;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.routing.RandomPool;
-import org.ld.examples.akka.akkafsm.actor.ProcessChecker;
-import org.ld.examples.akka.akkafsm.actor.ProcessDispatcher;
-import org.ld.examples.akka.akkafsm.actor.ProcessStarter;
-import org.ld.examples.akka.akkafsm.actor.state.ProcessData;
-import org.ld.examples.akka.akkafsm.actor.state.ProcessState;
-import org.ld.examples.akka.akkafsm.service.ProcessExecutorAdapter;
+import org.ld.actors.ProcessChecker;
+import org.ld.actors.ProcessDispatcher;
+import org.ld.actors.ProcessStarter;
+import org.ld.beans.ProcessData;
+import org.ld.enums.ProcessState;
+import org.ld.actors.ProcessExecutorAdapter;
 
 public class AkkaFsmApplication {
 
@@ -24,7 +24,7 @@ public class AkkaFsmApplication {
         var processChecker = actorSystem.actorOf(new RandomPool(10)
                 .props(Props.create(ProcessChecker.class, processExecutorAdapter)));
 
-        var a = actorSystem.actorOf(Props.create(
+        actorSystem.actorOf(Props.create(
                 ProcessDispatcher.class,
                 ProcessState.CREATED,
                 new ProcessData().setParams("5000", ""),

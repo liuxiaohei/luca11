@@ -1,4 +1,4 @@
-package org.ld.examples.akka.akkafsm.actor.state;
+package org.ld.enums;
 
 public enum ProcessState {
     CREATED,

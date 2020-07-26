@@ -1,8 +1,8 @@
-package org.ld.examples.akka.akkafsm.service;
+package org.ld.actors;
 
-import org.ld.examples.akka.akkafsm.actor.message.ProcessFinished;
-import org.ld.examples.akka.akkafsm.actor.message.ProcessInProgress;
-import org.ld.examples.akka.akkafsm.actor.message.ProcessStatus;
+import org.ld.beans.ProcessFinished;
+import org.ld.beans.ProcessInProgress;
+import org.ld.beans.ProcessStatus;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
