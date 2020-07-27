@@ -116,6 +116,17 @@ public class DemoController {
         return "success";
     }
 
+    @GetMapping("akkademo1")
+    public String getAkkaDemo1() {
+        var ref = actorMap.computeIfAbsent("testActor1",
+                key -> actorSystem.actorOf(
+                        akkaConfig.createPropsByName("counter"),
+                        key));
+        ref.tell("hello", ActorRef.noSender());
+        //        actorSystem.terminate(); // 这个方法终止 actor
+        return "success";
+    }
+
     @GetMapping("fsmdemo")
     public String getFSMDemo() {
         var processExecutorAdapter = new ProcessExecutorAdapter();

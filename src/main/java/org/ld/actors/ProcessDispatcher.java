@@ -65,22 +65,24 @@ public class ProcessDispatcher extends AbstractFSM<ProcessState, ProcessData> {
                 matchEvent(Collections.singletonList(StateTimeout()), ProcessData.class,
                         (message, data) -> goTo(CHECKING_STATE)));
 
-        onTransition(matchState(CREATED, STARTING, () -> {
-            LOG.info(CREATED.name() + "2" + STARTING);
-            processStarter.tell(new StartProcess(stateData().processParam, stateData().executorParam), getSelf());
-        })
-                .state(STARTING, CHECKING_STATE, () -> {
-                    LOG.info(STARTING.name() + "2" + CHECKING_STATE);
-                    processChecker.tell(new CheckProcessStatus(stateData().id), getSelf());
-                })
-                .state(EXECUTING, CHECKING_STATE, () -> {
-                    LOG.info(EXECUTING.name() + "2" + CHECKING_STATE);
-                    processChecker.tell(new CheckProcessStatus(stateData().id), getSelf());
-                })
-                .state(STARTING_FAILURE, STARTING, () -> {
-                    LOG.info(STARTING_FAILURE.name() + "2" + STARTING);
+        onTransition(
+                matchState(CREATED, STARTING, () -> {
+                    LOG.info(CREATED.name() + "2" + STARTING);
                     processStarter.tell(new StartProcess(stateData().processParam, stateData().executorParam), getSelf());
-                }));
+                })
+                        .state(STARTING, CHECKING_STATE, () -> {
+                            LOG.info(STARTING.name() + "2" + CHECKING_STATE);
+                            processChecker.tell(new CheckProcessStatus(stateData().id), getSelf());
+                        })
+                        .state(EXECUTING, CHECKING_STATE, () -> {
+                            LOG.info(EXECUTING.name() + "2" + CHECKING_STATE);
+                            processChecker.tell(new CheckProcessStatus(stateData().id), getSelf());
+                        })
+                        .state(STARTING_FAILURE, STARTING, () -> {
+                            LOG.info(STARTING_FAILURE.name() + "2" + STARTING);
+                            processStarter.tell(new StartProcess(stateData().processParam, stateData().executorParam), getSelf());
+                        })
+        );
 
         initialize();
     }
