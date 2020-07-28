@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
 /**
@@ -105,7 +104,7 @@ public class DemoController {
 
     @GetMapping("akkademo")
     public String getAkkaDemo() {
-        var ref = akkaConfig.createActorRef("counter", "testActor");
+        var ref = akkaConfig.getActorRef("counter", "testActor");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";
@@ -113,7 +112,7 @@ public class DemoController {
 
     @GetMapping("akkademo1")
     public String getAkkaDemo1() {
-        var ref = akkaConfig.createActorRef("counter", "testActor1");
+        var ref = akkaConfig.getActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";

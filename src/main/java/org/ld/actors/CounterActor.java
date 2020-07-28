@@ -20,5 +20,6 @@ public class CounterActor extends AbstractLoggingActor {
                 })
                 .matchAny(e -> log().info("接收到消息:{}", e))
                 .build();
+//        context().system().terminate();
     }
 }

@@ -1,9 +1,6 @@
 package org.ld.config;
 
-import akka.actor.Actor;
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
+import akka.actor.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,10 +19,11 @@ public class AkkaConfig {
         private static final ActorSystem actorSystem = ActorSystem.create("lucaSystem");
     }
 
-    Map<String, ActorRef> actorMap = new ConcurrentHashMap<>();
+    private final Map<String, ActorRef> actorMap = new ConcurrentHashMap<>();
 
     @Bean
     public ActorSystem actorSystem() {
+//        ActorSystemHolder.actorSystem.settings().LogLevel();
         return ActorSystemHolder.actorSystem;
     }
 
@@ -43,9 +41,10 @@ public class AkkaConfig {
     /**
      * 可通过bean的名称和ActorId 创建Actor对象
      */
-    public ActorRef createActorRef(String beanName, String ActorId) {
+    public ActorRef getActorRef(String beanName, String actorId) {
+        ActorSelection actorSelection = ActorSystemHolder.actorSystem.actorSelection(actorId);
         return actorMap.computeIfAbsent(
-                ActorId,
+                actorId,
                 key -> ActorSystemHolder.actorSystem.actorOf(createPropsByName(beanName), key));
     }
 }
