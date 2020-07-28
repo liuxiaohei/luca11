@@ -17,31 +17,14 @@ public class AkkaConfig {
         return ActorSystem.create("lucaSystem");
     }
 
-    public Props createPropsByName(String beanName) {
-        return Props.create(DIProducer.class, beanName);
-    }
-
     /**
-     * 可通过bean的名称找到对应的Actor
+     * 可通过bean的名称找到对应的ActorProps
      */
-    public static class DIProducer implements IndirectActorProducer {
-
-        private final String beanName;
-
-        public DIProducer(String beanName) {
-            this.beanName = beanName;
-        }
-
-        @Override
-        public Actor produce() {
-            return (Actor) StaticApplicationContext.getBean(beanName);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public Class<? extends Actor> actorClass() {
-            return (Class<? extends Actor>) StaticApplicationContext.getType(beanName);
-        }
+    @SuppressWarnings("unchecked")
+    public Props createPropsByName(String beanName) {
+        return Props.create(
+                (Class<Actor>) StaticApplicationContext.getType(beanName),
+                () -> (Actor) StaticApplicationContext.getBean(beanName)
+        );
     }
-
 }
