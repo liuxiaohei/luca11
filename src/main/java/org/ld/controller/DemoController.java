@@ -103,14 +103,9 @@ public class DemoController {
     @Autowired
     AkkaConfig akkaConfig;
 
-    Map<String, ActorRef> actorMap = new ConcurrentHashMap<>();
-
     @GetMapping("akkademo")
     public String getAkkaDemo() {
-        var ref = actorMap.computeIfAbsent("testActor",
-                key -> actorSystem.actorOf(
-                        akkaConfig.createPropsByName("counter"),
-                        key));
+        var ref = akkaConfig.createActorRef("counter", "testActor");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";
@@ -118,10 +113,7 @@ public class DemoController {
 
     @GetMapping("akkademo1")
     public String getAkkaDemo1() {
-        var ref = actorMap.computeIfAbsent("testActor1",
-                key -> actorSystem.actorOf(
-                        akkaConfig.createPropsByName("counter"),
-                        key));
+        var ref = akkaConfig.createActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";
