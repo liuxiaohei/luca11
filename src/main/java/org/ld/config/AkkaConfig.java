@@ -1,11 +1,14 @@
 package org.ld.config;
 
 import akka.actor.*;
+import akka.pattern.AskableActorSelection;
+import akka.util.Timeout;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * SpringBoot 集成Akka
@@ -18,8 +21,6 @@ public class AkkaConfig {
     private static class ActorSystemHolder {
         private static final ActorSystem actorSystem = ActorSystem.create("lucaSystem");
     }
-
-    private final Map<String, ActorRef> actorMap = new ConcurrentHashMap<>();
 
     @Bean
     public ActorSystem actorSystem() {
@@ -38,13 +39,16 @@ public class AkkaConfig {
         );
     }
 
+    private final Timeout t = new Timeout(50, TimeUnit.SECONDS);
+
     /**
      * 可通过bean的名称和ActorId 创建Actor对象
      */
-    public ActorRef getActorRef(String beanName, String actorId) {
-        ActorSelection actorSelection = ActorSystemHolder.actorSystem.actorSelection(actorId);
-        return actorMap.computeIfAbsent(
-                actorId,
-                key -> ActorSystemHolder.actorSystem.actorOf(createPropsByName(beanName), key));
+    public ActorRef getActorRef(String beanName, String actorId) throws Exception {
+        final ActorSelection sel = ActorSystemHolder.actorSystem.actorSelection("/user/" + actorId);
+        final Future<Object> fut = new AskableActorSelection(sel).ask(new Identify(1), t);
+        final ActorIdentity indent = (ActorIdentity) Await.result(fut, t.duration());
+        return indent.getActorRef()
+                .orElseGet(() -> ActorSystemHolder.actorSystem.actorOf(createPropsByName(beanName), actorId));
     }
 }

@@ -103,7 +103,7 @@ public class DemoController {
     AkkaConfig akkaConfig;
 
     @GetMapping("akkademo")
-    public String getAkkaDemo() {
+    public String getAkkaDemo() throws Exception {
         var ref = akkaConfig.getActorRef("counter", "testActor");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
@@ -111,7 +111,7 @@ public class DemoController {
     }
 
     @GetMapping("akkademo1")
-    public String getAkkaDemo1() {
+    public String getAkkaDemo1() throws Exception {
         var ref = akkaConfig.getActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
