@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.IntStream;
 
 /**
  *
@@ -105,7 +106,7 @@ public class DemoController {
     @GetMapping("akkademo")
     public String getAkkaDemo() throws Exception {
         var ref = akkaConfig.getActorRef("counter", "testActor");
-        ref.tell("hello", ActorRef.noSender());
+        IntStream.rangeClosed(1,100000).parallel().forEach(i -> ref.tell("hello", ActorRef.noSender()));
         //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";
     }
