@@ -39,7 +39,7 @@ public class AkkaConfig {
         );
     }
 
-    private final Timeout t = new Timeout(50, TimeUnit.SECONDS);
+    private final Timeout t = new Timeout(1, TimeUnit.DAYS);
 
     /**
      * 可通过bean的名称和ActorId 创建Actor对象

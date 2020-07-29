@@ -83,8 +83,8 @@
         <!-- akka 引入 注入灵魂 -->
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_2.11</artifactId>
-            <version>2.5.16</version>
+            <artifactId>akka-actor-typed_2.13</artifactId>
+            <version>2.6.8</version>
             <exclusions>
                 <exclusion>
                     <artifactId>scala-library</artifactId>
@@ -94,8 +94,8 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-slf4j_2.11</artifactId>
-            <version>2.5.16</version>
+            <artifactId>akka-slf4j_2.13</artifactId>
+            <version>2.6.8</version>
         </dependency>
         <!--        https://github.com/alibaba/easyexcel/blob/master/pom.xml-->
         <dependency>

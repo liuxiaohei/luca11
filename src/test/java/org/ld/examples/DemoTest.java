@@ -1,6 +1,8 @@
 package org.ld.examples;
 
+import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
+import org.ld.actors.HelloWorldMain;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
@@ -32,5 +34,14 @@ public class DemoTest {
         Thread.sleep(1000);
         System.out.println(SystemClock.now());
         System.out.println(SystemClock.now());
+    }
+
+    @Test
+    public void akksDemo() throws InterruptedException {
+        final ActorSystem<HelloWorldMain.SayHello> system =
+                ActorSystem.create(HelloWorldMain.create(), "hello");
+        system.tell(new HelloWorldMain.SayHello("World"));
+        system.tell(new HelloWorldMain.SayHello("Akka"));
+        Thread.sleep(10000);
     }
 }
