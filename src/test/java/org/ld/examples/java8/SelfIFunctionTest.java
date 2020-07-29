@@ -12,17 +12,13 @@ public class SelfIFunctionTest {
      */
     public static void main(String[] args) {
         System.out.println(
-                SelfCallUtil.run(
-                        (self, n) ->
-                                n <= 0
-                                        ? 1
-                                        : n * self.apply(self, n - 1),
-                        10)
+                SelfCallUtil.run((self, n) -> n <= 0 ? 1 : n * self.runwith(n - 1), 10)
         ); // Expect: 3628800
     }
 
     /**
      * 阶乘计算 -- 使用尾递归接口完成
+     *
      * @param factorial 当前递归栈的结果值
      * @param number    下一个递归需要计算的值
      * @return 尾递归接口, 调用invoke启动及早求值获得结果
