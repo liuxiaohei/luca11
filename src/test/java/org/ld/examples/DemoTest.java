@@ -3,7 +3,7 @@ package org.ld.examples;
 import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
 import org.ld.actors.HelloWorldMain;
-import org.ld.utils.IdWorker;
+import org.ld.utils.SnowflakeIdWorker;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
@@ -48,10 +48,9 @@ public class DemoTest {
 
     @Test
     public void idWorkerDemo() {
-        System.out.println(new IdWorker().nextId());
-        System.out.println(new IdWorker().nextId());
-        System.out.println(new IdWorker().nextId());
-        System.out.println(new IdWorker().nextId());
-        System.out.println(new IdWorker().nextId());
+        for (int i = 0; i < 1000; i++) {
+            long id = SnowflakeIdWorker.get();
+            System.out.println(id);
+        }
     }
 }
