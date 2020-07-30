@@ -121,7 +121,7 @@ public class ChatRoom {
                                                 .build()),
                                         "gabbler");
                                 context.watch(gabbler);
-                                chatRoom.tell(new ChatRoom.GetSession("ol’ Gabbler", gabbler));
+                                chatRoom.tell(new GetSession("ol’ Gabbler", gabbler));
                                 return Behaviors
                                         .receive(Object.class)
                                         .onSignal(Terminated.class, sig -> Behaviors.stopped())

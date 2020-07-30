@@ -3,6 +3,7 @@ package org.ld.examples;
 import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
 import org.ld.actors.HelloWorldMain;
+import org.ld.utils.IdWorker;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
@@ -43,5 +44,14 @@ public class DemoTest {
         system.tell(new HelloWorldMain.SayHello("World"));
         system.tell(new HelloWorldMain.SayHello("Akka"));
         Thread.sleep(10000);
+    }
+
+    @Test
+    public void idWorkerDemo() {
+        System.out.println(new IdWorker().nextId());
+        System.out.println(new IdWorker().nextId());
+        System.out.println(new IdWorker().nextId());
+        System.out.println(new IdWorker().nextId());
+        System.out.println(new IdWorker().nextId());
     }
 }
