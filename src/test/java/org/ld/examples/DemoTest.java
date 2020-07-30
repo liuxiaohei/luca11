@@ -8,6 +8,7 @@ import org.ld.utils.JsonUtil;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
 
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class DemoTest {
@@ -48,9 +49,11 @@ public class DemoTest {
 
     @Test
     public void idWorkerDemo() {
-        for (int i = 0; i < 1000; i++) {
-            long id = SnowflakeIdWorker.get();
-            System.out.println(id);
-        }
+        IntStream.rangeClosed(1,1000)
+                .parallel()
+                .boxed()
+                .map(e -> SnowflakeIdWorker.get())
+                .sorted()
+                .forEach(System.out::println);
     }
 }
