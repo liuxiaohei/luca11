@@ -34,12 +34,8 @@ public class SnowflakeIdWorker {
     private long lastTimestamp = -1L;
 
     public SnowflakeIdWorker() {
-        long workerId = 0L;
-        long datacenterId = 0L;
-        // 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
-        // 支持的最大数据标识id，结果是31
-        this.workerId = workerId;
-        this.datacenterId = datacenterId;
+        this.workerId = 0L;
+        this.datacenterId = 0L;
     }
 
     private static class Holder {
