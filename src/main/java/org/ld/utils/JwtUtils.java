@@ -53,7 +53,6 @@ public class JwtUtils {
 
     /**
      * 获得token中的信息
-     *
      * @return token中包含的名称
      */
     public static String getName(String token) {

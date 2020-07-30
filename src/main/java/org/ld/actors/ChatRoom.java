@@ -103,6 +103,7 @@ public class ChatRoom {
                                         Behaviors.setup(ctx -> chatRoom(ctx, new ArrayList<>())),
                                         "chatRoom"
                                 );
+                                // 急促而不清楚地说
                                 ActorRef<ChatRoom.SessionEvent> gabbler = context.spawn(
                                         Behaviors.setup(ctx ->
                                                 Behaviors.receive(ChatRoom.SessionEvent.class)
@@ -120,6 +121,7 @@ public class ChatRoom {
                                                 })
                                                 .build()),
                                         "gabbler");
+                                // 一个 Actor a 可以监控另一个 Actor b，当b被 context stop 或被 PoisonPill 毒死后，a 会收到一个 Terminated 信号。
                                 context.watch(gabbler);
                                 chatRoom.tell(new GetSession("ol’ Gabbler", gabbler));
                                 return Behaviors
