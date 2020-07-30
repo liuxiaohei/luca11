@@ -47,7 +47,7 @@ public class SnowflakeId {
     /**
      * 最大可能会有20位
      */
-    public static long get() {
+    public static Long get() {
         return Holder.idWorker.nextId();
     }
 

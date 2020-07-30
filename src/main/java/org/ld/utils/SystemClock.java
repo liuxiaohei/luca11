@@ -6,7 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 高并发场景下System.currentTimeMillis()的性能问题的优化
- **/
+ * 性能会比 System.currentTimeMillis() 好一些但是会有更高的概率出现ms冲突
+ */
 public class SystemClock {
 
     private final long period;

@@ -2,7 +2,7 @@ package org.ld.engine;
 
 import org.ld.exception.CodeStackException;
 import org.ld.uc.UCRunnable;
-import org.ld.utils.JsonUtil;
+import org.ld.utils.SnowflakeId;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +37,7 @@ public class ExecutorEngine {
         final JobDataMap jobDataMap = new JobDataMap(params);
         try {
             JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
-                    .withIdentity(JsonUtil.getShortUuid(), LocalDateTime.now().toString())
+                    .withIdentity(SnowflakeId.get().toString(), LocalDateTime.now().toString())
                     .withDescription("[Nothing]")
                     .setJobData(jobDataMap)
                     .storeDurably()
