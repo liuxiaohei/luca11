@@ -13,7 +13,7 @@ package org.ld.utils;
  * 加起来刚好64位，为一个Long型。
  * SnowFlake的优点是，整体上按照时间自增排序，并且整个分布式系统内不会产生ID碰撞(由数据中心ID和机器ID作区分)，并且效率较高，经测试，SnowFlake每秒能够产生26万ID左右。
  */
-public class SnowflakeIdWorker {
+public class SnowflakeId {
 
     /**
      * 工作机器ID(0~31)
@@ -35,13 +35,13 @@ public class SnowflakeIdWorker {
      */
     private long lastTimestamp = -1L;
 
-    private SnowflakeIdWorker() {
-        this.workerId = 0L;
-        this.datacenterId = 0L;
+    private SnowflakeId(long workerId, long datacenterId) {
+        this.workerId = workerId;
+        this.datacenterId = datacenterId;
     }
 
     private static class Holder {
-        private static final SnowflakeIdWorker idWorker = new SnowflakeIdWorker();
+        private static final SnowflakeId idWorker = new SnowflakeId(0, 0);
     }
 
     /**
@@ -51,43 +51,42 @@ public class SnowflakeIdWorker {
         return Holder.idWorker.nextId();
     }
 
+    private static final long stepSize = 1024;
+
+    /**
+     * 基础序列号, 每发生一次时钟回拨, basicSequence += stepSize
+     */
+    private long basicSequence = 0L;
+
     /**
      * 获得下一个ID (该方法是线程安全的)
      */
     private synchronized long nextId() {
         long timestamp = timeGen();
-        //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
         if (timestamp < lastTimestamp) {
-            throw new RuntimeException(
-                    String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+            // https://blog.csdn.net/jiangqian6481/article/details/102888944 检测时钟回退并处理
+            basicSequence += stepSize;
+            if (basicSequence >= 4095) {
+                basicSequence = 0;
+            }
         }
-
         //如果是同一时间生成的，则进行毫秒内序列
         long sequenceBits = 12L;
         if (lastTimestamp == timestamp) {
             // 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
             long sequenceMask = ~(-1L << sequenceBits);
             sequence = (sequence + 1) & sequenceMask;
-            //毫秒内序列溢出
             if (sequence == 0) {
-                //阻塞到下一个毫秒,获得新的时间戳
                 timestamp = tilNextMillis(lastTimestamp);
             }
         } else {
-            //时间戳改变，毫秒内序列重置
-            sequence = 0L;
+            sequence = basicSequence;
         }
-        //移位并通过或运算拼到一起组成64位的ID
-        //上次生成ID的时间截
         lastTimestamp = timestamp;
         // 开始时间截
         long twepoch = 1596088093000L;
-        // 数据标识id向左移17位(12+5)
-        // 机器id所占的位数
         long workerIdBits = 5L;
         long datacenterIdShift = sequenceBits + workerIdBits;
-        // 时间截向左移22位(5+5+12)
-        // 数据标识id所占的位数
         long datacenterIdBits = 5L;
         long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
         return ((timestamp - twepoch) << timestampLeftShift)
@@ -98,9 +97,6 @@ public class SnowflakeIdWorker {
 
     /**
      * 阻塞到下一个毫秒，直到获得新的时间戳
-     *
-     * @param lastTimestamp 上次生成ID的时间截
-     * @return 当前时间戳
      */
     private long tilNextMillis(long lastTimestamp) {
         long timestamp = timeGen();

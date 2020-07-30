@@ -3,7 +3,7 @@ package org.ld.examples;
 import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
 import org.ld.actors.HelloWorldMain;
-import org.ld.utils.SnowflakeIdWorker;
+import org.ld.utils.SnowflakeId;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
@@ -51,10 +51,10 @@ public class DemoTest {
 
     @Test
     public void idWorkerDemo() {
-        List<Long> a = IntStream.rangeClosed(1,10000)
+        List<Long> a = IntStream.rangeClosed(1,1000000)
                 .parallel()
                 .boxed()
-                .map(e -> SnowflakeIdWorker.get())
+                .map(e -> SnowflakeId.get())
                 .collect(Collectors.toList());
         a.stream().sorted().forEach(System.out::println);
     }
