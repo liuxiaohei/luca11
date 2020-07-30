@@ -3,7 +3,7 @@ package org.ld.config;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.ld.utils.JsonUtil;
+import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -29,7 +29,7 @@ public class AroundController {
     public Object mapResponseBodyAdvice(ProceedingJoinPoint point) throws Throwable {
         final var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         final var request = Optional.ofNullable(attributes).map(ServletRequestAttributes::getRequest);
-        final var shortUUid = Optional.ofNullable(UUIDS.get()).orElseGet(JsonUtil::getShortUuid);
+        final var shortUUid = Optional.ofNullable(UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
         UUIDS.set(shortUUid);
         LOG.info(shortUUid + ":接口地址:" + request.map(HttpServletRequest::getRequestURI).orElse(null));
         LOG.info(shortUUid + ":请求IP:" + request.map(ServletRequest::getRemoteAddr).orElse(null));

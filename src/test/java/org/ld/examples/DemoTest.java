@@ -4,7 +4,6 @@ import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
 import org.ld.actors.HelloWorldMain;
 import org.ld.utils.SnowflakeId;
-import org.ld.utils.JsonUtil;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
 
@@ -20,7 +19,7 @@ public class DemoTest {
      */
     @Test
     public void infiniteStream() {
-        Stream.generate(JsonUtil::getShortUuid).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
+        Stream.generate(() -> SnowflakeId.get().toString()).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
     }
 
     /**

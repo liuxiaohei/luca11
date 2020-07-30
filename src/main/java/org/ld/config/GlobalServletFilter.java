@@ -1,6 +1,6 @@
 package org.ld.config;
 
-import org.ld.utils.JsonUtil;
+import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ public class GlobalServletFilter {
             @Override
             protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
                 try {
-                    final var uuid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(JsonUtil::getShortUuid);
+                    final var uuid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
                     AroundController.UUIDS.set(uuid);
                     var time = System.currentTimeMillis();
                     filterChain.doFilter(httpServletRequest, httpServletResponse);

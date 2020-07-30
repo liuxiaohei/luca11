@@ -1,6 +1,7 @@
 package org.ld.config;
 
 import org.ld.utils.JsonUtil;
+import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
@@ -42,7 +43,7 @@ public class GlobalRequestBodyHandler implements RequestBodyAdvice {
             MethodParameter parameter,
             Type targetType,
             Class<? extends HttpMessageConverter<?>> converterType) {
-        final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(JsonUtil::getShortUuid);
+        final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
         LOG.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(body));
         return body;
     }
