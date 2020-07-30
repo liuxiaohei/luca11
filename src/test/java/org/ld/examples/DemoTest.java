@@ -8,6 +8,7 @@ import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -56,5 +57,10 @@ public class DemoTest {
                 .map(e -> SnowflakeId.get())
                 .collect(Collectors.toList());
         a.stream().sorted().forEach(System.out::println);
+    }
+
+    @Test
+    public void uuiddemo() {
+        System.out.println(UUID.randomUUID());
     }
 }
