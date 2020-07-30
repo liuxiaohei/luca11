@@ -21,13 +21,11 @@ public class SnowflakeIdWorker {
     /** 数据标识id所占的位数 */
     private final long datacenterIdBits = 5L;
 
-    private final long sequenceBits = 12L;
-
     /** 工作机器ID(0~31) */
-    private long workerId;
+    private final long workerId;
 
     /** 数据中心ID(0~31) */
-    private long datacenterId;
+    private final long datacenterId;
 
     /** 毫秒内序列(0~4095) */
     private long sequence = 0L;
@@ -35,29 +33,17 @@ public class SnowflakeIdWorker {
     /** 上次生成ID的时间截 */
     private long lastTimestamp = -1L;
 
-    //==============================Constructors=====================================
-    /**
-     * 构造函数
-     * @param workerId 工作ID (0~31)
-     * @param datacenterId 数据中心ID (0~31)
-     */
-    public SnowflakeIdWorker(long workerId, long datacenterId) {
-        /** 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数) */
-        final long maxWorkerId = ~(-1L << workerIdBits);
-        if (workerId > maxWorkerId || workerId < 0) {
-            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
-        }
-        /** 支持的最大数据标识id，结果是31 */
-        long maxDatacenterId = ~(-1L << datacenterIdBits);
-        if (datacenterId > maxDatacenterId || datacenterId < 0) {
-            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
-        }
+    public SnowflakeIdWorker() {
+        long workerId = 0L;
+        long datacenterId = 0L;
+        // 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
+        // 支持的最大数据标识id，结果是31
         this.workerId = workerId;
         this.datacenterId = datacenterId;
     }
 
     private static class Holder {
-        private static final SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 0);
+        private static final SnowflakeIdWorker idWorker = new SnowflakeIdWorker();
     }
 
     /**
@@ -80,8 +66,9 @@ public class SnowflakeIdWorker {
         }
 
         //如果是同一时间生成的，则进行毫秒内序列
+        long sequenceBits = 12L;
         if (lastTimestamp == timestamp) {
-            /** 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095) */
+            // 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
             long sequenceMask = ~(-1L << sequenceBits);
             sequence = (sequence + 1) & sequenceMask;
             //毫秒内序列溢出
@@ -98,11 +85,11 @@ public class SnowflakeIdWorker {
         //移位并通过或运算拼到一起组成64位的ID
         //上次生成ID的时间截
         lastTimestamp = timestamp;
-        /** 开始时间截 */
+        // 开始时间截
         long twepoch = 1596088093000L;
-        /** 数据标识id向左移17位(12+5) */
+        // 数据标识id向左移17位(12+5)
         long datacenterIdShift = sequenceBits + workerIdBits;
-        /** 时间截向左移22位(5+5+12) */
+        // 时间截向左移22位(5+5+12)
         long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
         return ((timestamp - twepoch) << timestampLeftShift) //
                 | (datacenterId << datacenterIdShift) //
