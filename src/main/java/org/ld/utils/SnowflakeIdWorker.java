@@ -15,22 +15,24 @@ package org.ld.utils;
  */
 public class SnowflakeIdWorker {
 
-    /** 机器id所占的位数 */
-    private final long workerIdBits = 5L;
-
-    /** 数据标识id所占的位数 */
-    private final long datacenterIdBits = 5L;
-
-    /** 工作机器ID(0~31) */
+    /**
+     * 工作机器ID(0~31)
+     */
     private final long workerId;
 
-    /** 数据中心ID(0~31) */
+    /**
+     * 数据中心ID(0~31)
+     */
     private final long datacenterId;
 
-    /** 毫秒内序列(0~4095) */
+    /**
+     * 毫秒内序列(0~4095)
+     */
     private long sequence = 0L;
 
-    /** 上次生成ID的时间截 */
+    /**
+     * 上次生成ID的时间截
+     */
     private long lastTimestamp = -1L;
 
     public SnowflakeIdWorker() {
@@ -51,7 +53,6 @@ public class SnowflakeIdWorker {
 
     /**
      * 获得下一个ID (该方法是线程安全的)
-     * @return SnowflakeId
      */
     public synchronized long nextId() {
         long timestamp = timeGen();
@@ -72,20 +73,22 @@ public class SnowflakeIdWorker {
                 //阻塞到下一个毫秒,获得新的时间戳
                 timestamp = tilNextMillis(lastTimestamp);
             }
-        }
-        //时间戳改变，毫秒内序列重置
-        else {
+        } else {
+            //时间戳改变，毫秒内序列重置
             sequence = 0L;
         }
-
         //移位并通过或运算拼到一起组成64位的ID
         //上次生成ID的时间截
         lastTimestamp = timestamp;
         // 开始时间截
         long twepoch = 1596088093000L;
         // 数据标识id向左移17位(12+5)
+        // 机器id所占的位数
+        long workerIdBits = 5L;
         long datacenterIdShift = sequenceBits + workerIdBits;
         // 时间截向左移22位(5+5+12)
+        // 数据标识id所占的位数
+        long datacenterIdBits = 5L;
         long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
         return ((timestamp - twepoch) << timestampLeftShift) //
                 | (datacenterId << datacenterIdShift) //
@@ -95,6 +98,7 @@ public class SnowflakeIdWorker {
 
     /**
      * 阻塞到下一个毫秒，直到获得新的时间戳
+     *
      * @param lastTimestamp 上次生成ID的时间截
      * @return 当前时间戳
      */
