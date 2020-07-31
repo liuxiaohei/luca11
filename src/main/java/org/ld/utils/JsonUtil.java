@@ -46,6 +46,15 @@ public class JsonUtil {
         }
     }
 
+    public static String obj2PrettyJson(Object obj) {
+        var mapper = new ObjectMapper();
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new CodeStackException(e);
+        }
+    }
+
     public static <T> T json2Obj(String json, Class<T> cls) {
         var jsonNode = toJsonNode(json);
         if (jsonNode == null) return null;

@@ -3,12 +3,15 @@ package org.ld.examples;
 import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
 import org.ld.actors.HelloWorldMain;
+import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
 import org.ld.utils.SystemClock;
 import org.ld.utils.ZLogger;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -51,7 +54,7 @@ public class DemoTest {
 
     @Test
     public void idWorkerDemo() {
-        List<Long> a = IntStream.rangeClosed(1,1000000)
+        List<Long> a = IntStream.rangeClosed(1, 1000000)
                 .parallel()
                 .boxed()
                 .map(e -> SnowflakeId.get())
@@ -62,5 +65,89 @@ public class DemoTest {
     @Test
     public void uuiddemo() {
         System.out.println(UUID.randomUUID());
+    }
+
+    @Test
+    public void shellDemo() throws IOException {
+        var tag = "studio-2.0.0-rc6";
+        var list = Arrays.asList("tdt","syncher-server","syncher-client");
+        var digestMap = new HashMap<String,String>();
+        list.forEach(s -> {
+            Process process;
+            try {
+                System.out.println("docker pull 172.16.1.99/postcommit/" + s + ":trunk");
+                process = Runtime.getRuntime().exec("docker pull 172.16.1.99/postcommit/" + s + ":trunk");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            var result = convertStreamToStr(process.getInputStream());
+            digestMap.put(s,result.get(1));
+//            System.out.println(JsonUtil.obj2PrettyJson(result));
+        });
+        var process = Runtime.getRuntime().exec("docker images");
+        var result = convertStreamToStr(process.getInputStream());
+        var s1 = result.stream().skip(1).filter(s -> s.startsWith("172.16.1.99/postcommit/")).collect(Collectors.toList());
+        var imageIdMap = list.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        e -> s1.stream().filter(f -> f.contains(e)).findFirst()
+                                .map(g -> Stream.of(g.split(" "))
+                                        .filter(h -> h.length() > 0).skip(2)
+                                        .findFirst().orElse(""))
+                                .orElse("")));
+        imageIdMap.forEach((name,imageId) -> {
+            try {
+                final var fullTag = "172.16.1.99/transwarp/" + name + ":" + tag;
+                System.out.println("docker tag " + imageId + " " + fullTag);
+                var p = Runtime.getRuntime().exec("docker tag " + imageId + " " + fullTag);
+                p.waitFor();
+                System.out.println("docker push " + fullTag);
+                p = Runtime.getRuntime().exec("docker push " + fullTag);
+                p.waitFor();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        System.out.println("=======");
+        list.forEach(e -> {
+            System.out.println("name :" + e);
+            System.out.println("imageId :" + imageIdMap.get(e));
+            System.out.println(digestMap.get(e));
+            System.out.println("=======");
+        });
+    }
+
+
+    public List<String> convertStreamToStr(InputStream is) {
+        final String chars = "\n";
+        String result = "";
+        if (is != null) {
+            Writer writer = new StringWriter();
+            char[] buffer = new char[1024];
+            try (is) {
+                Reader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                int n;
+                while ((n = reader.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            result = writer.toString();
+        } else {
+            result = "";
+        }
+        return Stream.of(result.split(chars)).collect(Collectors.toList());
+    }
+
+    @Test
+    public void test() {
+        User user = new User();
+        user.age = 20;
+        user.username = "test";
+        user.hobbies = Arrays.asList("x", "y", "z").toArray(new String[]{});
+        user.phones = new HashSet<String>(Arrays.asList("a", "b", "c"));
+        user.valid = true;
+        System.out.println(JsonUtil.obj2PrettyJson(user));
     }
 }
