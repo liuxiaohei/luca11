@@ -31,23 +31,18 @@ public class GushiShengChengQi {
     };
 
     public static String produceSentence() {
-        Random rand = new Random();
-        int randNum = rand.nextInt(SENTENCE_MODEL.length);
-        String model = SENTENCE_MODEL[randNum];
-        String result;
-        result = model.replaceFirst("xxxx", FOUR_CHARS_WORDS[rand.nextInt(FOUR_CHARS_WORDS.length)]);
-        result = result.replaceFirst("xxxx", FOUR_CHARS_WORDS[rand.nextInt(FOUR_CHARS_WORDS.length)]);
-        result = result.replaceFirst("xxxx", FOUR_CHARS_WORDS[rand.nextInt(FOUR_CHARS_WORDS.length)]);
-        result = result.replaceFirst("xx", TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)]);
-        result = result.replaceFirst("xx", TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)]);
-        result = result.replaceFirst("x",
-                TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)].charAt(rand.nextInt(2)) + "");
-        result = result.replaceFirst("x",
-                TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)].charAt(rand.nextInt(2)) + "");
-        result = result.replaceFirst("x",
-                TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)].charAt(rand.nextInt(2)) + "");
-        result = result.replaceFirst("x",
-                TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)].charAt(rand.nextInt(2)) + "");
+        var rand = new Random();
+        var result = SENTENCE_MODEL[rand.nextInt(SENTENCE_MODEL.length)];
+        while (result.contains("xxxx")) {
+            result = result.replaceFirst("xxxx", FOUR_CHARS_WORDS[rand.nextInt(FOUR_CHARS_WORDS.length)]);
+        }
+        while (result.contains("xx")) {
+            result = result.replaceFirst("xx", TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)]);
+        }
+        while (result.contains("x")) {
+            result = result.replaceFirst("x", TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)]
+                    .charAt(rand.nextInt(2)) + "");
+        }
         return result;
     }
 
