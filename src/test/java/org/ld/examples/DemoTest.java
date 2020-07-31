@@ -81,8 +81,10 @@ public class DemoTest {
                 throw new RuntimeException(e);
             }
             var result = convertStreamToStr(process.getInputStream());
+            if(result.size() < 2) {
+                throw new RuntimeException("拉取镜像失败");
+            }
             digestMap.put(s,result.get(1));
-//            System.out.println(JsonUtil.obj2PrettyJson(result));
         });
         var process = Runtime.getRuntime().exec("docker images");
         var result = convertStreamToStr(process.getInputStream());
@@ -120,18 +122,18 @@ public class DemoTest {
 
     public List<String> convertStreamToStr(InputStream is) {
         final String chars = "\n";
-        String result = "";
+        String result;
         if (is != null) {
-            Writer writer = new StringWriter();
-            char[] buffer = new char[1024];
+            var writer = new StringWriter();
+            var buffer = new char[1024];
             try (is) {
-                Reader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                var reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 int n;
                 while ((n = reader.read(buffer)) != -1) {
                     writer.write(buffer, 0, n);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
             result = writer.toString();
         } else {
@@ -142,7 +144,7 @@ public class DemoTest {
 
     @Test
     public void test() {
-        User user = new User();
+        var user = new User();
         user.age = 20;
         user.username = "test";
         user.hobbies = Arrays.asList("x", "y", "z").toArray(new String[]{});
