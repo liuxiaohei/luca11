@@ -1,6 +1,7 @@
 package org.ld.examples;
 
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /**
  * https://blog.csdn.net/u011545382/article/details/51524689?utm_source=blogxgwz9
@@ -31,25 +32,23 @@ public class GushiShengChengQi {
     };
 
     public static String produceSentence() {
-        var rand = new Random();
-        var result = SENTENCE_MODEL[rand.nextInt(SENTENCE_MODEL.length)];
-        while (result.contains("xxxx")) {
-            result = result.replaceFirst("xxxx", FOUR_CHARS_WORDS[rand.nextInt(FOUR_CHARS_WORDS.length)]);
+        var ra = new Random();
+        var r = SENTENCE_MODEL[ra.nextInt(SENTENCE_MODEL.length)];
+        while (r.contains("xxxx")) {
+            r = r.replaceFirst("xxxx", FOUR_CHARS_WORDS[ra.nextInt(FOUR_CHARS_WORDS.length)]);
         }
-        while (result.contains("xx")) {
-            result = result.replaceFirst("xx", TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)]);
+        while (r.contains("xx")) {
+            r = r.replaceFirst("xx", TWO_CHARS_WORDS[ra.nextInt(TWO_CHARS_WORDS.length)]);
         }
-        while (result.contains("x")) {
-            result = result.replaceFirst("x", TWO_CHARS_WORDS[rand.nextInt(TWO_CHARS_WORDS.length)]
-                    .charAt(rand.nextInt(2)) + "");
+        while (r.contains("x")) {
+            r = r.replaceFirst("x", TWO_CHARS_WORDS[ra.nextInt(TWO_CHARS_WORDS.length)]
+                    .charAt(ra.nextInt(2)) + "");
         }
-        return result;
+        return r;
     }
 
     public static void main(String[] args) {
-        for (int i = 0; i < 22; i++) {
-            System.out.println(produceSentence());
-        }
+        IntStream.rangeClosed(1,22).forEach(i -> System.out.println(produceSentence()));
     }
 
 }
