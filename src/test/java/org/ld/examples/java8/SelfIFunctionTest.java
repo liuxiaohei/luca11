@@ -12,7 +12,9 @@ public class SelfIFunctionTest {
      */
     public static void main(String[] args) {
         System.out.println(
-                SelfCallUtil.run((self, n) -> n <= 0 ? 1 : n * self.runwith(n - 1), 10)
+                SelfCallUtil.run(
+                        (self, n) -> n <= 0 ? 1 : n * self.apply(n - 1),
+                        10)
         ); // Expect: 3628800
     }
 
