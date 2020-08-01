@@ -13,6 +13,8 @@ import org.ld.actors.ProcessStarter;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.ProcessData;
 import org.ld.beans.RespBean;
+import org.ld.beans.User;
+import org.ld.beans.UserRepository;
 import org.ld.config.AkkaConfig;
 import org.ld.engine.ExecutorEngine;
 import org.ld.enums.ProcessState;
@@ -21,6 +23,8 @@ import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +143,41 @@ public class DemoController {
     public String fjDemo() {
         forkJoinPool.submit(() -> System.out.println("aaaaa"));
         return "success";
+    }
+
+    /**
+     * Mono
+     * 0-1 的非阻塞结果
+     * Reactive Streams JVM API Publisher
+     * 非阻塞 Optional
+     * Flux
+     * 0-N 的非阻塞序列
+     * Reactive Streams JVM API Publisher
+     * 非阻塞 Stream
+     * https://www.jianshu.com/p/2db1ecacb770
+     *
+     */
+    // WebFlux(返回的是Mono)
+    @GetMapping("/hi")
+    private Mono<String> get2() {
+        ZLogger.newInstance().info("get2 start");
+        Mono<String> result = Mono.fromSupplier(() -> "demo");
+        ZLogger.newInstance().info("get2 end.");
+        return result;
+    }
+
+    @Autowired
+    UserRepository userRepository;
+
+    /**
+     *
+     * @return  返回Flux 非阻塞序列
+     */
+    @GetMapping("users")
+    public Flux<User> getAll() {
+        String threadName = Thread.currentThread().getName();
+        System.out.println("HelloWorldAsyncController[" + threadName + "]: " + "获取HTTP请求");
+        return Flux.fromStream(userRepository.getUsers().values().stream());
     }
 
 }

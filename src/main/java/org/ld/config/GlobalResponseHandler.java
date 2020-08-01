@@ -11,6 +11,8 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
@@ -40,7 +42,8 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
         final var path = request.getURI().getPath();
         if (o instanceof RespBean
                 || o instanceof FileSystemResource // 不包装文件流
-//                || o instanceof String
+                || o instanceof Mono
+                || o instanceof Flux
                 || path.contains("swagger")
                 || path.equals("/error")
                 || path.equals("/v2/api-docs")
