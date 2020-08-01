@@ -1,5 +1,7 @@
 package org.ld.uc;
 
+import java.util.function.Supplier;
+
 /**
  * 使用尾递归的类,目的是对外统一方法
  */
@@ -23,8 +25,9 @@ public class TailInvoke {
      * @param <T>   T
      * @return 一个isFinished状态true的尾递归, 外部通过调用接口的invoke方法及早求值, 启动递归求值。
      */
-    public static <T> TailRecursion<T> done(T value) {
-        return new TailRecursion<T>() {
+    public static <T> TailRecursion<T> call(Supplier<T> value) {
+        return new TailRecursion<>() {
+
             @Override
             public TailRecursion<T> apply() {
                 throw new Error("递归已经结束,非法调用apply方法");
@@ -37,7 +40,7 @@ public class TailInvoke {
 
             @Override
             public T getResult() {
-                return value;
+                return value.get();
             }
         };
     }

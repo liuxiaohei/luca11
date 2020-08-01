@@ -21,15 +21,15 @@ public class SelfIFunctionTest {
     /**
      * 阶乘计算 -- 使用尾递归接口完成
      *
-     * @param factorial 当前递归栈的结果值
+     * @param result 当前递归栈的结果值 可以这样理解 对于跳出条件而言 他就是当前number 下对应的结果，对于外部调用而言它是初始的结果，
      * @param number    下一个递归需要计算的值
      * @return 尾递归接口, 调用invoke启动及早求值获得结果
      */
-    public static TailRecursion<Integer> factorialTailRecursion(final int factorial, final int number) {
+    public static TailRecursion<Integer> factorialTailRecursion(final int result, final int number) {
         if (number == 1) {
-            return TailInvoke.done(factorial);
+            return TailInvoke.call(() -> result);
         } else {
-            return TailInvoke.call(() -> factorialTailRecursion(factorial * number, number - 1));
+            return TailInvoke.call(() -> factorialTailRecursion(result * number, number - 1));
         }
     }
 

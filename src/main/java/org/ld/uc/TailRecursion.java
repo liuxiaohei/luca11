@@ -38,7 +38,7 @@ public interface TailRecursion<T> {
         return Stream.iterate(this, TailRecursion::apply)
                 .filter(TailRecursion::isFinished)
                 .findFirst()
-                .get()
-                .getResult();
+                .map(TailRecursion::getResult)
+                .orElse(null);
     }
 }
