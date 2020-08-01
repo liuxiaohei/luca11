@@ -5,12 +5,6 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
     <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-    </root>
-    <root level="INFO">
-        <appender-ref ref="FILE"/>
-    </root>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder charset="UTF-8">
@@ -49,11 +43,12 @@
         </sift>
     </appender>
 
-<!--    <root level="INFO">-->
+    <root level="INFO">
 <!--        <appender-ref ref="STDOUT"/>-->
-<!--        <appender-ref ref="ROLLING"/>-->
-<!--    </root>-->
-
+        <appender-ref ref="ROLLING"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
     <logger name="org.ld.examples" level="INFO">
         <appender-ref ref="SIFT"/>
     </logger>
