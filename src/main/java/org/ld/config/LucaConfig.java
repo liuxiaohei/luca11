@@ -141,4 +141,9 @@ public class LucaConfig {
         );
     }
 
+    @Bean
+    GlobalRequestBodyHandler globalRequestBodyHandler() {
+        return new GlobalRequestBodyHandler(serverCodecConfigurer.getReaders());
+    }
+
 }
