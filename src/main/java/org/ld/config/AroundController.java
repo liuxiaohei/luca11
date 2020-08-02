@@ -22,9 +22,14 @@ public class AroundController {
      */
     @Around("@within(org.springframework.web.bind.annotation.RestController)")
     public Object mapResponseBodyAdvice(ProceedingJoinPoint point) throws Throwable {
-        final var shortUUid = Optional.ofNullable(UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
-        UUIDS.set(shortUUid);
-        LOG.info(shortUUid + ":CLASS_METHOD : " + point.getSignature().getDeclaringTypeName() + "." + point.getSignature().getName());
-        return point.proceed();
+        try {
+            final var snowflakeId = Optional.ofNullable(UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
+            AroundController.UUIDS.set(snowflakeId);
+            UUIDS.set(snowflakeId);
+            LOG.info(snowflakeId + ":CLASS_METHOD : " + point.getSignature().getDeclaringTypeName() + "." + point.getSignature().getName());
+            return point.proceed();
+        } finally {
+            AroundController.UUIDS.remove();
+        }
     }
 }
