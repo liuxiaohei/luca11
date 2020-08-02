@@ -133,7 +133,7 @@ public class LucaConfig {
     @Autowired
     RequestedContentTypeResolver requestedContentTypeResolver;
 
-//    @Bean
+    @Bean
     GlobalResponseHandler responseWrapper() {
         return new GlobalResponseHandler(
                 serverCodecConfigurer.getWriters(),
