@@ -2,24 +2,23 @@ package org.ld.config;
 
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.utils.ServiceExecutor;
-import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.servlet.MultipartConfigElement;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+
+//import javax.servlet.MultipartConfigElement;
 
 /**
  * 获取配置中心的自定义配置信息
@@ -28,27 +27,31 @@ import java.util.concurrent.ForkJoinPool;
  */
 @SuppressWarnings("unused")
 @Configuration
-@EnableSwagger2
+//@EnableSwagger2
+@EnableOpenApi
 public class LucaConfig {
 
     /**
+     * webflux 已没有这个东西
+     * https://blog.csdn.net/lyboy0414/article/details/100763644
      * 增大默认上传文件大小的限制
      */
-    @Bean
-    public MultipartConfigElement multipartConfigElement() {
-        MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize(DataSize.ofMegabytes(2L));
-        factory.setMaxRequestSize(DataSize.ofMegabytes(10L));
-        return factory.createMultipartConfig();
-    }
+//    @Bean
+//    public MultipartConfigElement multipartConfigElement() {
+//        MultipartConfigFactory factory = new MultipartConfigFactory();
+//        factory.setMaxFileSize(DataSize.ofMegabytes(2L));
+//        factory.setMaxRequestSize(DataSize.ofMegabytes(10L));
+//        return factory.createMultipartConfig();
+//    }
 
     /**
      * http://127.0.0.1:9999/swagger-ui.html#/
      */
     @Bean
-    public Docket api() {
+    public Docket createRestApi() {
         final List<ResponseMessage> responseMessages = ResponseMessageEnum.getMessages();
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
+                .pathMapping("/")
                 .globalResponseMessage(RequestMethod.GET, responseMessages)
                 .globalResponseMessage(RequestMethod.POST, responseMessages)
                 .globalResponseMessage(RequestMethod.PUT, responseMessages)
