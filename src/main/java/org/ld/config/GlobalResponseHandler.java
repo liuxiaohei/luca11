@@ -1,56 +1,51 @@
 package org.ld.config;
 
-import org.ld.beans.RespBean;
-import org.ld.utils.JsonUtil;
-import org.ld.utils.ZLogger;
+import com.google.common.base.Preconditions;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-import reactor.core.publisher.Flux;
+import org.springframework.http.codec.HttpMessageWriter;
+import org.springframework.web.reactive.HandlerResult;
+import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
+import java.util.List;
+//https://xbuba.com/questions/48705172
+public class GlobalResponseHandler extends ResponseBodyResultHandler {
+    private static MethodParameter param;
 
-@RestControllerAdvice
-public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
-
-    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
-
-    /**
-     * 判断支持的类型
-     */
-    @Override
-    public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
-        return true;
+    static {
+        try {
+            //get new params
+            param = new MethodParameter(GlobalResponseHandler.class
+                    .getDeclaredMethod("methodForParams"), -1);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     *
-     */
+    public GlobalResponseHandler(List<HttpMessageWriter<?>> writers, RequestedContentTypeResolver resolver) {
+        super(writers, resolver);
+    }
+
+    private static Mono<ServerResponse> methodForParams() {
+        return null;
+    }
+
     @Override
-    public Object beforeBodyWrite(Object o,
-                                  MethodParameter methodParameter,
-                                  MediaType mediaType,
-                                  Class<? extends HttpMessageConverter<?>> aClass,
-                                  ServerHttpRequest request,
-                                  ServerHttpResponse serverHttpResponse) {
-        final var path = request.getURI().getPath();
-        if (o instanceof RespBean
-                || o instanceof FileSystemResource // 不包装文件流
-                || o instanceof Mono
-                || o instanceof Flux
-                || path.contains("swagger")
-                || path.equals("/error")
-                || path.equals("/v2/api-docs")
-        ) {
-            return o; // 防止多余的封装
-        }
-        LOG.info(Optional.ofNullable(AroundController.UUIDS.get()).map(e -> e + ":").orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
-        return new RespBean<>(true, o, null, "成功", null, null);
+    public boolean supports(HandlerResult result) {
+        boolean isMono = result.getReturnType().resolve() == Mono.class;
+        boolean isAlreadyResponse = result.getReturnType().resolveGeneric(0) == ServerResponse.class;
+        return isMono && !isAlreadyResponse;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Mono<Void> handleResult(ServerWebExchange exchange, HandlerResult result) {
+        Preconditions.checkNotNull(result.getReturnValue(), "response is null!");
+        // modify the result as you want
+        Mono<ServerResponse> body = ((Mono<ServerResponse>) result.getReturnValue());
+        return writeBody(body, param, exchange);
     }
 }

@@ -2,10 +2,13 @@ package org.ld.config;
 
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.utils.ServiceExecutor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -123,6 +126,19 @@ public class LucaConfig {
     @Bean
     public ForkJoinPool pool() {
         return ServiceExecutor.getInstance();
+    }
+
+    @Autowired
+    ServerCodecConfigurer serverCodecConfigurer;
+    @Autowired
+    RequestedContentTypeResolver requestedContentTypeResolver;
+
+//    @Bean
+    GlobalResponseHandler responseWrapper() {
+        return new GlobalResponseHandler(
+                serverCodecConfigurer.getWriters(),
+                requestedContentTypeResolver
+        );
     }
 
 }
