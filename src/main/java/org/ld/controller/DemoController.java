@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 /**
@@ -110,7 +111,7 @@ public class DemoController {
     @GetMapping("akkademo")
     public String getAkkaDemo() throws Exception {
         var ref = akkaConfig.getActorRef("counter", "testActor");
-        IntStream.rangeClosed(1,100000).parallel().forEach(i -> ref.tell("hello", ActorRef.noSender()));
+        IntStream.rangeClosed(1, 100000).parallel().forEach(i -> ref.tell("hello", ActorRef.noSender()));
         //        actorSystem.terminate(); // 这个方法终止 actor
         return "success";
     }
@@ -158,13 +159,19 @@ public class DemoController {
      * https://www.cnblogs.com/zhujiabin/p/9849669.html
      * https://blog.csdn.net/u011499747/article/details/78065544
      * https://www.cnblogs.com/Java3y/p/11880377.html
-     *
      */
     // WebFlux(返回的是Mono)
     @GetMapping("/hi")
     private Mono<String> get2() {
         ZLogger.newInstance().info("get2 start");
-        Mono<String> result = Mono.fromSupplier(() -> "demo");
+        Mono<String> result = Mono.fromSupplier(() -> {
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return  "demo";
+        });
         ZLogger.newInstance().info("get2 end.");
         return result;
     }
@@ -173,14 +180,26 @@ public class DemoController {
     UserRepository userRepository;
 
     /**
-     *
-     * @return  返回Flux 非阻塞序列
+     * @return 返回Flux 非阻塞序列
      */
     @GetMapping("users")
     public Flux<User> getAll() {
         String threadName = Thread.currentThread().getName();
         System.out.println("HelloWorldAsyncController[" + threadName + "]: " + "获取HTTP请求");
         return Flux.fromStream(userRepository.getUsers().values().stream());
+    }
+
+    @GetMapping(value = "/3", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> flux() {
+        return Flux
+                .fromStream(IntStream.range(1, 5).mapToObj(i -> {
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException ignored) {
+                    }
+                    ZLogger.newInstance().info("flux data--" + i);
+                    return "flux data--" + i;
+                }));
     }
 
 }

@@ -1,19 +1,26 @@
 package org.ld.controller;
 
 import org.ld.utils.SnowflakeId;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * @author ld
  */
-//@RestController
-//@RequestMapping("/file")
+@RestController
+@RequestMapping("/file")
 public class FileUpLoadController {
 
     /**
@@ -28,4 +35,44 @@ public class FileUpLoadController {
         return null;
     }
 
+    @RequestMapping(value = "/upload/single", method = RequestMethod.POST)
+    public Mono<String> single(@RequestPart("file") Mono<FilePart> file) throws IOException {
+        //此时已转换为File类，具体的业务逻辑我就忽略了
+        return file.map(filePart -> {
+            Path tempFile = null;
+            try {
+                tempFile = Files.createTempFile("test", filePart.filename());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            AsynchronousFileChannel channel = null;
+            try {
+                channel = AsynchronousFileChannel.open(tempFile, StandardOpenOption.WRITE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            DataBufferUtils.write(filePart.content(), channel, 0).doOnComplete(() -> {
+                System.out.println("finish");
+            }).subscribe();
+            return tempFile;
+        })
+                .map(Path::toFile)
+                .flatMap(fileSinge -> file.map(FilePart::filename));
+    }
+
+    @RequestMapping(value = "/upload/numty", method = RequestMethod.POST)
+    public Mono<List<String>> more(@RequestPart("file") Flux<FilePart> file) throws IOException {
+        //此时已转换为File类，具体的业务逻辑我就忽略了
+        return file.map(filePart -> {
+            Path tempFile = null;
+            try {
+                tempFile = Files.createTempFile("test", filePart.filename());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            filePart.transferTo(tempFile.toFile());
+            return tempFile;
+        }).map(Path::toFile)
+                .flatMap(fileSinge -> file.map(FilePart::filename)).collectList();
+    }
 }
