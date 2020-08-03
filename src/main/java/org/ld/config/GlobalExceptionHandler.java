@@ -6,29 +6,25 @@ import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
 import org.ld.utils.ZLogger;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.codec.HttpMessageWriter;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.HandlerStrategies;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.result.view.ViewResolver;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebExceptionHandler;
-import reactor.core.publisher.Mono;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  * 异常处理策略
  */
-@Component
-public class GlobalExceptionHandler implements WebExceptionHandler {
+@RestControllerAdvice
+public class GlobalExceptionHandler {
 
     private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     // TODO 加jwt https://www.cnblogs.com/gdjlc/p/12081701.html
     public RespBean<Object> exceptionHandler(Throwable e) {
         LOG.error(AroundController.UUIDS.get(), e);
@@ -67,69 +63,5 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
         result.setMessage(e.getMessage());
         result.setSuccess(false);
         return result;
-    }
-
-    /**
-     * Handle the given exception. A completion signal through the return value
-     * indicates error handling is complete while an error signal indicates the
-     * exception is still not handled.
-     *
-     * @param exchange the current exchange
-     * @param ex       the exception to handle
-     * @return {@code Mono<Void>} to indicate when exception handling is complete
-     */
-    @Override
-    public Mono<Void> handle(final ServerWebExchange exchange, final Throwable ex) {
-        return handle(ex)
-                .flatMap(it -> it.writeTo(exchange, new HandlerStrategiesResponseContext(HandlerStrategies.withDefaults())))
-                .flatMap(i -> Mono.empty());
-    }
-
-
-    private Mono<ServerResponse> handle(Throwable ex) {
-        return createResponse(HttpStatus.INTERNAL_SERVER_ERROR,   ex);
-    }
-
-    private Mono<ServerResponse> createResponse(final HttpStatus httpStatus, Throwable ex) {
-        exceptionHandler(ex);
-        return ServerResponse.status(httpStatus).syncBody(exceptionHandler(ex));
-    }
-
-
-    /**
-     * The type Handler strategies response context.
-     */
-    static class HandlerStrategiesResponseContext implements ServerResponse.Context {
-
-        private HandlerStrategies handlerStrategies;
-
-        /**
-         * Instantiates a new Handler strategies response context.
-         *
-         * @param handlerStrategies the handler strategies
-         */
-        public HandlerStrategiesResponseContext(final HandlerStrategies handlerStrategies) {
-            this.handlerStrategies = handlerStrategies;
-        }
-
-        /**
-         * Return the {@link HttpMessageWriter}s to be used for response body conversion.
-         *
-         * @return the list of message writers
-         */
-        @Override
-        public List<HttpMessageWriter<?>> messageWriters() {
-            return this.handlerStrategies.messageWriters();
-        }
-
-        /**
-         * Return the  {@link ViewResolver}s to be used for view name resolution.
-         *
-         * @return the list of view resolvers
-         */
-        @Override
-        public List<ViewResolver> viewResolvers() {
-            return this.handlerStrategies.viewResolvers();
-        }
     }
 }
