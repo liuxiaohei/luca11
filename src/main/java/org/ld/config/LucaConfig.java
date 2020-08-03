@@ -55,7 +55,7 @@ public class LucaConfig {
      */
     @Bean
     public Docket createRestApi() {
-        final List<ResponseMessage> responseMessages = ResponseMessageEnum.getMessages();
+        final var responseMessages = ResponseMessageEnum.getMessages();
         return new Docket(DocumentationType.OAS_30)
                 .pathMapping("/")
                 .globalResponseMessage(RequestMethod.GET, responseMessages)
@@ -91,25 +91,6 @@ public class LucaConfig {
                         .version("1.0")
                         .build());
     }
-
-//    @SuppressWarnings("unchecked")
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        try {
-//            Field registrationsField = ClassUtils.getField(InterceptorRegistry.class, "registrations");
-//            List<InterceptorRegistration> registrations = (List<InterceptorRegistration>) ReflectionUtils.getField(registrationsField, registry);
-//            if (registrations != null) {
-//                for (InterceptorRegistration interceptorRegistration : registrations) {
-//                    interceptorRegistration
-//                            .excludePathPatterns("/swagger**/**")
-//                            .excludePathPatterns("/webjars/**")
-//                            .excludePathPatterns("/v3/**")
-//                            .excludePathPatterns("/doc.html");
-//                }
-//            }
-//        } catch (Exception e) {
-//
-//        }
-//    }
 
     /**
      * https://www.cnblogs.com/javazhiyin/p/9851775.html

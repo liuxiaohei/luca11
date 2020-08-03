@@ -26,17 +26,17 @@ public class FlywayMigrate {
 
     @PostConstruct
     public void init() {
-        final String targetDb = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
+        final var targetDb = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
                 .map(str -> str.split("/"))
                 .map(strs -> strs[strs.length - 1])
                 .map(str -> str.split("[?]"))
                 .map(strs -> strs[0]).orElse("");
-        final String rawJdbcUrl = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
+        final var rawJdbcUrl = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
                 .map(e -> e.split(targetDb)[0])
                 .filter(e -> !e.contains("useSSL")).map(e -> e + "?useSSL=false")
                 .orElse("");
-        final String initSql = "CREATE DATABASE IF NOT EXISTS " + targetDb;
-        final Flyway flyway = Flyway
+        final var initSql = "CREATE DATABASE IF NOT EXISTS " + targetDb;
+        final var flyway = Flyway
                 .configure()
                 .dataSource(
                         Optional.of(dataSourceConfig.getJdbcUrl())
@@ -45,8 +45,8 @@ public class FlywayMigrate {
                         , dataSourceConfig.getUserName()
                         , dataSourceConfig.getPassWord()).load();
         log.info("init Db jdbcurl:" + rawJdbcUrl + " database:" + targetDb); //自动创建database
-        try (final Connection connection = DriverManager.getConnection(rawJdbcUrl, dataSourceConfig.getUserName(), dataSourceConfig.getPassWord());
-             final Statement statement = connection.createStatement()) {
+        try (final var connection = DriverManager.getConnection(rawJdbcUrl, dataSourceConfig.getUserName(), dataSourceConfig.getPassWord());
+             final var statement = connection.createStatement()) {
             statement.execute(initSql);
             flyway.repair();
             flyway.migrate();

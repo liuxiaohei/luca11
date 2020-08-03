@@ -31,7 +31,7 @@ public class DataSourceConfig {
     @Primary
     public DataSource dataSource() {
         // Hikari 日语 光
-        HikariDataSource datasource = new HikariDataSource();
+        var datasource = new HikariDataSource();
         datasource.setJdbcUrl(jdbcUrl);
         datasource.setUsername(userName);
         datasource.setPassword(passWord);

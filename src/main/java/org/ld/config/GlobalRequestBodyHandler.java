@@ -37,7 +37,7 @@ public class GlobalRequestBodyHandler  extends AbstractMessageReaderArgumentReso
 
     @Override
     public Mono<Object> resolveArgument(MethodParameter param, BindingContext bindingContext, ServerWebExchange exchange) {
-        RequestBody ann = param.getParameterAnnotation(RequestBody.class);
+        var ann = param.getParameterAnnotation(RequestBody.class);
         final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
         LOG.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));
         return readBody(param, ann.required(), bindingContext, exchange);

@@ -6,7 +6,6 @@ import akka.util.Timeout;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import scala.concurrent.Await;
-import scala.concurrent.Future;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +23,6 @@ public class AkkaConfig {
 
     @Bean
     public ActorSystem actorSystem() {
-//        ActorSystemHolder.actorSystem.settings().LogLevel();
         return ActorSystemHolder.actorSystem;
     }
 
@@ -45,9 +43,9 @@ public class AkkaConfig {
      * 可通过bean的名称和ActorId 创建Actor对象
      */
     public ActorRef getActorRef(String beanName, String actorId) throws Exception {
-        final ActorSelection sel = ActorSystemHolder.actorSystem.actorSelection("/user/" + actorId);
-        final Future<Object> fut = new AskableActorSelection(sel).ask(new Identify(1), t);
-        final ActorIdentity indent = (ActorIdentity) Await.result(fut, t.duration());
+        final var sel = ActorSystemHolder.actorSystem.actorSelection("/user/" + actorId);
+        final var fut = new AskableActorSelection(sel).ask(new Identify(1), t);
+        final var indent = (ActorIdentity) Await.result(fut, t.duration());
         return indent.getActorRef()
                 .orElseGet(() -> ActorSystemHolder.actorSystem.actorOf(createPropsByName(beanName), actorId));
     }
