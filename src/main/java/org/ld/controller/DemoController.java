@@ -53,31 +53,33 @@ public class DemoController {
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
-    public Map<String, Object> demo(@RequestParam String param) {
+    public Mono<Map<String, Object>> demo(@RequestParam String param) {
         Map<String, Object> a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
         descriptor.runAsync(() -> ZLogger.newInstance().info(param));
-        return a;
+        return Mono.fromSupplier(() -> a);
     }
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "demo")
-    public Map<Object, Object> postDemo(@RequestBody RespBean<String> aaa) {
+    public Mono<Map<Object, Object>> postDemo(@RequestBody RespBean<String> aaa) {
         var a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
-        return a;
+        return Mono.fromSupplier(() -> a);
     }
 
     @ApiOperation(value = "错误事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "errored")
-    public Map<String, Object> errorDemo() {
-        Map<String, Object> a = new HashMap<>();
-        Objects.requireNonNull(null);
-        return a;
+    public Mono<Map<String, Object>> errorDemo() {
+        return Mono.fromSupplier(() -> {
+            Map<String, Object> a = new HashMap<>();
+            Objects.requireNonNull(null);
+            return a;
+        });
     }
 
     @ApiOperation(value = "时间", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -87,45 +89,45 @@ public class DemoController {
     }
 
     @PostMapping("getToken")
-    public String getToken(@RequestParam String userName, @RequestParam String password) {
+    public Mono<String> getToken(@RequestParam String userName, @RequestParam String password) {
         if (userName.equals("admin") && password.equals("123456")) {
-            return JwtUtils.sign("admin");
+            return Mono.fromSupplier(() -> JwtUtils.sign("admin"));
         }
-        return "用户名或密码错误";
+        return Mono.fromSupplier(() -> "用户名或密码错误");
     }
 
     @GetMapping("stringdemo")
-    public String getStringDemo() {
-        return "获取数据...";
+    public Mono<String> getStringDemo() {
+        return Mono.fromSupplier(() -> "获取数据...");
     }
 
     @NeedToken
     @GetMapping("getData")
-    public String getData() {
-        return "获取数据...";
+    public Mono<String> getData() {
+        return Mono.fromSupplier(() -> "获取数据...");
     }
 
     @Autowired
     AkkaConfig akkaConfig;
 
     @GetMapping("akkademo")
-    public String getAkkaDemo() throws Exception {
+    public Mono<String> getAkkaDemo() throws Exception {
         var ref = akkaConfig.getActorRef("counter", "testActor");
         IntStream.rangeClosed(1, 100000).parallel().forEach(i -> ref.tell("hello", ActorRef.noSender()));
         //        actorSystem.terminate(); // 这个方法终止 actor
-        return "success";
+        return Mono.fromSupplier(() -> "success");
     }
 
     @GetMapping("akkademo1")
-    public String getAkkaDemo1() throws Exception {
+    public Mono<String> getAkkaDemo1() throws Exception {
         var ref = akkaConfig.getActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
-        return "success";
+        return Mono.fromSupplier(() -> "success");
     }
 
     @GetMapping("fsmdemo")
-    public String getFSMDemo() {
+    public Mono<String> getFSMDemo() {
         var processExecutorAdapter = new ProcessExecutorAdapter();
         var processStarter = actorSystem.actorOf(new RandomPool(10)
                 .props(Props.create(ProcessStarter.class, processExecutorAdapter)));
@@ -137,13 +139,13 @@ public class DemoController {
                 new ProcessData().setParams("5000", ""),
                 processStarter,
                 processChecker));
-        return "success";
+        return Mono.fromSupplier(() -> "success");
     }
 
     @GetMapping("fjdemo")
-    public String fjDemo() {
+    public Mono<String> fjDemo() {
         forkJoinPool.submit(() -> System.out.println("aaaaa"));
-        return "success";
+        return Mono.fromSupplier(() -> "success");
     }
 
     /**
@@ -170,7 +172,7 @@ public class DemoController {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return  "demo";
+            return "demo";
         });
         ZLogger.newInstance().info("get2 end.");
         return result;
