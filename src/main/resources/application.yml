@@ -30,8 +30,6 @@ spring:
     #jdbc:
     #initialize-schema: never
 
-
-#spring:
 #  datasource:
 #    driver-class-name: com.mysql.jdbc.Driver        # 配置MySQL的驱动程序类
 #    url: jdbc:mysql://127.0.0.1:3306/luca?useSSL=false # 数据库连接地址
@@ -42,3 +40,8 @@ spring:
 #      initial-size: 5                               # 初始化提供的连接数
 #      max-total: 30                                 # 最大的连接数
 #      max-wait-millis: 30000                        # 等待连接获取的最大超时时间
+
+#  r2dbc:
+#    url: r2dbc:jdbc:mysql://127.0.0.1:3306/luca?useSSL=false
+#    username: root
+#    password: 12345678
