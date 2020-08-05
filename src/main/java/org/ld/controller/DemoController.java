@@ -121,9 +121,9 @@ public class DemoController {
                 .sql(" SELECT * FROM orders ")
                 .fetch()
                 .all()
-                .map(map -> {
-                    Long id = (Long) map.get("id");
-                    String fn = (String) map.get("fn");
+                .map(e -> {
+                    var id = (Long) e.get("id");
+                    var fn = (String) e.get("fn");
                     return new Order(id, fn);
                 });
         schemaStatement
@@ -132,6 +132,45 @@ public class DemoController {
                 .subscribe(log::info);
         return Mono.empty();
     }
+
+    /**
+     * 查询
+     *
+     * @return 返回Flux序列 包含所有的ClientUser
+     */
+    @GetMapping("/get")
+    public Flux<Order> clientUserFlux() {
+        return client
+                .execute()
+                .sql("select * from orders ")
+                .fetch()
+                .all()
+                .map(e -> {
+                    var id = (Long) e.get("id");
+                    var fn = (String) e.get("fn");
+                    return new Order(id, fn);
+                });
+    }
+
+//    /**
+//     * 响应式写入.
+//     *
+//     * @return Mono对象包含更新成功的条数
+//     */
+//    @GetMapping("/add")
+//    public Mono<Integer> insert() {
+//        Order clientUser = new Order();
+//        clientUser.setUserId("34345514644");
+//        clientUser.setUsername("felord.cn");
+//        clientUser.setPhoneNumber("3456121");
+//        clientUser.setGender(1);
+//
+//        return client.insert().into(ClientUser.class)
+//                .using(clientUser)
+//                .fetch().rowsUpdated();
+//    }
+
+//}
 
     @ApiOperation(value = "错误事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "errored")
