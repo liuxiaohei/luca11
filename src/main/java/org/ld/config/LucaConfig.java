@@ -1,10 +1,14 @@
 package org.ld.config;
 
+import com.github.jasync.r2dbc.mysql.JasyncConnectionFactory;
+import com.github.jasync.sql.db.mysql.pool.MySQLConnectionFactory;
+import com.github.jasync.sql.db.mysql.util.URLParser;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.utils.ServiceExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +22,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
@@ -125,6 +130,13 @@ public class LucaConfig {
     @Bean
     GlobalRequestBodyHandler globalRequestBodyHandler() {
         return new GlobalRequestBodyHandler(serverCodecConfigurer.getReaders());
+    }
+
+    @Bean
+    public DatabaseClient databaseClient() {
+        var url = "jdbc:mysql://127.0.0.1/luca?user=root&password=12345678";
+        var connectionFactory = new JasyncConnectionFactory(new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8)));
+        return DatabaseClient.create(connectionFactory);
     }
 
 }
