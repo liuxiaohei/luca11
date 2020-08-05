@@ -6,6 +6,10 @@ import akka.actor.Props;
 import akka.routing.RandomPool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.ld.actors.ProcessChecker;
 import org.ld.actors.ProcessDispatcher;
 import org.ld.actors.ProcessExecutorAdapter;
@@ -21,6 +25,7 @@ import org.ld.enums.ProcessState;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -38,6 +43,7 @@ import java.util.stream.IntStream;
  *
  */
 @Api(tags = {"样例API"})
+@Log4j2
 @RestController
 @SuppressWarnings("unused")
 public class DemoController {
@@ -50,6 +56,9 @@ public class DemoController {
 
     @Autowired
     private ForkJoinPool forkJoinPool;
+
+    @Autowired
+    private DatabaseClient client;
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
@@ -70,6 +79,58 @@ public class DemoController {
         b.put("wer", List.of("234", "333", "eee"));
         a.put("aaa", b);
         return Mono.fromSupplier(() -> a);
+    }
+
+    private static Mono<Void> executeStatement(DatabaseClient client, String sql) {
+        String[] statements;
+        if (sql.contains(";")) {
+            statements = sql.split(";");
+        } else {
+            statements = new String[]{sql};
+        }
+        return Flux
+                .fromArray(statements)
+                .flatMap(s -> client.execute().sql(s).then())
+                .then();
+    }
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    static class Order {
+        private Long id;
+        private String name;
+    }
+
+    @ApiOperation(value = "r2dbc", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "r2dbc")
+    public Mono<Void> r2dbc(@RequestBody RespBean<String> aaa) {
+        var schemaStatement = executeStatement(client,
+                "CREATE TABLE  IF NOT EXISTS orders  (\n" +
+                        "  id bigint primary key auto_increment not null ,\n" +
+                        "  fn varchar(255) not null\n" +
+                        ");\n" +
+                        "truncate orders ;");
+        var dataStatement = executeStatement(client,
+                "insert into orders(fn) values('Jane');\n" +
+                        "insert into orders(fn) values('John');");
+
+        var orderFlux = client
+                .execute()
+                .sql(" SELECT * FROM orders ")
+                .fetch()
+                .all()
+                .map(map -> {
+                    Long id = (Long) map.get("id");
+                    String fn = (String) map.get("fn");
+                    return new Order(id, fn);
+                });
+        schemaStatement
+                .thenMany(dataStatement)
+                .thenMany(orderFlux)
+                .subscribe(log::info);
+        return Mono.empty();
     }
 
     @ApiOperation(value = "错误事例", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,19 +1,18 @@
 package org.ld.config;
 
+import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ld.utils.SnowflakeId;
-import org.ld.utils.ZLogger;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Aspect
 @Component
+@Log4j2
 public class AroundController {
-
-    private static final org.slf4j.Logger LOG = ZLogger.newInstance();
 
     public static final ThreadLocal<String> UUIDS = new ThreadLocal<>();
 
@@ -26,7 +25,7 @@ public class AroundController {
             final var snowflakeId = Optional.ofNullable(UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
             AroundController.UUIDS.set(snowflakeId);
             UUIDS.set(snowflakeId);
-            LOG.info(snowflakeId + ":CLASS_METHOD : " + point.getSignature().getDeclaringTypeName() + "." + point.getSignature().getName());
+            log.info(snowflakeId + ":CLASS_METHOD : " + point.getSignature().getDeclaringTypeName() + "." + point.getSignature().getName());
             return point.proceed();
         } finally {
             AroundController.UUIDS.remove();

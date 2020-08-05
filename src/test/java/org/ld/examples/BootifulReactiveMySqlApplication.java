@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
+import org.ld.LucaApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -27,9 +28,11 @@ import java.nio.charset.StandardCharsets;
 @SpringBootApplication
 public class BootifulReactiveMySqlApplication {
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		System.setProperty("spring.main.lazy-initialization", "true");
-		SpringApplication.run(BootifulReactiveMySqlApplication.class, args);
+//		SpringApplication.run(BootifulReactiveMySqlApplication.class, args);
+		SpringApplication.run(LucaApplication.class, args);
+
 	}
 }
 
@@ -37,16 +40,16 @@ public class BootifulReactiveMySqlApplication {
 @Component
 class Initializer {
 
-	private final OrderRepository or;
-
-	Initializer(OrderRepository or) {
-		this.or = or;
-	}
-
-	@EventListener(ApplicationReadyEvent.class)
-	public void go() {
-		this.or.findAll().subscribe(log::info);
-	}
+//	private final OrderRepository or;
+//
+//	Initializer(OrderRepository or) {
+//		this.or = or;
+//	}
+//
+//	@EventListener(ApplicationReadyEvent.class)
+//	public void go() {
+//		this.or.findAll().subscribe(log::info);
+//	}
 }
 
 @EnableR2dbcRepositories
@@ -55,7 +58,7 @@ class MySqlR2dbConfiguration extends AbstractR2dbcConfiguration {
 
 	@Override
 	public ConnectionFactory connectionFactory() {
-		String url = "mysql://orders:orders@127.0.0.1:3306/orders";
+		String url = "jdbc:mysql://127.0.0.1/luca?user=root&password=12345678";
 		return new JasyncConnectionFactory(new MySQLConnectionFactory(
 			URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8)));
 	}
