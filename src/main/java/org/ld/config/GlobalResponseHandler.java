@@ -1,7 +1,8 @@
 package org.ld.config;
 
 import com.google.common.base.Preconditions;
-import org.ld.beans.RespBean;
+import org.jetbrains.annotations.NotNull;
+import org.ld.beans.SuccessRespBean;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
@@ -46,14 +47,15 @@ public class GlobalResponseHandler extends ResponseBodyResultHandler {
         return isMono && !isAlreadyResponse;
     }
 
+    @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Mono<Void> handleResult(ServerWebExchange exchange, HandlerResult result) {
+    public Mono<Void> handleResult(@NotNull ServerWebExchange exchange, HandlerResult result) {
         Preconditions.checkNotNull(result.getReturnValue(), "response is null!");
         var body = ((Mono<Object>) result.getReturnValue())
                 .map(o -> {
-                    if (o instanceof RespBean) {
-                        return (RespBean<Object>) o; // 防止多余的封装
+                    if (o instanceof SuccessRespBean) {
+                        return (SuccessRespBean<Object>) o; // 防止多余的封装
                     }
                     final var snowflakeId = Optional.ofNullable(AroundController.UUIDS.get())
                             .orElseGet(() -> SnowflakeId.get().toString());
@@ -62,7 +64,7 @@ public class GlobalResponseHandler extends ResponseBodyResultHandler {
                             .info(Optional.ofNullable(AroundController.UUIDS.get())
                                     .map(e -> e + ":")
                                     .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
-                    return new RespBean<>(true, o, null, "成功", null, null);
+                    return new SuccessRespBean<>(o);
                 });
         return writeBody(body, param, exchange);
     }

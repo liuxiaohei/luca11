@@ -16,7 +16,7 @@ import org.ld.actors.ProcessExecutorAdapter;
 import org.ld.actors.ProcessStarter;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.ProcessData;
-import org.ld.beans.RespBean;
+import org.ld.beans.SuccessRespBean;
 import org.ld.beans.User;
 import org.ld.beans.UserRepository;
 import org.ld.config.AkkaConfig;
@@ -73,7 +73,7 @@ public class DemoController {
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "demo")
-    public Mono<Map<Object, Object>> postDemo(@RequestBody RespBean<String> aaa) {
+    public Mono<Map<Object, Object>> postDemo(@RequestBody SuccessRespBean<String> aaa) {
         var a = new HashMap<>();
         var b = new HashMap<>();
         b.put("wer", List.of("234", "333", "eee"));
@@ -105,7 +105,7 @@ public class DemoController {
 
     @ApiOperation(value = "r2dbc", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "r2dbc")
-    public Mono<Void> r2dbc(@RequestBody RespBean<String> aaa) {
+    public Mono<Void> r2dbc(@RequestBody SuccessRespBean<String> aaa) {
         var schemaStatement = executeStatement(client,
                 "CREATE TABLE  IF NOT EXISTS orders  (\n" +
                         "  id bigint primary key auto_increment not null ,\n" +

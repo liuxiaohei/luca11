@@ -22,6 +22,7 @@ public class InterceptorConfig implements WebFilter {
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     // todo https://blog.csdn.net/Javamine/article/details/93035927
+    // TODO 加jwt https://www.cnblogs.com/gdjlc/p/12081701.html
     @NotNull
     @Override
     public Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
