@@ -1,9 +1,8 @@
 package org.ld.enums;
 
 import org.springframework.http.HttpStatus;
-import springfox.documentation.builders.ResponseMessageBuilder;
-import springfox.documentation.schema.ModelRef;
-import springfox.documentation.service.ResponseMessage;
+import springfox.documentation.builders.ResponseBuilder;
+import springfox.documentation.service.Response;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,12 +27,11 @@ public enum ResponseMessageEnum {
         this.name = name;
     }
 
-    public static List<ResponseMessage> getMessages() {
+    public static List<Response> getMessages() {
         return Stream.of(values())
-                .map(e -> new ResponseMessageBuilder()
-                        .code(e.httpStatus.value())
-                        .message(e.name)
-                        .responseModel(new ModelRef("ApiError"))
+                .map(e -> new ResponseBuilder()
+                        .code(e.httpStatus.value() + "")
+                        .description(e.name)
                         .build())
                 .collect(Collectors.toList());
     }

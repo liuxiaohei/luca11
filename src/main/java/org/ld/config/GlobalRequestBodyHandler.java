@@ -1,5 +1,6 @@
 package org.ld.config;
 
+import org.jetbrains.annotations.NotNull;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
@@ -31,15 +32,17 @@ public class GlobalRequestBodyHandler  extends AbstractMessageReaderArgumentReso
     }
 
     @Override
-    public boolean supportsParameter(MethodParameter methodParameter) {
+    public boolean supportsParameter(@NotNull MethodParameter methodParameter) {
         return true;
     }
 
+    @NotNull
     @Override
-    public Mono<Object> resolveArgument(MethodParameter param, BindingContext bindingContext, ServerWebExchange exchange) {
+    public Mono<Object> resolveArgument(MethodParameter param, @NotNull BindingContext bindingContext, @NotNull ServerWebExchange exchange) {
         var ann = param.getParameterAnnotation(RequestBody.class);
         final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
         LOG.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));
+        assert ann != null;
         return readBody(param, ann.required(), bindingContext, exchange);
     }
 }

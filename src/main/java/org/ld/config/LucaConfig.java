@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -38,7 +38,6 @@ import java.util.concurrent.ForkJoinPool;
  */
 @SuppressWarnings("unused")
 @Configuration
-//@EnableSwagger2
 @EnableOpenApi
 public class LucaConfig {
 
@@ -65,10 +64,10 @@ public class LucaConfig {
         final var responseMessages = ResponseMessageEnum.getMessages();
         return new Docket(DocumentationType.OAS_30)
                 .pathMapping("/")
-                .globalResponseMessage(RequestMethod.GET, responseMessages)
-                .globalResponseMessage(RequestMethod.POST, responseMessages)
-                .globalResponseMessage(RequestMethod.PUT, responseMessages)
-                .globalResponseMessage(RequestMethod.DELETE, responseMessages)
+                .globalResponses(HttpMethod.GET, responseMessages)
+                .globalResponses(HttpMethod.POST, responseMessages)
+                .globalResponses(HttpMethod.PUT, responseMessages)
+                .globalResponses(HttpMethod.DELETE, responseMessages)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("org.ld.controller"))
                 .paths(PathSelectors.any())
@@ -97,7 +96,7 @@ public class LucaConfig {
         securityContexts.add(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
-                        .forPaths(PathSelectors.regex("^(?!auth).*$"))
+//                        .forPaths(PathSelectors.regex("^(?!auth).*$"))
                         .build());
         return securityContexts;
     }
