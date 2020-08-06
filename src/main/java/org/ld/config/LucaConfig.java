@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.r2dbc.function.DatabaseClient;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +24,7 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
@@ -73,28 +75,40 @@ public class LucaConfig {
                 .build()
                 // 支持的通讯协议集合
                 .protocols(Set.of("https", "http"))
-                .securitySchemes(List.of(new ApiKey("BASE_TOKEN", "token", "pass")))
+                .securitySchemes(securitySchemes())
                 // 授权信息全局应用
-                .securityContexts(List.of(
-                        SecurityContext
-                                .builder()
-                                .securityReferences(
-                                        List.of(new SecurityReference(
-                                                        "BASE_TOKEN",
-                                                        new AuthorizationScope[]{
-                                                                new AuthorizationScope("global", "")
-                                                        }
-                                                )
-                                        )
-                                )
-                                .build()
-                ))
+                .securityContexts(securityContexts())
                 .apiInfo(new ApiInfoBuilder()
                         .title("LUCA")
                         .description("系统介绍")
                         .contact(new Contact("ld", "", "2297598383@qq.com"))
                         .version("1.0")
                         .build());
+    }
+
+    private List<SecurityScheme> securitySchemes() {
+        List<SecurityScheme> apiKeyList= new ArrayList<>();
+        apiKeyList.add(new ApiKey(HttpHeaders.AUTHORIZATION, HttpHeaders.AUTHORIZATION, "header"));
+        return apiKeyList;
+    }
+
+    private List<SecurityContext> securityContexts() {
+        List<SecurityContext> securityContexts=new ArrayList<>();
+        securityContexts.add(
+                SecurityContext.builder()
+                        .securityReferences(defaultAuth())
+                        .forPaths(PathSelectors.regex("^(?!auth).*$"))
+                        .build());
+        return securityContexts;
+    }
+
+    private List<SecurityReference> defaultAuth() {
+        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+        authorizationScopes[0] = authorizationScope;
+        List<SecurityReference> securityReferences=new ArrayList<>();
+        securityReferences.add(new SecurityReference("Authorization", authorizationScopes));
+        return securityReferences;
     }
 
     /**

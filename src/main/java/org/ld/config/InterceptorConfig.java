@@ -1,5 +1,6 @@
 package org.ld.config;
 
+import org.jetbrains.annotations.NotNull;
 import org.ld.annotation.NeedToken;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.utils.JwtUtils;
@@ -21,8 +22,9 @@ public class InterceptorConfig implements WebFilter {
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     // todo https://blog.csdn.net/Javamine/article/details/93035927
+    @NotNull
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    public Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
         var handlerMethod = requestMappingHandlerMapping.getHandler(exchange).toProcessor().peek();
         //注意跨域时的配置，跨域时浏览器会先发送一个option请求，这时候getHandler不会时真正的HandlerMethod
         if (handlerMethod instanceof HandlerMethod) {
