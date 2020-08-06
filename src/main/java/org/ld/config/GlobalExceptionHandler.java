@@ -1,7 +1,7 @@
 package org.ld.config;
 
 import lombok.extern.log4j.Log4j2;
-import org.ld.beans.ErrorRespBean;
+import org.ld.beans.OnErrorResp;
 import org.ld.utils.ZLogger;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,8 +19,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorRespBean exceptionHandler(Throwable e) {
+    public OnErrorResp exceptionHandler(Throwable e) {
         log.error(AroundController.UUIDS.get(), e);
-        return new ErrorRespBean(e);
+        return new OnErrorResp(e);
     }
 }

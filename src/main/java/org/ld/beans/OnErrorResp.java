@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 @NoArgsConstructor
 @Data
-public class ErrorRespBean {
+public class OnErrorResp {
     private Integer errorCode;
     private String errorMsgDescription;
     private String message;
@@ -24,7 +24,7 @@ public class ErrorRespBean {
         return false;
     }
 
-    public ErrorRespBean(Throwable e) {
+    public OnErrorResp(Throwable e) {
         final var se = Optional.of(e)
                 .map(t -> {
                     var t1 = t;

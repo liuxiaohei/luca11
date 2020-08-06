@@ -5,10 +5,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class SuccessRespBean<T> {
+public class OnSuccessResp<T> {
     private T data;
 
-    public SuccessRespBean(T data) {
+    public OnSuccessResp(T data) {
         this.data = data;
     }
 
