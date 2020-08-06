@@ -46,7 +46,7 @@ public class OnErrorResp {
                     e.printStackTrace(pw);
                     var strings = Stream.of(sw.toString().split("\n\t"))
                             .skip(1)
-                            .map(str -> str.replace("\n", ""))
+                            .map(str -> str.replace("\n", "").replace("\t",""))
                             .toArray(String[]::new);
                     pw.flush();
                     return strings;
