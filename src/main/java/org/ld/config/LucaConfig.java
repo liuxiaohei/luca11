@@ -96,7 +96,6 @@ public class LucaConfig {
         securityContexts.add(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
-//                        .forPaths(PathSelectors.regex("^(?!auth).*$"))
                         .build());
         return securityContexts;
     }
