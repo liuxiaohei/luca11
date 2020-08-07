@@ -44,20 +44,4 @@ public class DataSourceConfig {
         datasource.setMaxLifetime(1800000);
         return datasource;
     }
-
-    /**
-     * https://github.com/mirromutth/r2dbc-mysql
-     * https://blog.csdn.net/stevenchen1989/article/details/105109595/
-     */
-//    @Bean
-//    public ConnectionFactory connectionFactory() {
-//        return MySqlConnectionFactory.from(MySqlConnectionConfiguration
-//                .builder()
-//                .host("127.0.0.1")
-//                .port(3306)
-//                .username(userName)
-//                .password(passWord)
-//                .database("r2dbc")
-//                .build());
-//    }
 }

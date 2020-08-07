@@ -8,9 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.Statement;
 import java.util.Optional;
 
 /**

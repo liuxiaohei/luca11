@@ -25,7 +25,6 @@ public class GlobalResponseHandler extends ResponseBodyResultHandler {
 
     static {
         try {
-            //get new params
             param = new MethodParameter(GlobalResponseHandler.class.getDeclaredMethod("methodForParams"), -1);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

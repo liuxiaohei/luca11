@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
-//import javax.servlet.MultipartConfigElement;
-
 /**
  * 获取配置中心的自定义配置信息
  *
@@ -42,25 +40,12 @@ import java.util.concurrent.ForkJoinPool;
 public class LucaConfig {
 
     /**
-     * webflux 已没有这个东西
-     * https://blog.csdn.net/lyboy0414/article/details/100763644
-     * 增大默认上传文件大小的限制
-     */
-//    @Bean
-//    public MultipartConfigElement multipartConfigElement() {
-//        MultipartConfigFactory factory = new MultipartConfigFactory();
-//        factory.setMaxFileSize(DataSize.ofMegabytes(2L));
-//        factory.setMaxRequestSize(DataSize.ofMegabytes(10L));
-//        return factory.createMultipartConfig();
-//    }
-
-    /**
      * https://blog.csdn.net/lilinhai548/article/details/107394670
      * http://127.0.0.1:9999/swagger-ui.html#/
      * http://127.0.0.1:9999/swagger-ui/index.html
      */
     @Bean
-    public Docket createRestApi() {
+    Docket createRestApi() {
         final var responseMessages = ResponseMessageEnum.getMessages();
         return new Docket(DocumentationType.OAS_30)
                 .pathMapping("/")
@@ -114,7 +99,7 @@ public class LucaConfig {
      * 在Spring 环境下优先使用 RestTemplate 来发送Http请求
      */
     @Bean
-    public RestTemplate restTemplate() {
+    RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
@@ -122,7 +107,7 @@ public class LucaConfig {
      * Spring 的方式获取线程池
      */
     @Bean
-    public ForkJoinPool pool() {
+    ForkJoinPool pool() {
         return ServiceExecutor.getInstance();
     }
 
@@ -145,7 +130,7 @@ public class LucaConfig {
     }
 
     @Bean
-    public DatabaseClient databaseClient() {
+    DatabaseClient databaseClient() {
         var url = "jdbc:mysql://127.0.0.1/luca?user=root&password=12345678";
         var connectionFactory = new JasyncConnectionFactory(new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8)));
         return DatabaseClient.create(connectionFactory);
