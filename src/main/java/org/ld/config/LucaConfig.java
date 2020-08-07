@@ -4,6 +4,7 @@ import com.github.jasync.r2dbc.mysql.JasyncConnectionFactory;
 import com.github.jasync.sql.db.mysql.pool.MySQLConnectionFactory;
 import com.github.jasync.sql.db.mysql.util.URLParser;
 import com.google.common.base.Preconditions;
+import io.r2dbc.spi.ConnectionFactory;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.ld.beans.OnErrorResp;
@@ -210,7 +211,7 @@ public class LucaConfig {
     /**
      * 请求体策略
      */
-    public static class GlobalRequestBodyHandler extends AbstractMessageReaderArgumentResolver {
+    static class GlobalRequestBodyHandler extends AbstractMessageReaderArgumentResolver {
 
         protected GlobalRequestBodyHandler(List<HttpMessageReader<?>> readers) {
             super(readers);
@@ -237,10 +238,9 @@ public class LucaConfig {
     }
 
     @Bean
-    DatabaseClient databaseClient() {
+    ConnectionFactory connectionFactory() {
         var url = "jdbc:mysql://127.0.0.1/luca?user=root&password=12345678";
-        var connectionFactory = new JasyncConnectionFactory(new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8)));
-        return DatabaseClient.create(connectionFactory);
+        return new JasyncConnectionFactory(new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8)));
     }
 
     @Bean

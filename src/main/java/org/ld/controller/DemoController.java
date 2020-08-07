@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.routing.RandomPool;
+import io.r2dbc.spi.ConnectionFactory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -58,7 +59,7 @@ public class DemoController {
     private ForkJoinPool forkJoinPool;
 
     @Autowired
-    private DatabaseClient client;
+    private ConnectionFactory connectionFactory;
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
@@ -106,17 +107,17 @@ public class DemoController {
     @ApiOperation(value = "r2dbc", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "r2dbc")
     public Mono<Void> r2dbc(@RequestBody OnSuccessResp<String> aaa) {
-        var schemaStatement = executeStatement(client,
+        var schemaStatement = executeStatement(DatabaseClient.create(connectionFactory),
                 "CREATE TABLE  IF NOT EXISTS orders  (\n" +
                         "  id bigint primary key auto_increment not null ,\n" +
                         "  fn varchar(255) not null\n" +
                         ");\n" +
                         "truncate orders ;");
-        var dataStatement = executeStatement(client,
+        var dataStatement = executeStatement(DatabaseClient.create(connectionFactory),
                 "insert into orders(fn) values('Jane');\n" +
                         "insert into orders(fn) values('John');");
 
-        var orderFlux = client
+        var orderFlux = DatabaseClient.create(connectionFactory)
                 .execute()
                 .sql(" SELECT * FROM orders ")
                 .fetch()
@@ -140,7 +141,7 @@ public class DemoController {
      */
     @GetMapping("/get")
     public Flux<Order> clientUserFlux() {
-        return client
+        return DatabaseClient.create(connectionFactory)
                 .execute()
                 .sql("select * from orders ")
                 .fetch()
