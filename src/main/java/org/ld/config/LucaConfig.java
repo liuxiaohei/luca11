@@ -3,6 +3,8 @@ package org.ld.config;
 import com.github.jasync.r2dbc.mysql.JasyncConnectionFactory;
 import com.github.jasync.sql.db.mysql.pool.MySQLConnectionFactory;
 import com.github.jasync.sql.db.mysql.util.URLParser;
+import lombok.extern.log4j.Log4j2;
+import org.ld.beans.OnErrorResp;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.utils.ServiceExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -37,6 +43,7 @@ import java.util.concurrent.ForkJoinPool;
 @SuppressWarnings("unused")
 @Configuration
 @EnableOpenApi
+@Log4j2
 public class LucaConfig {
 
     /**
@@ -135,5 +142,21 @@ public class LucaConfig {
         var connectionFactory = new JasyncConnectionFactory(new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8)));
         return DatabaseClient.create(connectionFactory);
     }
+
+    @Bean
+    GlobalExceptionHandler globalExceptionHandler() {
+        return new GlobalExceptionHandler();
+    }
+
+    @RestControllerAdvice
+    static class GlobalExceptionHandler {
+        @ExceptionHandler(Exception.class)
+        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+        public OnErrorResp exceptionHandler(Throwable e) {
+            log.error(AroundController.UUIDS.get(), e);
+            return new OnErrorResp(e);
+        }
+    }
+
 
 }
