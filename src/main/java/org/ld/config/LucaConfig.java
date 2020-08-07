@@ -3,23 +3,41 @@ package org.ld.config;
 import com.github.jasync.r2dbc.mysql.JasyncConnectionFactory;
 import com.github.jasync.sql.db.mysql.pool.MySQLConnectionFactory;
 import com.github.jasync.sql.db.mysql.util.URLParser;
+import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.ld.beans.OnErrorResp;
+import org.ld.beans.OnSuccessResp;
 import org.ld.enums.ResponseMessageEnum;
+import org.ld.utils.JsonUtil;
 import org.ld.utils.ServiceExecutor;
+import org.ld.utils.SnowflakeId;
+import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.codec.HttpMessageReader;
+import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.BindingContext;
+import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver;
+import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -32,6 +50,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
@@ -78,13 +97,13 @@ public class LucaConfig {
     }
 
     private List<SecurityScheme> securitySchemes() {
-        List<SecurityScheme> apiKeyList= new ArrayList<>();
+        List<SecurityScheme> apiKeyList = new ArrayList<>();
         apiKeyList.add(new ApiKey(HttpHeaders.AUTHORIZATION, HttpHeaders.AUTHORIZATION, "header"));
         return apiKeyList;
     }
 
     private List<SecurityContext> securityContexts() {
-        List<SecurityContext> securityContexts=new ArrayList<>();
+        List<SecurityContext> securityContexts = new ArrayList<>();
         securityContexts.add(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
@@ -96,7 +115,7 @@ public class LucaConfig {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        List<SecurityReference> securityReferences=new ArrayList<>();
+        List<SecurityReference> securityReferences = new ArrayList<>();
         securityReferences.add(new SecurityReference("Authorization", authorizationScopes));
         return securityReferences;
     }
@@ -131,9 +150,90 @@ public class LucaConfig {
         );
     }
 
+    //https://xbuba.com/questions/48705172
+    //https://blog.csdn.net/lizz861109/article/details/106303929
+    static class GlobalResponseHandler extends ResponseBodyResultHandler {
+        private static MethodParameter param;
+
+        static {
+            try {
+                param = new MethodParameter(GlobalResponseHandler.class.getDeclaredMethod("methodForParams"), -1);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public GlobalResponseHandler(List<HttpMessageWriter<?>> writers, RequestedContentTypeResolver resolver) {
+            super(writers, resolver);
+        }
+
+        private static Mono<ServerResponse> methodForParams() {
+            return null;
+        }
+
+        @Override
+        public boolean supports(HandlerResult result) {
+            var isMono = result.getReturnType().resolve() == Mono.class;
+            var isAlreadyResponse = result.getReturnType().resolveGeneric(0) == ServerResponse.class;
+            return isMono && !isAlreadyResponse;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        public Mono<Void> handleResult(@NotNull ServerWebExchange exchange, HandlerResult result) {
+            Preconditions.checkNotNull(result.getReturnValue(), "response is null!");
+            var body = ((Mono<Object>) result.getReturnValue())
+                    .map(o -> {
+                        if (o instanceof OnSuccessResp) {
+                            return (OnSuccessResp<Object>) o; // 防止多余的封装
+                        }
+                        final var snowflakeId = Optional.ofNullable(AroundController.UUIDS.get())
+                                .orElseGet(() -> SnowflakeId.get().toString());
+                        AroundController.UUIDS.set(snowflakeId);
+                        ZLogger.newInstance()
+                                .info(Optional.ofNullable(AroundController.UUIDS.get())
+                                        .map(e -> e + ":")
+                                        .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
+                        return new OnSuccessResp<>(o);
+                    });
+            return writeBody(body, param, exchange);
+        }
+
+    }
+
     @Bean
     GlobalRequestBodyHandler globalRequestBodyHandler() {
         return new GlobalRequestBodyHandler(serverCodecConfigurer.getReaders());
+    }
+
+    /**
+     * 请求体策略
+     */
+    public static class GlobalRequestBodyHandler extends AbstractMessageReaderArgumentResolver {
+
+        protected GlobalRequestBodyHandler(List<HttpMessageReader<?>> readers) {
+            super(readers);
+        }
+
+        protected GlobalRequestBodyHandler(List<HttpMessageReader<?>> messageReaders, ReactiveAdapterRegistry adapterRegistry) {
+            super(messageReaders, adapterRegistry);
+        }
+
+        @Override
+        public boolean supportsParameter(@NotNull MethodParameter methodParameter) {
+            return true;
+        }
+
+        @NotNull
+        @Override
+        public Mono<Object> resolveArgument(MethodParameter param, @NotNull BindingContext bindingContext, @NotNull ServerWebExchange exchange) {
+            var ann = param.getParameterAnnotation(RequestBody.class);
+            final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
+            log.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));
+            assert ann != null;
+            return readBody(param, ann.required(), bindingContext, exchange);
+        }
     }
 
     @Bean
