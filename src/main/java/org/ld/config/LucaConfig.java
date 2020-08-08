@@ -248,20 +248,15 @@ public class LucaConfig {
         }
     }
 
+    @Autowired
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+    /**
+     * 拦截器
+     */
     @Bean
     WebFilter webFilter() {
-        return new LucaWebFilter();
-    }
-
-    @Configuration
-    static class LucaWebFilter implements WebFilter {
-
-        @Autowired
-        private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-        @NotNull
-        @Override
-        public Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
+        return (exchange, chain) -> {
             var handlerMethod = requestMappingHandlerMapping.getHandler(exchange).toProcessor().peek();
             //注意跨域时的配置，跨域时浏览器会先发送一个option请求，这时候getHandler不会时真正的HandlerMethod
             if (handlerMethod instanceof HandlerMethod) {
@@ -277,7 +272,6 @@ public class LucaConfig {
                 }
             }
             return chain.filter(exchange);
-
-        }
+        };
     }
 }
