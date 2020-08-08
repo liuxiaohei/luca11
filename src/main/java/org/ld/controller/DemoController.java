@@ -26,6 +26,7 @@ import org.ld.enums.ProcessState;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -100,6 +101,7 @@ public class DemoController {
     @AllArgsConstructor
     @NoArgsConstructor
     static class Order {
+        @Id
         private Long id;
         private String name;
     }
