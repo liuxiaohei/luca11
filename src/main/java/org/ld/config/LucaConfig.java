@@ -259,8 +259,12 @@ public class LucaConfig {
                         , dataSourceConfig.getUserName()
                         , dataSourceConfig.getPassWord()).load();
         log.info("init Db jdbcUrl:" + rawJdbcUrl + " database:" + targetDb); //自动创建database
-        try (final var connection = DriverManager.getConnection(rawJdbcUrl, dataSourceConfig.getUserName(), dataSourceConfig.getPassWord());
-             final var statement = connection.createStatement()) {
+        try (final var connection = DriverManager.getConnection(
+                rawJdbcUrl,
+                dataSourceConfig.getUserName(),
+                dataSourceConfig.getPassWord());
+             final var statement = connection.createStatement()
+        ) {
             statement.execute(initSql);
             flyway.repair();
             flyway.migrate();
@@ -270,7 +274,7 @@ public class LucaConfig {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static class MethodParameterHolder {
 
@@ -287,4 +291,6 @@ public class LucaConfig {
                     }
                 }).get(), -1);
     }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
