@@ -4,10 +4,10 @@ import akka.actor.*;
 import akka.pattern.AskableActorSelection;
 import akka.util.Timeout;
 import org.ld.utils.SpringBeanFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import scala.concurrent.Await;
 
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,16 +16,10 @@ import java.util.concurrent.TimeUnit;
  * https://www.cnblogs.com/yxwkf/p/4613036.html
  */
 @Configuration
-public class AkkaConfig {
+public class AkkaUtil {
 
-    private static class ActorSystemHolder {
-        private static final ActorSystem actorSystem = ActorSystem.create("lucaSystem");
-    }
-
-    @Bean
-    public ActorSystem actorSystem() {
-        return ActorSystemHolder.actorSystem;
-    }
+    @Resource
+    ActorSystem actorSystem;
 
     /**
      * 可通过bean的名称找到对应的ActorProps
@@ -44,10 +38,10 @@ public class AkkaConfig {
      * 可通过bean的名称和ActorId 创建Actor对象
      */
     public ActorRef getActorRef(String beanName, String actorId) throws Exception {
-        final var sel = ActorSystemHolder.actorSystem.actorSelection("/user/" + actorId);
+        final var sel = actorSystem.actorSelection("/user/" + actorId);
         final var fut = new AskableActorSelection(sel).ask(new Identify(1), t);
         final var indent = (ActorIdentity) Await.result(fut, t.duration());
         return indent.getActorRef()
-                .orElseGet(() -> ActorSystemHolder.actorSystem.actorOf(createPropsByName(beanName), actorId));
+                .orElseGet(() -> actorSystem.actorOf(createPropsByName(beanName), actorId));
     }
 }

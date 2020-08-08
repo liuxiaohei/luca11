@@ -1,11 +1,13 @@
 package org.ld.config;
 
+import akka.actor.ActorSystem;
 import com.github.jasync.r2dbc.mysql.JasyncConnectionFactory;
 import com.github.jasync.sql.db.mysql.pool.MySQLConnectionFactory;
 import com.github.jasync.sql.db.mysql.util.URLParser;
 import com.google.common.base.Preconditions;
 import io.r2dbc.spi.ConnectionFactory;
 import lombok.extern.log4j.Log4j2;
+import org.flywaydb.core.Flyway;
 import org.jetbrains.annotations.NotNull;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.OnErrorResp;
@@ -52,8 +54,10 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
+import java.sql.DriverManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -79,13 +83,16 @@ public class LucaConfig {
     @Resource
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
+    @Resource
+    private DataSourceConfig dataSourceConfig;
+
     /**
      * https://blog.csdn.net/lilinhai548/article/details/107394670
      * http://127.0.0.1:9999/swagger-ui.html#/
      * http://127.0.0.1:9999/swagger-ui/index.html
      */
     @Bean
-    Docket createRestApi() {
+    Docket openApi() {
         final var responseMessages = ResponseMessageEnum.getMessages();
         return new Docket(DocumentationType.OAS_30)
                 .pathMapping("/")
@@ -97,10 +104,8 @@ public class LucaConfig {
                 .apis(RequestHandlerSelectors.basePackage("org.ld.controller"))
                 .paths(PathSelectors.any())
                 .build()
-                // 支持的通讯协议集合
                 .protocols(Set.of("https", "http"))
                 .securitySchemes(List.of(new ApiKey(HttpHeaders.AUTHORIZATION, HttpHeaders.AUTHORIZATION, "header")))
-                // 授权信息全局应用
                 .securityContexts(List.of(
                         SecurityContext.builder()
                                 .securityReferences(List.of(
@@ -115,7 +120,7 @@ public class LucaConfig {
                 .apiInfo(new ApiInfoBuilder()
                         .title("LUCA")
                         .description("系统介绍")
-                        .contact(new Contact("ld", "", "2297598383@qq.com"))
+                        .contact(new Contact("ld", "www.baidu.com", "2297598383@qq.com"))
                         .version("1.0")
                         .build());
     }
@@ -137,10 +142,9 @@ public class LucaConfig {
         return ServiceExecutor.getInstance();
     }
 
-    //https://xbuba.com/questions/48705172
     //https://blog.csdn.net/lizz861109/article/details/106303929
     @Bean
-    ResponseBodyResultHandler responseWrapper() {
+    ResponseBodyResultHandler responseBodyHandler() {
         return new ResponseBodyResultHandler(
                 serverCodecConfigurer.getWriters(),
                 requestedContentTypeResolver
@@ -195,7 +199,7 @@ public class LucaConfig {
      * 请求体策略
      */
     @Bean
-    AbstractMessageReaderArgumentResolver globalRequestBodyHandler() {
+    AbstractMessageReaderArgumentResolver requestBodyHandler() {
         return new AbstractMessageReaderArgumentResolver(serverCodecConfigurer.getReaders()) {
             @Override
             public boolean supportsParameter(@NotNull MethodParameter methodParameter) {
@@ -217,7 +221,9 @@ public class LucaConfig {
     @Bean
     ConnectionFactory connectionFactory() {
         var url = "jdbc:mysql://127.0.0.1/luca?user=root&password=12345678";
-        return new JasyncConnectionFactory(new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8)));
+        return new JasyncConnectionFactory(
+                new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8))
+        );
     }
 
     @Bean
@@ -257,5 +263,42 @@ public class LucaConfig {
             }
             return chain.filter(exchange);
         };
+    }
+
+    @Bean
+    public ActorSystem actorSystem() {
+        return ActorSystem.create("lucaSystem");
+    }
+
+    @PostConstruct
+    public void init() {
+        final var targetDb = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
+                .map(str -> str.split("/"))
+                .map(s -> s[s.length - 1])
+                .map(str -> str.split("[?]"))
+                .map(strs -> strs[0]).orElse("");
+        final var rawJdbcUrl = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
+                .map(e -> e.split(targetDb)[0])
+                .filter(e -> !e.contains("useSSL")).map(e -> e + "?useSSL=false")
+                .orElse("");
+        final var initSql = "CREATE DATABASE IF NOT EXISTS " + targetDb;
+        final var flyway = Flyway
+                .configure()
+                .dataSource(
+                        Optional.of(dataSourceConfig.getJdbcUrl())
+                                .filter(e -> !e.contains("useSSL")).map(e -> e + "&useSSL=false")
+                                .orElse(dataSourceConfig.getJdbcUrl())
+                        , dataSourceConfig.getUserName()
+                        , dataSourceConfig.getPassWord()).load();
+        log.info("init Db jdbcUrl:" + rawJdbcUrl + " database:" + targetDb); //自动创建database
+        try (final var connection = DriverManager.getConnection(rawJdbcUrl, dataSourceConfig.getUserName(), dataSourceConfig.getPassWord());
+             final var statement = connection.createStatement()) {
+            statement.execute(initSql);
+            flyway.repair();
+            flyway.migrate();
+        } catch (Exception e) {
+            log.error("", e);
+            throw new CodeStackException(e);
+        }
     }
 }

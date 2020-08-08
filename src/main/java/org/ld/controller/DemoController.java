@@ -20,7 +20,7 @@ import org.ld.beans.ProcessData;
 import org.ld.beans.OnSuccessResp;
 import org.ld.beans.User;
 import org.ld.beans.UserRepository;
-import org.ld.config.AkkaConfig;
+import org.ld.config.AkkaUtil;
 import org.ld.engine.ExecutorEngine;
 import org.ld.enums.ProcessState;
 import org.ld.utils.JwtUtils;
@@ -211,11 +211,11 @@ public class DemoController {
     }
 
     @Autowired
-    AkkaConfig akkaConfig;
+    AkkaUtil akkaUtil;
 
     @GetMapping("akkademo")
     public Mono<String> getAkkaDemo() throws Exception {
-        var ref = akkaConfig.getActorRef("counter", "testActor");
+        var ref = akkaUtil.getActorRef("counter", "testActor");
         IntStream.rangeClosed(1, 100000).parallel().forEach(i -> ref.tell("hello", ActorRef.noSender()));
         //        actorSystem.terminate(); // 这个方法终止 actor
         return Mono.fromSupplier(() -> "success");
@@ -223,7 +223,7 @@ public class DemoController {
 
     @GetMapping("akkademo1")
     public Mono<String> getAkkaDemo1() throws Exception {
-        var ref = akkaConfig.getActorRef("counter", "testActor1");
+        var ref = akkaUtil.getActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
         //        actorSystem.terminate(); // 这个方法终止 actor
         return Mono.fromSupplier(() -> "success");
