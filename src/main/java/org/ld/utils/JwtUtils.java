@@ -24,8 +24,8 @@ public class JwtUtils {
      * @return 加密后的token
      */
     public static String sign(String name) {
-        Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
-        Algorithm algorithm = Algorithm.HMAC256(SECRET); //使用HS256算法
+        var date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
+        var algorithm = Algorithm.HMAC256(SECRET); //使用HS256算法
         return JWT.create() //创建令牌实例
                 .withClaim("name", name) //指定自定义声明，保存一些信息
                 //.withSubject(name) //信息直接放在这里也行
@@ -40,9 +40,9 @@ public class JwtUtils {
      */
     public static void verify(String token) {
         try{
-            String name = getName(token);
-            Algorithm algorithm = Algorithm.HMAC256(SECRET);
-            JWTVerifier verifier = JWT.require(algorithm)
+            var name = getName(token);
+            var algorithm = Algorithm.HMAC256(SECRET);
+            var verifier = JWT.require(algorithm)
                     .withClaim("name", name)
                     //.withSubject(name)
                     .build();
@@ -58,7 +58,7 @@ public class JwtUtils {
      */
     public static String getName(String token) {
         try {
-            DecodedJWT jwt = JWT.decode(token);
+            var jwt = JWT.decode(token);
             return jwt.getClaim("name").asString();
         }catch(Exception e){
             return null;

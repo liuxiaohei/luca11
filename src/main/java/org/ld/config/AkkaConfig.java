@@ -3,6 +3,7 @@ package org.ld.config;
 import akka.actor.*;
 import akka.pattern.AskableActorSelection;
 import akka.util.Timeout;
+import org.ld.utils.SpringBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import scala.concurrent.Await;
@@ -32,8 +33,8 @@ public class AkkaConfig {
     @SuppressWarnings("unchecked")
     public Props createPropsByName(String beanName) {
         return Props.create(
-                (Class<Actor>) StaticApplicationContext.getType(beanName),
-                () -> (Actor) StaticApplicationContext.getBean(beanName)
+                (Class<Actor>) SpringBeanFactory.getType(beanName),
+                () -> (Actor) SpringBeanFactory.getBean(beanName)
         );
     }
 

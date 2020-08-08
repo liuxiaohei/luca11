@@ -42,9 +42,9 @@ public class MD5 {
     public static String toMD5String(byte[] input) {
         final char[] output = new char[32];
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] by = md.digest(input);
-            for (int i = 0; i < by.length; i++) {
+            var md = MessageDigest.getInstance("MD5");
+            var by = md.digest(input);
+            for (var i = 0; i < by.length; i++) {
                 output[2 * i] = num_chars[(by[i] & 0xf0) >> 4];
                 output[2 * i + 1] = num_chars[by[i] & 0xf];
             }
@@ -58,23 +58,23 @@ public class MD5 {
         if (StringUtil.isEmpty(filePath)) {
             return null;
         }
-        File file = new File(filePath);
+        var file = new File(filePath);
         if (!file.isFile()) {
             return null;
         }
         FileInputStream in = null;
-        byte[] buffer = new byte[1024];
+        var buffer = new byte[1024];
         int len;
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            var md = MessageDigest.getInstance("MD5");
             in = new FileInputStream(file);
             while ((len = in.read(buffer, 0, 1024)) != -1) {
                 md.update(buffer, 0, len);
             }
 
-            byte[] by = md.digest();
-            final char[] output = new char[32];
-            for (int i = 0; i < by.length; i++) {
+            var by = md.digest();
+            final var output = new char[32];
+            for (var i = 0; i < by.length; i++) {
                 output[2 * i] = num_chars[(by[i] & 0xf0) >> 4];
                 output[2 * i + 1] = num_chars[by[i] & 0xf];
             }

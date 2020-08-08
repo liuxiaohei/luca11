@@ -1,4 +1,4 @@
-package org.ld.config;
+package org.ld.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.ld.exception.CodeStackException;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @SuppressWarnings("unused")
 @Configuration
-public class StaticApplicationContext implements ApplicationContextAware {
+public class SpringBeanFactory implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
 

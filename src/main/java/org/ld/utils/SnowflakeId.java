@@ -62,7 +62,7 @@ public class SnowflakeId {
      * 获得下一个ID (该方法是线程安全的)
      */
     private synchronized long nextId() {
-        long timestamp = timeGen();
+        var timestamp = timeGen();
         if (timestamp < lastTimestamp) {
             // https://blog.csdn.net/jiangqian6481/article/details/102888944 检测时钟回退并处理
             basicSequence += stepSize;
@@ -71,7 +71,7 @@ public class SnowflakeId {
             }
         }
         //如果是同一时间生成的，则进行毫秒内序列
-        long sequenceBits = 12L;
+        var sequenceBits = 12L;
         if (lastTimestamp == timestamp) {
             // 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
             long sequenceMask = ~(-1L << sequenceBits);
@@ -84,11 +84,11 @@ public class SnowflakeId {
         }
         lastTimestamp = timestamp;
         // 开始时间截
-        long twepoch = 1596088093000L;
-        long workerIdBits = 5L;
-        long datacenterIdShift = sequenceBits + workerIdBits;
-        long datacenterIdBits = 5L;
-        long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
+        var twepoch = 1596088093000L;
+        var workerIdBits = 5L;
+        var datacenterIdShift = sequenceBits + workerIdBits;
+        var datacenterIdBits = 5L;
+        var timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
         return ((timestamp - twepoch) << timestampLeftShift)
                 | (datacenterId << datacenterIdShift)
                 | (workerId << sequenceBits)
@@ -99,7 +99,7 @@ public class SnowflakeId {
      * 阻塞到下一个毫秒，直到获得新的时间戳
      */
     private long tilNextMillis(long lastTimestamp) {
-        long timestamp = timeGen();
+        var timestamp = timeGen();
         while (timestamp <= lastTimestamp) {
             timestamp = timeGen();
         }
