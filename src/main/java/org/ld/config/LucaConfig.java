@@ -7,13 +7,12 @@ import com.google.common.base.Preconditions;
 import io.r2dbc.spi.ConnectionFactory;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
+import org.ld.annotation.NeedToken;
 import org.ld.beans.OnErrorResp;
 import org.ld.beans.OnSuccessResp;
 import org.ld.enums.ResponseMessageEnum;
-import org.ld.utils.JsonUtil;
-import org.ld.utils.ServiceExecutor;
-import org.ld.utils.SnowflakeId;
-import org.ld.utils.ZLogger;
+import org.ld.enums.UserErrorCodeEnum;
+import org.ld.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,13 +29,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -245,5 +248,36 @@ public class LucaConfig {
         }
     }
 
+    @Bean
+    WebFilter webFilter() {
+        return new LucaWebFilter();
+    }
 
+    @Configuration
+    static class LucaWebFilter implements WebFilter {
+
+        @Autowired
+        private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+        @NotNull
+        @Override
+        public Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
+            var handlerMethod = requestMappingHandlerMapping.getHandler(exchange).toProcessor().peek();
+            //注意跨域时的配置，跨域时浏览器会先发送一个option请求，这时候getHandler不会时真正的HandlerMethod
+            if (handlerMethod instanceof HandlerMethod) {
+                var loginToken = ((HandlerMethod) handlerMethod).getMethodAnnotation(NeedToken.class);
+                var request = exchange.getRequest();
+                if (loginToken != null && loginToken.required()) {
+                    var tokenHeader = request.getHeaders().get(JwtUtils.TOKEN_HEADER);
+                    if (tokenHeader == null || tokenHeader.size() == 0) {
+                        throw UserErrorCodeEnum.EMPTY_TOKEN.getException();
+                    }
+                    var token = tokenHeader.get(0).replace(JwtUtils.TOKEN_PREFIX, "");
+                    JwtUtils.verify(token);
+                }
+            }
+            return chain.filter(exchange);
+
+        }
+    }
 }
