@@ -179,22 +179,6 @@ public class LucaConfig {
         };
     }
 
-    public static class MethodParameterHolder {
-
-        private static Mono<ServerResponse> methodForParams() {
-            return null;
-        }
-
-        static final MethodParameter param = new MethodParameter(
-                Optional.of(MethodParameterHolder.class).map(e -> {
-                    try {
-                        return e.getDeclaredMethod("methodForParams");
-                    } catch (NoSuchMethodException noSuchMethodException) {
-                        throw new CodeStackException(noSuchMethodException);
-                    }
-                }).get(), -1);
-    }
-
     /**
      * 请求体策略
      */
@@ -303,5 +287,23 @@ public class LucaConfig {
             log.error("", e);
             throw new CodeStackException(e);
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static class MethodParameterHolder {
+
+        private static Mono<ServerResponse> methodForParams() {
+            return null;
+        }
+
+        static final MethodParameter param = new MethodParameter(
+                Optional.of(MethodParameterHolder.class).map(e -> {
+                    try {
+                        return e.getDeclaredMethod("methodForParams");
+                    } catch (NoSuchMethodException noSuchMethodException) {
+                        throw new CodeStackException(noSuchMethodException);
+                    }
+                }).get(), -1);
     }
 }
