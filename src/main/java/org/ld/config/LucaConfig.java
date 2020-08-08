@@ -12,8 +12,10 @@ import org.ld.beans.OnErrorResp;
 import org.ld.beans.OnSuccessResp;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
-import org.ld.utils.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.ld.utils.JsonUtil;
+import org.ld.utils.JwtUtils;
+import org.ld.utils.ServiceExecutor;
+import org.ld.utils.SnowflakeId;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
@@ -39,7 +41,6 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
-import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -53,6 +54,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +71,29 @@ import java.util.concurrent.ForkJoinPool;
 @EnableOpenApi
 @Log4j2
 public class LucaConfig {
+
+    @Resource
+    ServerCodecConfigurer serverCodecConfigurer;
+
+    @Resource
+    RequestedContentTypeResolver requestedContentTypeResolver;
+
+    @Resource
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+    private static MethodParameter param;
+
+    private static Mono<ServerResponse> methodForParams() {
+        return null;
+    }
+
+    static {
+        try {
+            param = new MethodParameter(LucaConfig.class.getDeclaredMethod("methodForParams"), -1);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * https://blog.csdn.net/lilinhai548/article/details/107394670
@@ -96,7 +121,7 @@ public class LucaConfig {
                         SecurityContext.builder()
                                 .securityReferences(List.of(
                                         new SecurityReference(
-                                                "Authorization",
+                                                HttpHeaders.AUTHORIZATION,
                                                 new AuthorizationScope[]{
                                                         new AuthorizationScope("global", "accessEverything")
                                                 })
@@ -128,103 +153,65 @@ public class LucaConfig {
         return ServiceExecutor.getInstance();
     }
 
-    @Autowired
-    ServerCodecConfigurer serverCodecConfigurer;
-    @Autowired
-    RequestedContentTypeResolver requestedContentTypeResolver;
-
-    @Bean
-    GlobalResponseHandler responseWrapper() {
-        return new GlobalResponseHandler(
-                serverCodecConfigurer.getWriters(),
-                requestedContentTypeResolver
-        );
-    }
-
     //https://xbuba.com/questions/48705172
     //https://blog.csdn.net/lizz861109/article/details/106303929
-    static class GlobalResponseHandler extends ResponseBodyResultHandler {
-        private static MethodParameter param;
-
-        static {
-            try {
-                param = new MethodParameter(GlobalResponseHandler.class.getDeclaredMethod("methodForParams"), -1);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public GlobalResponseHandler(List<HttpMessageWriter<?>> writers, RequestedContentTypeResolver resolver) {
-            super(writers, resolver);
-        }
-
-        private static Mono<ServerResponse> methodForParams() {
-            return null;
-        }
-
-        @Override
-        public boolean supports(HandlerResult result) {
-            var isMono = result.getReturnType().resolve() == Mono.class;
-            var isAlreadyResponse = result.getReturnType().resolveGeneric(0) == ServerResponse.class;
-            return isMono && !isAlreadyResponse;
-        }
-
-        @NotNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public Mono<Void> handleResult(@NotNull ServerWebExchange exchange, HandlerResult result) {
-            Preconditions.checkNotNull(result.getReturnValue(), "response is null!");
-            var body = ((Mono<Object>) result.getReturnValue())
-                    .map(o -> {
-                        if (o instanceof OnSuccessResp) {
-                            return (OnSuccessResp<Object>) o; // 防止多余的封装
-                        }
-                        final var snowflakeId = Optional.ofNullable(AroundController.UUIDS.get())
-                                .orElseGet(() -> SnowflakeId.get().toString());
-                        AroundController.UUIDS.set(snowflakeId);
-                        ZLogger.newInstance()
-                                .info(Optional.ofNullable(AroundController.UUIDS.get())
-                                        .map(e -> e + ":")
-                                        .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
-                        return new OnSuccessResp<>(o);
-                    });
-            return writeBody(body, param, exchange);
-        }
-
-    }
-
     @Bean
-    GlobalRequestBodyHandler globalRequestBodyHandler() {
-        return new GlobalRequestBodyHandler(serverCodecConfigurer.getReaders());
+    ResponseBodyResultHandler responseWrapper() {
+        return new ResponseBodyResultHandler(
+                serverCodecConfigurer.getWriters(),
+                requestedContentTypeResolver
+        ) {
+            @Override
+            public boolean supports(@NotNull HandlerResult result) {
+                var isMono = result.getReturnType().resolve() == Mono.class;
+                var isAlreadyResponse = result.getReturnType().resolveGeneric(0) == ServerResponse.class;
+                return isMono && !isAlreadyResponse;
+            }
+
+            @NotNull
+            @Override
+            @SuppressWarnings("unchecked")
+            public Mono<Void> handleResult(@NotNull ServerWebExchange exchange, @NotNull HandlerResult result) {
+                Preconditions.checkNotNull(result.getReturnValue(), "response is null!");
+                var body = ((Mono<Object>) result.getReturnValue())
+                        .map(o -> {
+                            if (o instanceof OnSuccessResp) {
+                                return (OnSuccessResp<Object>) o; // 防止多余的封装
+                            }
+                            final var snowflakeId = Optional.ofNullable(AroundController.UUIDS.get())
+                                    .orElseGet(() -> SnowflakeId.get().toString());
+                            AroundController.UUIDS.set(snowflakeId);
+                            log.info(Optional.ofNullable(AroundController.UUIDS.get())
+                                    .map(e -> e + ":")
+                                    .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
+                            return new OnSuccessResp<>(o);
+                        });
+                return writeBody(body, param, exchange);
+            }
+        };
     }
 
     /**
      * 请求体策略
      */
-    static class GlobalRequestBodyHandler extends AbstractMessageReaderArgumentResolver {
+    @Bean
+    AbstractMessageReaderArgumentResolver globalRequestBodyHandler() {
+        return new AbstractMessageReaderArgumentResolver(serverCodecConfigurer.getReaders()) {
+            @Override
+            public boolean supportsParameter(@NotNull MethodParameter methodParameter) {
+                return true;
+            }
 
-        protected GlobalRequestBodyHandler(List<HttpMessageReader<?>> readers) {
-            super(readers);
-        }
-
-        protected GlobalRequestBodyHandler(List<HttpMessageReader<?>> messageReaders, ReactiveAdapterRegistry adapterRegistry) {
-            super(messageReaders, adapterRegistry);
-        }
-
-        @Override
-        public boolean supportsParameter(@NotNull MethodParameter methodParameter) {
-            return true;
-        }
-
-        @NotNull
-        @Override
-        public Mono<Object> resolveArgument(MethodParameter param, @NotNull BindingContext bindingContext, @NotNull ServerWebExchange exchange) {
-            var ann = param.getParameterAnnotation(RequestBody.class);
-            final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
-            log.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));
-            assert ann != null;
-            return readBody(param, ann.required(), bindingContext, exchange);
-        }
+            @NotNull
+            @Override
+            public Mono<Object> resolveArgument(@NotNull MethodParameter param, @NotNull BindingContext bindingContext, @NotNull ServerWebExchange exchange) {
+                var ann = param.getParameterAnnotation(RequestBody.class);
+                final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
+                log.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));
+                assert ann != null;
+                return readBody(param, ann.required(), bindingContext, exchange);
+            }
+        };
     }
 
     @Bean
@@ -247,9 +234,6 @@ public class LucaConfig {
             return new OnErrorResp(e);
         }
     }
-
-    @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     /**
      * 拦截器
