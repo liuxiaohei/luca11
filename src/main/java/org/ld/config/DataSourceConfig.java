@@ -27,6 +27,10 @@ public class DataSourceConfig {
     @Value("${db.password}")
     private String passWord;
 
+    String getFullUrl() {
+        return getJdbcUrl() + "user="+ getUserName() +"&password=" + getPassWord();
+    }
+
     @Bean
     @Primary
     public DataSource dataSource() {
