@@ -12,6 +12,7 @@ import org.ld.beans.OnErrorResp;
 import org.ld.beans.OnSuccessResp;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
+import org.ld.exception.CodeStackException;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ServiceExecutor;
@@ -19,12 +20,9 @@ import org.ld.utils.SnowflakeId;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.codec.HttpMessageReader;
-import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,27 +71,13 @@ import java.util.concurrent.ForkJoinPool;
 public class LucaConfig {
 
     @Resource
-    ServerCodecConfigurer serverCodecConfigurer;
+    private ServerCodecConfigurer serverCodecConfigurer;
 
     @Resource
-    RequestedContentTypeResolver requestedContentTypeResolver;
+    private RequestedContentTypeResolver requestedContentTypeResolver;
 
     @Resource
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-    private static MethodParameter param;
-
-    private static Mono<ServerResponse> methodForParams() {
-        return null;
-    }
-
-    static {
-        try {
-            param = new MethodParameter(LucaConfig.class.getDeclaredMethod("methodForParams"), -1);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * https://blog.csdn.net/lilinhai548/article/details/107394670
@@ -186,9 +170,25 @@ public class LucaConfig {
                                     .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
                             return new OnSuccessResp<>(o);
                         });
-                return writeBody(body, param, exchange);
+                return writeBody(body, MethodParameterHolder.param, exchange);
             }
         };
+    }
+
+    public static class MethodParameterHolder {
+
+        private static Mono<ServerResponse> methodForParams() {
+            return null;
+        }
+
+        static final MethodParameter param = new MethodParameter(
+                Optional.of(MethodParameterHolder.class).map(e -> {
+                    try {
+                        return e.getDeclaredMethod("methodForParams");
+                    } catch (NoSuchMethodException noSuchMethodException) {
+                        throw new CodeStackException(noSuchMethodException);
+                    }
+                }).get(), -1);
     }
 
     /**
