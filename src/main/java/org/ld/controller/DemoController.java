@@ -20,7 +20,7 @@ import org.ld.beans.ProcessData;
 import org.ld.beans.OnSuccessResp;
 import org.ld.beans.User;
 import org.ld.beans.UserRepository;
-import org.ld.config.AkkaUtil;
+import org.ld.utils.AkkaUtil;
 import org.ld.engine.ExecutorEngine;
 import org.ld.enums.ProcessState;
 import org.ld.utils.JwtUtils;

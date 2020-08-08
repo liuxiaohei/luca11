@@ -1,4 +1,4 @@
-package org.ld.config;
+package org.ld.utils;
 
 import akka.actor.*;
 import akka.pattern.AskableActorSelection;

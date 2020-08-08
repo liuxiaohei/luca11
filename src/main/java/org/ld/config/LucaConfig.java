@@ -220,7 +220,7 @@ public class LucaConfig {
 
     @Bean
     ConnectionFactory connectionFactory() {
-        var url = "jdbc:mysql://127.0.0.1/luca?user=root&password=12345678";
+        var url = dataSourceConfig.getJdbcUrl() + "user="+ dataSourceConfig.getUserName() +"&password=" + dataSourceConfig.getPassWord();
         return new JasyncConnectionFactory(
                 new MySQLConnectionFactory(URLParser.INSTANCE.parseOrDie(url, StandardCharsets.UTF_8))
         );
@@ -271,6 +271,7 @@ public class LucaConfig {
     }
 
     @PostConstruct
+    @SuppressWarnings("all")
     public void init() {
         final var targetDb = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
                 .map(str -> str.split("/"))
