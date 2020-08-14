@@ -68,8 +68,8 @@ public class DemoTest {
     }
 
     @Test
-    public void shellDemo() throws IOException {
-        var tag = "studio-2.0.0-rc7";
+    public void dabao() throws IOException {
+        var tag = "studio-2.0.0-final";
         var list = Arrays.asList("tdt","syncher-server","syncher-client");
         var digestMap = new HashMap<String,String>();
         list.forEach(s -> {
