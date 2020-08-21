@@ -16,6 +16,7 @@ import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
 import org.ld.utils.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.*;
@@ -26,8 +27,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.*;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
+import org.springframework.web.reactive.function.server.RequestPredicates;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.result.method.annotation.*;
+import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
@@ -38,7 +45,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import javax.annotation.*;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.sql.DriverManager;
 import java.util.*;
@@ -160,6 +168,24 @@ public class LucaConfig {
         };
     }
 
+    //    https://www.jianshu.com/p/d117bf98b4f2
+    //    https://www.jianshu.com/p/b584c3dcc44a
+    @Bean
+    public HandlerMapping handlerMapping() {
+        // 对相应的URL进行添加处理器
+        Map<String, WebSocketHandler> map = new HashMap<>();
+        map.put("/hello", new MyWebSocketHandler());
+        SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+        mapping.setUrlMap(map);
+        mapping.setOrder(-1);
+        return mapping;
+    }
+
+    @Bean
+    public WebSocketHandlerAdapter handlerAdapter() {
+        return new WebSocketHandlerAdapter();
+    }
+
     /**
      * 请求体策略
      */
@@ -272,6 +298,15 @@ public class LucaConfig {
             log.error("", e);
             throw new CodeStackException(e);
         }
+    }
+
+    /**
+     * WebFlux 的路由
+     */
+    @Bean
+    public RouterFunction<ServerResponse> indexRouter(@Value("classpath:/static/index.html") final org.springframework.core.io.Resource index) {
+        return RouterFunctions
+                .route(RequestPredicates.GET("/"), e -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(index));
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
