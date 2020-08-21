@@ -1,5 +1,6 @@
 package org.ld.config;
 
+import org.jetbrains.annotations.NotNull;
 import org.ld.controller.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.socket.*;
@@ -16,6 +17,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
     @Autowired
     private TokenService tokenService;
 
+    @NotNull
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         // 在生产环境中，需对url中的参数进行检验，如token，不符合要求的连接的直接关闭
