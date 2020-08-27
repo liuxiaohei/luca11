@@ -1,53 +1,66 @@
 package org.ld.config;
 
 import akka.actor.ActorSystem;
-import com.github.jasync.r2dbc.mysql.JasyncConnectionFactory;
-import com.github.jasync.sql.db.mysql.pool.MySQLConnectionFactory;
-import com.github.jasync.sql.db.mysql.util.URLParser;
 import com.google.common.base.Preconditions;
-import io.r2dbc.spi.ConnectionFactory;
 import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.Flyway;
-import org.jetbrains.annotations.NotNull;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.OnErrorResp;
 import org.ld.beans.OnSuccessResp;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
-import org.ld.utils.*;
+import org.ld.utils.JsonUtil;
+import org.ld.utils.JwtUtils;
+import org.ld.utils.ServiceExecutor;
+import org.ld.utils.SnowflakeId;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.reactive.*;
+import org.springframework.web.reactive.BindingContext;
+import org.springframework.web.reactive.HandlerMapping;
+import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
-import org.springframework.web.reactive.result.method.annotation.*;
+import org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
-import springfox.documentation.builders.*;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.oas.annotations.EnableOpenApi;
-import springfox.documentation.service.*;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.nio.charset.StandardCharsets;
+import javax.validation.constraints.NotNull;
 import java.sql.DriverManager;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
@@ -207,16 +220,6 @@ public class LucaConfig {
                 return readBody(param, ann.required(), bindingContext, exchange);
             }
         };
-    }
-
-    @Bean
-    ConnectionFactory connectionFactory() {
-        return new JasyncConnectionFactory(
-                new MySQLConnectionFactory(
-                        URLParser.INSTANCE.parseOrDie(dataSourceConfig.getFullUrl(),
-                                StandardCharsets.UTF_8)
-                )
-        );
     }
 
     @Bean

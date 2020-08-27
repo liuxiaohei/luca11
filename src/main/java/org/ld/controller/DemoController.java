@@ -4,7 +4,6 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.routing.RandomPool;
-import io.r2dbc.spi.ConnectionFactory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,6 @@ import org.ld.utils.JwtUtils;
 import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -59,9 +57,6 @@ public class DemoController {
     @Autowired
     private ForkJoinPool forkJoinPool;
 
-    @Autowired
-    private ConnectionFactory connectionFactory;
-
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "demo")
     public Mono<Map<String, Object>> demo(@RequestParam String param) {
@@ -83,20 +78,6 @@ public class DemoController {
         return Mono.fromSupplier(() -> a);
     }
 
-    private static Mono<Void> executeStatement(DatabaseClient client, String sql) {
-        String[] statements;
-        if (sql.contains(";")) {
-            statements = sql.split(";");
-        } else {
-            statements = new String[]{sql};
-        }
-        return Flux
-                .fromArray(statements)
-                .flatMap(s -> client.execute().sql(s).then())
-                .then();
-    }
-
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -105,75 +86,6 @@ public class DemoController {
         private Long id;
         private String name;
     }
-
-    @ApiOperation(value = "r2dbc", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "r2dbc")
-    public Mono<Void> r2dbc(@RequestBody OnSuccessResp<String> aaa) {
-        var schemaStatement = executeStatement(DatabaseClient.create(connectionFactory),
-                "CREATE TABLE  IF NOT EXISTS orders  (\n" +
-                        "  id bigint primary key auto_increment not null ,\n" +
-                        "  fn varchar(255) not null\n" +
-                        ");\n" +
-                        "truncate orders ;");
-        var dataStatement = executeStatement(DatabaseClient.create(connectionFactory),
-                "insert into orders(fn) values('Jane');\n" +
-                        "insert into orders(fn) values('John');");
-
-        var orderFlux = DatabaseClient.create(connectionFactory)
-                .execute()
-                .sql(" SELECT * FROM orders ")
-                .fetch()
-                .all()
-                .map(e -> {
-                    var id = (Long) e.get("id");
-                    var fn = (String) e.get("fn");
-                    return new Order(id, fn);
-                });
-        schemaStatement
-                .thenMany(dataStatement)
-                .thenMany(orderFlux)
-                .subscribe(log::info);
-        return Mono.empty();
-    }
-
-    /**
-     * 查询
-     *
-     * @return 返回Flux序列 包含所有的ClientUser
-     */
-    @GetMapping("/get")
-    public Flux<Order> clientUserFlux() {
-        return DatabaseClient.create(connectionFactory)
-                .execute()
-                .sql("select * from orders ")
-                .fetch()
-                .all()
-                .map(e -> {
-                    var id = (Long) e.get("id");
-                    var fn = (String) e.get("fn");
-                    return new Order(id, fn);
-                });
-    }
-
-//    /**
-//     * 响应式写入.
-//     *
-//     * @return Mono对象包含更新成功的条数
-//     */
-//    @GetMapping("/add")
-//    public Mono<Integer> insert() {
-//        Order clientUser = new Order();
-//        clientUser.setUserId("34345514644");
-//        clientUser.setUsername("felord.cn");
-//        clientUser.setPhoneNumber("3456121");
-//        clientUser.setGender(1);
-//
-//        return client.insert().into(ClientUser.class)
-//                .using(clientUser)
-//                .fetch().rowsUpdated();
-//    }
-
-//}
 
     @ApiOperation(value = "错误事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "errored")
