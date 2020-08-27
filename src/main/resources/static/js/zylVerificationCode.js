@@ -2,7 +2,6 @@ $(function(){
 	zylVerCode();//初始化生成随机数
 });
 
-
 //生成随机数
 function zylVerCode(len){
     len = len || 4;
