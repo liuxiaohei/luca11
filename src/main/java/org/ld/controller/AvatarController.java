@@ -12,17 +12,17 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.*;
+import java.util.Random;
 
 /**
  * @author ld
  */
 @RestController
 @RequestMapping("/")
-public class MakeAvatarController {
+public class AvatarController {
 
     private final List<String> colors = Arrays.asList(
             "34CFA3",
