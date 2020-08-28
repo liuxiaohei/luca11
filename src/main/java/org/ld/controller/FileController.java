@@ -2,12 +2,15 @@ package org.ld.controller;
 
 import org.ld.utils.SnowflakeId;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.Files;
@@ -21,7 +24,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/file")
-public class FileUpLoadController {
+public class FileController {
 
     /**
      * 上传文件
@@ -75,4 +78,15 @@ public class FileUpLoadController {
         }).map(Path::toFile)
                 .flatMap(fileSinge -> file.map(FilePart::filename)).collectList();
     }
+
+    @RequestMapping(value = "/get",produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] getImage() throws IOException {
+        File file = new File("D:/test.jpg");
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[inputStream.available()];
+        inputStream.read(bytes, 0, inputStream.available());
+        return bytes;
+    }
+
 }
