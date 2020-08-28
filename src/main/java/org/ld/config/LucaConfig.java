@@ -14,14 +14,12 @@ import org.ld.utils.JsonUtil;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ServiceExecutor;
 import org.ld.utils.SnowflakeId;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,9 +31,6 @@ import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
-import org.springframework.web.reactive.function.server.RequestPredicates;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver;
@@ -301,15 +296,6 @@ public class LucaConfig {
             log.error("", e);
             throw new CodeStackException(e);
         }
-    }
-
-    /**
-     * WebFlux 的路由
-     */
-    @Bean
-    public RouterFunction<ServerResponse> indexRouter(@Value("classpath:/static/index.html") final org.springframework.core.io.Resource index) {
-        return RouterFunctions
-                .route(RequestPredicates.GET("/"), e -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(index));
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
