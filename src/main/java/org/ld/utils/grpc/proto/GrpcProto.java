@@ -1,23 +1,21 @@
 package org.ld.utils.grpc.proto;
 
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.ExtensionRegistry;
+import com.google.protobuf.GeneratedMessageV3;
+
 public final class GrpcProto {
-    private GrpcProto() {
-    }
 
-    public static void registerAllExtensions() {
-    }
+    static final Descriptors.Descriptor internal_static_GrpcRequest_descriptor;
+    static final GeneratedMessageV3.FieldAccessorTable internal_static_GrpcRequest_fieldAccessorTable;
+    static final Descriptors.Descriptor internal_static_GrpcReply_descriptor;
+    static final GeneratedMessageV3.FieldAccessorTable internal_static_GrpcReply_fieldAccessorTable;
 
-    static final com.google.protobuf.Descriptors.Descriptor internal_static_GrpcRequest_descriptor;
-    static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable internal_static_GrpcRequest_fieldAccessorTable;
-    static final com.google.protobuf.Descriptors.Descriptor internal_static_GrpcReply_descriptor;
-    static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable internal_static_GrpcReply_fieldAccessorTable;
-
-    public static com.google.protobuf.Descriptors.FileDescriptor getDescriptor() {
+    public static Descriptors.FileDescriptor getDescriptor() {
         return descriptor;
     }
 
-    private static com.google.protobuf.Descriptors.FileDescriptor
-            descriptor;
+    private static Descriptors.FileDescriptor descriptor;
 
     static {
         String[] descriptorData = {
@@ -26,28 +24,28 @@ public final class GrpcProto {
                         "eeter\022)\n\013sendMessage\022\014.GrpcRequest\032\n.Grp" +
                         "cReply\"\000B\023B\tGrpcProtoP\001\242\002\003HLWb\006proto3"
         };
-        com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-                new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-                    public com.google.protobuf.ExtensionRegistry assignDescriptors(
-                            com.google.protobuf.Descriptors.FileDescriptor root) {
+        Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+                new Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+                    public ExtensionRegistry assignDescriptors(
+                            Descriptors.FileDescriptor root) {
                         descriptor = root;
                         return null;
                     }
                 };
-        com.google.protobuf.Descriptors.FileDescriptor
+        Descriptors.FileDescriptor
                 .internalBuildGeneratedFileFrom(descriptorData,
-                        new com.google.protobuf.Descriptors.FileDescriptor[]{
+                        new Descriptors.FileDescriptor[]{
                         }, assigner);
         internal_static_GrpcRequest_descriptor =
                 getDescriptor().getMessageTypes().get(0);
         internal_static_GrpcRequest_fieldAccessorTable = new
-                com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+                GeneratedMessageV3.FieldAccessorTable(
                 internal_static_GrpcRequest_descriptor,
                 new String[]{"Params",});
         internal_static_GrpcReply_descriptor =
                 getDescriptor().getMessageTypes().get(1);
         internal_static_GrpcReply_fieldAccessorTable = new
-                com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+                GeneratedMessageV3.FieldAccessorTable(
                 internal_static_GrpcReply_descriptor,
                 new String[]{"Message",});
     }

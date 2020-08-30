@@ -1,5 +1,6 @@
 package org.ld.utils.grpc.proto;
 
+import com.google.protobuf.Descriptors;
 import io.grpc.stub.StreamObserver;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
@@ -8,9 +9,6 @@ import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
 public final class GreeterGrpc {
-
-    private GreeterGrpc() {
-    }
 
     public static final String SERVICE_NAME = "Greeter";
 
@@ -124,12 +122,12 @@ public final class GreeterGrpc {
         }
 
         @Override
-        public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
+        public Descriptors.FileDescriptor getFileDescriptor() {
             return GrpcProto.getDescriptor();
         }
 
         @Override
-        public com.google.protobuf.Descriptors.ServiceDescriptor getServiceDescriptor() {
+        public Descriptors.ServiceDescriptor getServiceDescriptor() {
             return getFileDescriptor().findServiceByName("Greeter");
         }
     }
@@ -150,7 +148,7 @@ public final class GreeterGrpc {
         }
 
         @Override
-        public com.google.protobuf.Descriptors.MethodDescriptor getMethodDescriptor() {
+        public Descriptors.MethodDescriptor getMethodDescriptor() {
             return getServiceDescriptor().findMethodByName(methodName);
         }
     }

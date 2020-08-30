@@ -34,12 +34,6 @@ public class DemoTest {
     }
 
     public static void main(String... args) throws InterruptedException {
-        System.out.println(SystemClock.now());
-        System.out.println(SystemClock.now());
-        System.out.println(SystemClock.now());
-        Thread.sleep(1000);
-        System.out.println(SystemClock.now());
-        System.out.println(SystemClock.now());
     }
 
     @Test
