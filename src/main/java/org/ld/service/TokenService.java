@@ -1,4 +1,4 @@
-package org.ld.controller;
+package org.ld.service;
 
 import org.springframework.stereotype.Service;
 

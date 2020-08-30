@@ -6,10 +6,9 @@ import org.ld.pojo.Job;
 import org.quartz.*;
 
 public class JobUtils {
-    
-    //key前缀
+
     private final static String JOB_NAME = "TASK_";
-    //暂停任务
+
     public final static Integer STATUS = 1;
 
     public static final String JOB_PARAM_KEY = "JOB_PARAM_KEY";

@@ -4,7 +4,6 @@ import org.ld.beans.JobBean;
 import org.ld.beans.JobQuery;
 import org.ld.beans.PageData;
 import org.ld.beans.ServiceBean;
-import org.ld.enums.EnumDeleted;
 import org.ld.mapper.JobMapper;
 import org.ld.pojo.Job;
 import org.ld.pojo.JobExample;
@@ -21,9 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class JobService {
+
     @Resource
     private DiscoveryClient discoveryClient;
     @Resource
@@ -33,29 +34,25 @@ public class JobService {
 
     public PageData<ServiceBean> queryServices() {
         PageData<ServiceBean> pageData = new PageData<>();
-        List<String> services = discoveryClient.getServices();
-        List<ServiceBean> serviceList = new ArrayList<>();
-        services.stream().distinct().forEach(e -> {
-            ServiceBean serviceBean = new ServiceBean();
-            serviceBean.serviceName = e;
-            serviceList.add(serviceBean);
-        });
-        pageData.setList(serviceList);
+        pageData.setList(discoveryClient.getServices().stream().distinct()
+                .map(e -> {
+                    ServiceBean serviceBean = new ServiceBean();
+                    serviceBean.serviceName = e;
+                    return serviceBean;
+                }).collect(Collectors.toList()));
         return pageData;
     }
 
     @Transactional
     public JobBean save(JobBean jobBean) {
-        //名称是否重复
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
         criteria.andNameEqualTo(jobBean.name);
-        criteria.andDeletedEqualTo(EnumDeleted.NO.getValue());
+        criteria.andDeletedEqualTo(0);
         Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new
                 RuntimeException("error_job_name"));
-        //查询可用服务
         List<ServiceInstance> instanceList = discoveryClient.getInstances(jobBean.serviceName);
-        for (ServiceInstance instance: instanceList) {
+        for (ServiceInstance instance : instanceList) {
             Map<String, String> metadata = instance.getMetadata();
             if (metadata.get("grpcPort") != null) {
                 jobBean.host = instance.getHost();
@@ -64,13 +61,12 @@ public class JobService {
             }
         }
         if (jobBean.host == null || jobBean.port == null) {
-            throw new RuntimeException( "error_service_rpc_null");
+            throw new RuntimeException("error_service_rpc_null");
         }
         Job job = couponJob(jobBean);
         int count = jobMapper.insertSelective(job);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_save"));
-        //创建任务执行器并执行任务
-        JobUtils.createScheduleJob(scheduler,job);
+        JobUtils.createScheduleJob(scheduler, job);
         jobBean.id = job.getId();
         return jobBean;
     }
@@ -90,34 +86,31 @@ public class JobService {
     @Transactional
     public void delete(Integer jobId) {
         Job job = getAndCheckJob(jobId);
-        job.setDeleted(EnumDeleted.YES.getValue());
+        job.setDeleted(1);
         int count = jobMapper.updateByPrimaryKeySelective(job);
         Optional.of(count)
                 .filter(e -> e > 0)
                 .orElseThrow(() -> new RuntimeException("error_job_delete"));
-        //删除任务
-        JobUtils.deleteScheduleJob(scheduler,jobId);
+        JobUtils.deleteScheduleJob(scheduler, jobId);
     }
 
     @Transactional
     public void update(JobBean jobBean) {
         Job job = getAndCheckJob(jobBean.id);
-        checkAndSet(jobBean,job);
-        //名称是否重复
+        checkAndSet(jobBean, job);
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
         criteria.andNameEqualTo(jobBean.name);
-        criteria.andDeletedEqualTo(EnumDeleted.NO.getValue());
+        criteria.andDeletedEqualTo(0);
         criteria.andIdNotEqualTo(jobBean.id);
-        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new RuntimeException( "error_job_name"));
-        //数据校验
+        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new RuntimeException("error_job_name"));
         validate(jobBean);
         Job jobReq = couponJob(jobBean);
         jobReq.setId(job.getId());
         jobReq.setStatus(job.getStatus());
         int count = jobMapper.updateByPrimaryKeySelective(jobReq);
-        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException( "error_job_update"));
-        JobUtils.updateScheduleJob(scheduler,jobReq);
+        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
+        JobUtils.updateScheduleJob(scheduler, jobReq);
     }
 
     private void checkAndSet(JobBean jobBean, Job job) {
@@ -144,7 +137,7 @@ public class JobService {
     public PageData<JobBean> queryJobList(JobQuery query) {
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
-        criteria.andDeletedEqualTo(EnumDeleted.NO.getValue());
+        criteria.andDeletedEqualTo(0);
         if (StringUtil.isNotBlank(query.jobName)) {
             criteria.andNameLike("%" + query.jobName + "%");
         }
@@ -168,13 +161,8 @@ public class JobService {
         return pageData;
     }
 
-    /**
-     * 类型转换
-     * @param jobs 任务列表
-     */
     private List<JobBean> convertJobs(List<Job> jobs) {
-        List<JobBean> list = new ArrayList<>();
-        jobs.forEach(e -> {
+        return jobs.stream().map(e -> {
             JobBean jobBean = new JobBean();
             jobBean.id = e.getId();
             jobBean.port = e.getPort();
@@ -186,60 +174,32 @@ public class JobService {
             jobBean.params = e.getParams();
             jobBean.createTime = e.getCreateTime();
             jobBean.status = e.getStatus();
-            list.add(jobBean);
-        });
-        return list;
+            return jobBean;
+        }).collect(Collectors.toList());
     }
 
-    /**
-     * 立即执行任务,执行一次
-     */
     public void run(Integer jobId) {
-        Job job = getAndCHeckJob(jobId);
-        JobUtils.run(scheduler,job);
-    }
-
-    /**
-     *获取任务信息
-     */
-    private Job getAndCHeckJob(Integer jobId) {
         Job job = jobMapper.selectByPrimaryKey(jobId);
-        Optional.ofNullable(job).orElseThrow(() -> new RuntimeException("error_job_not_exist"));
-        Optional.of(job)
-                .filter(e -> job.getDeleted().equals(EnumDeleted.NO.getValue()))
-                .orElseThrow(() -> new RuntimeException("error_job_delete_status"));
-        return job;
+        JobUtils.run(scheduler, job);
     }
 
-    /**
-     * 暂停任务
-     * @param jobId 任务id
-     */
     @Transactional
     public void pauseJob(Integer jobId) {
-        Job job = getAndCHeckJob(jobId);
+        Job job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(JobUtils.STATUS);
         int count = jobMapper.updateByPrimaryKeySelective(job);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
-        JobUtils.pauseJob(scheduler,jobId);
+        JobUtils.pauseJob(scheduler, jobId);
     }
 
-    /**
-     * 恢复任务
-     * @param jobId 任务id
-     */
     @Transactional
     public void resumeJob(Integer jobId) {
-        Job job = getAndCHeckJob(jobId);
+        Job job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(0);
-        int count = jobMapper.updateByPrimaryKeySelective(job);
-        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
-        JobUtils.resumeJob(scheduler,jobId);
+        jobMapper.updateByPrimaryKeySelective(job);
+        JobUtils.resumeJob(scheduler, jobId);
     }
 
-    /**
-     * 数据校验
-     */
     public void validate(JobBean jobBean) {
         Optional.ofNullable(jobBean.name)
                 .filter(StringUtil::isNotBlank)
@@ -259,16 +219,10 @@ public class JobService {
 
     }
 
-    /**
-     * 获取任务并检查
-     * @param jobId 任务id
-     * @return 任务实体
-     */
     private Job getAndCheckJob(Integer jobId) {
         Job job = jobMapper.selectByPrimaryKey(jobId);
-        Optional.ofNullable(job).orElseThrow(() -> new RuntimeException("error_job_not_exist"));
         Optional.of(job)
-                .filter(e -> job.getDeleted().equals(EnumDeleted.NO.getValue()))
+                .filter(e -> job.getDeleted().equals(0))
                 .orElseThrow(() -> new RuntimeException("error_job_delete_status"));
         return job;
     }

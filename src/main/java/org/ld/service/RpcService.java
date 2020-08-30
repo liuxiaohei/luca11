@@ -14,74 +14,65 @@ import org.ld.utils.grpc.proto.GrpcReply;
 import org.ld.utils.grpc.proto.GrpcRequest;
 import org.quartz.Scheduler;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class RpcService {
-    private ManagedChannel channel;
 
-    @Autowired
+    @Resource
     private Scheduler scheduler;
-    @Autowired
+    @Resource
     private RefreshServiceTask refreshServiceTask;
 
     private final Logger log = ZLogger.newInstance();
 
-    /**
-     * 客户端发起调用
-     *
-     * @param params 客户端发起请求
-     */
-    public void sendClient(String params) throws InterruptedException {
-        Job job = JsonUtil.json2Obj(params, Job.class);
-        Map<String, List<Job>> map = RefreshServiceTask.servicesMap;
+    public void sendClient(Job job) throws InterruptedException {
+        assert job != null;
         List<Job> jobs = refreshServiceTask.getServiceInstance(job.getServiceName());
         if (StringUtil.isNotEmpty(jobs)) {
             job.setHost(jobs.get(0).getHost());
             job.setPort(jobs.get(0).getPort());
-            map.put(job.getServiceName(), jobs);
+            RefreshServiceTask.servicesMap.put(job.getServiceName(), jobs);
         }
-        this.channel = ManagedChannelBuilder.forAddress(job.getHost(), job.getPort())
+        ManagedChannel channel = ManagedChannelBuilder
+                .forAddress(job.getHost(), job.getPort())
                 .usePlaintext()
                 .build();
         GreeterGrpc.GreeterBlockingStub blockingStub = GreeterGrpc.newBlockingStub(channel);
-        GrpcRequest request = GrpcRequest.newBuilder().setParams(params).build();
+        GrpcRequest request = GrpcRequest.newBuilder()
+                .setParams(JsonUtil.obj2Json(job))
+                .build();
         try {
             GrpcReply grpcReply = blockingStub.sendMessage(request);
             if ("UNKNOWN".equals(grpcReply.getMessage())) {
                 log.error("任务执行失败:{}，任务id:{}", grpcReply.getMessage(), job.getId());
             }
         } catch (StatusRuntimeException e) {
-            List<Job> jobServices = map.get(job.getServiceName());
+            List<Job> jobServices = RefreshServiceTask.servicesMap.get(job.getServiceName());
             if (StringUtil.isNotEmpty(jobServices) && jobServices.size() > 1) {
                 jobServices.remove(0);
                 job.setHost(jobServices.get(0).getHost());
                 job.setPort(jobServices.get(0).getPort());
-                map.put(job.getServiceName(), jobServices);
+                RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
                 JobUtils.updateScheduleJob(scheduler, job);
             } else {
                 jobServices = refreshServiceTask.getServiceInstance(job.getServiceName());
                 if (StringUtil.isNotEmpty(jobServices)) {
                     job.setHost(jobServices.get(0).getHost());
                     job.setPort(jobServices.get(0).getPort());
-                    map.put(job.getServiceName(), jobServices);
+                    RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
                     JobUtils.updateScheduleJob(scheduler, job);
                 }
             }
-            System.out.println(e.getMessage());
-
+            log.info(e.getMessage());
         } finally {
-            shutdown();
+            channel.shutdown().awaitTermination(500, TimeUnit.SECONDS);
         }
-    }
-
-    public void shutdown() throws InterruptedException {
-        this.channel.shutdown().awaitTermination(500, TimeUnit.SECONDS);
     }
 
 }
