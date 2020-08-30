@@ -153,7 +153,6 @@ public final class GrpcRequest extends
             return super.equals(obj);
         }
         GrpcRequest other = (GrpcRequest) obj;
-
         boolean result;
         result = getParams()
                 .equals(other.getParams());
