@@ -1,35 +1,16 @@
 package org.ld.grpc.client;
 
-import com.google.protobuf.Descriptors;
-import io.grpc.*;
-import io.grpc.protobuf.ProtoFileDescriptorSupplier;
-import io.grpc.protobuf.ProtoMethodDescriptorSupplier;
-import io.grpc.protobuf.ProtoServiceDescriptorSupplier;
-import io.grpc.protobuf.ProtoUtils;
-import io.grpc.stub.AbstractStub;
-import io.grpc.stub.ClientCalls;
-import io.grpc.stub.ServerCalls;
 import io.grpc.stub.StreamObserver;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
-import static io.grpc.stub.ClientCalls.futureUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
-/**
- * <pre>
- * The greeting service definition.
- * </pre>
- */
-@javax.annotation.Generated(
-        value = "by gRPC proto compiler (version 1.13.1)",
-        comments = "Source: hello.proto")
 public final class GreeterGrpc {
 
     public static final String SERVICE_NAME = "Greeter";
     private static final int METHODID_SEND_MESSAGE = 0;
-    // Static method descriptors that strictly reflect the proto.
     private static volatile io.grpc.MethodDescriptor<GrpcRequest,
             GrpcReply> getSendMessageMethod;
     private static volatile io.grpc.ServiceDescriptor serviceDescriptor;
@@ -61,27 +42,9 @@ public final class GreeterGrpc {
         return getSendMessageMethod;
     }
 
-    /**
-     * Creates a new async stub that supports all call types for the service
-     */
-    public static GreeterStub newStub(io.grpc.Channel channel) {
-        return new GreeterStub(channel);
-    }
-
-    /**
-     * Creates a new blocking-style stub that supports unary and streaming output calls on the service
-     */
     public static GreeterBlockingStub newBlockingStub(
             io.grpc.Channel channel) {
         return new GreeterBlockingStub(channel);
-    }
-
-    /**
-     * Creates a new ListenableFuture-style stub that supports unary calls on the service
-     */
-    public static GreeterFutureStub newFutureStub(
-            io.grpc.Channel channel) {
-        return new GreeterFutureStub(channel);
     }
 
     public static io.grpc.ServiceDescriptor getServiceDescriptor() {
@@ -100,18 +63,8 @@ public final class GreeterGrpc {
         return result;
     }
 
-    /**
-     * <pre>
-     * The greeting service definition.
-     * </pre>
-     */
     public static abstract class GreeterImplBase implements io.grpc.BindableService {
 
-        /**
-         * <pre>
-         * Sends a greeting
-         * </pre>
-         */
         public void sendMessage(GrpcRequest request,
                                 io.grpc.stub.StreamObserver<GrpcReply> responseObserver) {
             asyncUnimplementedUnaryCall(getSendMessageMethod(), responseObserver);
@@ -123,52 +76,12 @@ public final class GreeterGrpc {
                     .addMethod(
                             getSendMessageMethod(),
                             asyncUnaryCall(
-                                    new MethodHandlers<
-                                            GrpcRequest,
-                                            GrpcReply>(
+                                    new MethodHandlers<>(
                                             this, METHODID_SEND_MESSAGE)))
                     .build();
         }
     }
 
-    /**
-     * <pre>
-     * The greeting service definition.
-     * </pre>
-     */
-    public static final class GreeterStub extends io.grpc.stub.AbstractStub<GreeterStub> {
-        private GreeterStub(io.grpc.Channel channel) {
-            super(channel);
-        }
-
-        private GreeterStub(io.grpc.Channel channel,
-                            io.grpc.CallOptions callOptions) {
-            super(channel, callOptions);
-        }
-
-        @Override
-        protected GreeterStub build(io.grpc.Channel channel,
-                                    io.grpc.CallOptions callOptions) {
-            return new GreeterStub(channel, callOptions);
-        }
-
-        /**
-         * <pre>
-         * Sends a greeting
-         * </pre>
-         */
-        public void sendMessage(GrpcRequest request,
-                                io.grpc.stub.StreamObserver<GrpcReply> responseObserver) {
-            ClientCalls.asyncUnaryCall(
-                    getChannel().newCall(getSendMessageMethod(), getCallOptions()), request, responseObserver);
-        }
-    }
-
-    /**
-     * <pre>
-     * The greeting service definition.
-     * </pre>
-     */
     public static final class GreeterBlockingStub extends io.grpc.stub.AbstractStub<GreeterBlockingStub> {
         private GreeterBlockingStub(io.grpc.Channel channel) {
             super(channel);
@@ -185,47 +98,9 @@ public final class GreeterGrpc {
             return new GreeterBlockingStub(channel, callOptions);
         }
 
-        /**
-         * <pre>
-         * Sends a greeting
-         * </pre>
-         */
         public GrpcReply sendMessage(GrpcRequest request) {
             return blockingUnaryCall(
                     getChannel(), getSendMessageMethod(), getCallOptions(), request);
-        }
-    }
-
-    /**
-     * <pre>
-     * The greeting service definition.
-     * </pre>
-     */
-    public static final class GreeterFutureStub extends io.grpc.stub.AbstractStub<GreeterFutureStub> {
-        private GreeterFutureStub(io.grpc.Channel channel) {
-            super(channel);
-        }
-
-        private GreeterFutureStub(io.grpc.Channel channel,
-                                  io.grpc.CallOptions callOptions) {
-            super(channel, callOptions);
-        }
-
-        @Override
-        protected GreeterFutureStub build(io.grpc.Channel channel,
-                                          io.grpc.CallOptions callOptions) {
-            return new GreeterFutureStub(channel, callOptions);
-        }
-
-        /**
-         * <pre>
-         * Sends a greeting
-         * </pre>
-         */
-        public com.google.common.util.concurrent.ListenableFuture<GrpcReply> sendMessage(
-                GrpcRequest request) {
-            return futureUnaryCall(
-                    getChannel().newCall(getSendMessageMethod(), getCallOptions()), request);
         }
     }
 
@@ -245,24 +120,18 @@ public final class GreeterGrpc {
         @Override
         @SuppressWarnings("unchecked")
         public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
-            switch (methodId) {
-                case METHODID_SEND_MESSAGE:
-                    serviceImpl.sendMessage((GrpcRequest) request,
-                            (io.grpc.stub.StreamObserver<GrpcReply>) responseObserver);
-                    break;
-                default:
-                    throw new AssertionError();
+            if (methodId == METHODID_SEND_MESSAGE) {
+                serviceImpl.sendMessage((GrpcRequest) request,
+                        (StreamObserver<GrpcReply>) responseObserver);
+            } else {
+                throw new AssertionError();
             }
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public io.grpc.stub.StreamObserver<Req> invoke(
                 io.grpc.stub.StreamObserver<Resp> responseObserver) {
-            switch (methodId) {
-                default:
-                    throw new AssertionError();
-            }
+            throw new AssertionError();
         }
     }
 

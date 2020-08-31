@@ -23,7 +23,6 @@ public class GreeterImpl extends GreeterGrpc.GreeterImplBase {
     /**
      * grpc服务端接受消息方法
      * 通过反射调用具体需要执行方法
-     *
      * @param req              传入参数
      * @param responseObserver 返回结果
      */

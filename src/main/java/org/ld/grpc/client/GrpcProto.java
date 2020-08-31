@@ -51,20 +51,9 @@ public final class GrpcProto {
     private GrpcProto() {
     }
 
-    public static void registerAllExtensions(
-            com.google.protobuf.ExtensionRegistryLite registry) {
-    }
-
-    public static void registerAllExtensions(
-            com.google.protobuf.ExtensionRegistry registry) {
-        registerAllExtensions(
-                (com.google.protobuf.ExtensionRegistryLite) registry);
-    }
-
     public static com.google.protobuf.Descriptors.FileDescriptor
     getDescriptor() {
         return descriptor;
     }
 
-    // @@protoc_insertion_point(outer_class_scope)
 }
