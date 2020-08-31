@@ -19,31 +19,28 @@ public final class GreeterGrpc {
 
     public static final String SERVICE_NAME = "Greeter";
     private static final int METHODID_SEND_MESSAGE = 0;
-    private static volatile MethodDescriptor<GrpcRequest,
-            GrpcReply> getSendMessageMethod;
+    private static volatile MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
     private static volatile ServiceDescriptor serviceDescriptor;
 
     private GreeterGrpc() {
     }
 
-    public static MethodDescriptor<GrpcRequest,
-            GrpcReply> getSendMessageMethod() {
+    public static MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod() {
         MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
         if ((getSendMessageMethod = GreeterGrpc.getSendMessageMethod) == null) {
             synchronized (GreeterGrpc.class) {
                 if ((getSendMessageMethod = GreeterGrpc.getSendMessageMethod) == null) {
-                    GreeterGrpc.getSendMessageMethod = getSendMessageMethod =
-                            MethodDescriptor.<GrpcRequest, GrpcReply>newBuilder()
-                                    .setType(MethodDescriptor.MethodType.UNARY)
-                                    .setFullMethodName(generateFullMethodName(
-                                            "Greeter", "sendMessage"))
-                                    .setSampledToLocalTracing(true)
-                                    .setRequestMarshaller(ProtoUtils.marshaller(
-                                            GrpcRequest.getDefaultInstance()))
-                                    .setResponseMarshaller(ProtoUtils.marshaller(
-                                            GrpcReply.getDefaultInstance()))
-                                    .setSchemaDescriptor(new GreeterMethodDescriptorSupplier("sendMessage"))
-                                    .build();
+                    GreeterGrpc.getSendMessageMethod
+                            = getSendMessageMethod
+                            = MethodDescriptor
+                            .<GrpcRequest, GrpcReply>newBuilder()
+                            .setType(MethodDescriptor.MethodType.UNARY)
+                            .setFullMethodName(generateFullMethodName("Greeter", "sendMessage"))
+                            .setSampledToLocalTracing(true)
+                            .setRequestMarshaller(ProtoUtils.marshaller(GrpcRequest.getDefaultInstance()))
+                            .setResponseMarshaller(ProtoUtils.marshaller(GrpcReply.getDefaultInstance()))
+                            .setSchemaDescriptor(new GreeterMethodDescriptorSupplier("sendMessage"))
+                            .build();
                 }
             }
         }
@@ -81,11 +78,7 @@ public final class GreeterGrpc {
         @Override
         public final ServerServiceDefinition bindService() {
             return ServerServiceDefinition.builder(getServiceDescriptor())
-                    .addMethod(
-                            getSendMessageMethod(),
-                            asyncUnaryCall(
-                                    new MethodHandlers<>(
-                                            this, METHODID_SEND_MESSAGE)))
+                    .addMethod(getSendMessageMethod(), asyncUnaryCall(new MethodHandlers<>(this, METHODID_SEND_MESSAGE)))
                     .build();
         }
     }
@@ -129,8 +122,7 @@ public final class GreeterGrpc {
         @SuppressWarnings("unchecked")
         public void invoke(Req request, StreamObserver<Resp> responseObserver) {
             if (methodId == METHODID_SEND_MESSAGE) {
-                serviceImpl.sendMessage((GrpcRequest) request,
-                        (StreamObserver<GrpcReply>) responseObserver);
+                serviceImpl.sendMessage((GrpcRequest) request, (StreamObserver<GrpcReply>) responseObserver);
             } else {
                 throw new AssertionError();
             }

@@ -3,11 +3,7 @@ package org.ld.grpc.client;
 import com.google.protobuf.*;
 
 /**
- * <pre>
  * The request message containing the user's name.
- * </pre>
- * <p>
- * Protobuf type {@code GrpcRequest}
  */
 public final class GrpcRequest extends
         GeneratedMessageV3 implements
@@ -231,11 +227,7 @@ public final class GrpcRequest extends
     }
 
     /**
-     * <pre>
      * The request message containing the user's name.
-     * </pre>
-     * <p>
-     * Protobuf type {@code GrpcRequest}
      */
     public static final class Builder extends
             GeneratedMessageV3.Builder<Builder> implements
@@ -372,9 +364,6 @@ public final class GrpcRequest extends
             return this;
         }
 
-        /**
-         * <code>string params = 1;</code>
-         */
         public String getParams() {
             Object ref = params_;
             if (!(ref instanceof String)) {
@@ -388,9 +377,6 @@ public final class GrpcRequest extends
             }
         }
 
-        /**
-         * <code>string params = 1;</code>
-         */
         public Builder setParams(
                 String value) {
             if (value == null) {
@@ -400,23 +386,6 @@ public final class GrpcRequest extends
             params_ = value;
             onChanged();
             return this;
-        }
-
-        /**
-         * <code>string params = 1;</code>
-         */
-        public ByteString
-        getParamsBytes() {
-            Object ref = params_;
-            if (ref instanceof String) {
-                ByteString b =
-                        ByteString.copyFromUtf8(
-                                (String) ref);
-                params_ = b;
-                return b;
-            } else {
-                return (ByteString) ref;
-            }
         }
 
         public Builder clearParams() {

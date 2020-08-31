@@ -3,15 +3,9 @@ package org.ld.grpc.client;
 import com.google.protobuf.*;
 
 /**
- * <pre>
  * The response message containing the greetings
- * </pre>
- * <p>
- * Protobuf type {@code GrpcReply}
  */
-public final class GrpcReply extends
-        GeneratedMessageV3 implements
-        MessageOrBuilder {
+public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuilder {
     public static final int MESSAGE_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcReply DEFAULT_INSTANCE;
@@ -74,8 +68,7 @@ public final class GrpcReply extends
         } catch (InvalidProtocolBufferException e) {
             throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
-            throw new InvalidProtocolBufferException(
-                    e).setUnfinishedMessage(this);
+            throw new InvalidProtocolBufferException(e).setUnfinishedMessage(this);
         } finally {
             this.unknownFields = unknownFields.build();
             makeExtensionsImmutable();
@@ -143,7 +136,6 @@ public final class GrpcReply extends
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
         if (isInitialized == 0) return false;
-
         memoizedIsInitialized = 1;
         return true;
     }
@@ -178,10 +170,8 @@ public final class GrpcReply extends
             return super.equals(obj);
         }
         GrpcReply other = (GrpcReply) obj;
-
         boolean result;
-        result = getMessage()
-                .equals(other.getMessage());
+        result = getMessage().equals(other.getMessage());
         result = result && unknownFields.equals(other.unknownFields);
         return result;
     }
@@ -206,7 +196,8 @@ public final class GrpcReply extends
 
     public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
-                ? new Builder() : new Builder().mergeFrom(this);
+                ? new Builder()
+                : new Builder().mergeFrom(this);
     }
 
     @Override
@@ -381,19 +372,6 @@ public final class GrpcReply extends
             message_ = value;
             onChanged();
             return this;
-        }
-
-        public ByteString getMessageBytes() {
-            Object ref = message_;
-            if (ref instanceof String) {
-                ByteString b =
-                        ByteString.copyFromUtf8(
-                                (String) ref);
-                message_ = b;
-                return b;
-            } else {
-                return (ByteString) ref;
-            }
         }
 
         public Builder clearMessage() {

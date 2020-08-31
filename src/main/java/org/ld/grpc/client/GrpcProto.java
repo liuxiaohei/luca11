@@ -54,8 +54,7 @@ public final class GrpcProto {
     private GrpcProto() {
     }
 
-    public static Descriptors.FileDescriptor
-    getDescriptor() {
+    public static Descriptors.FileDescriptor getDescriptor() {
         return descriptor;
     }
 

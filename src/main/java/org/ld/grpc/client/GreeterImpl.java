@@ -19,7 +19,7 @@ public class GreeterImpl extends GreeterGrpc.GreeterImplBase {
     private Object target;
     private Method method;
     private String params;
-    private Logger log = ZLogger.newInstance();
+    private final Logger log = ZLogger.newInstance();
 
     /**
      * grpc服务端接受消息方法
@@ -33,6 +33,7 @@ public class GreeterImpl extends GreeterGrpc.GreeterImplBase {
         ScheduleJob scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
         String message = "SUCCESS";
         try {
+            assert scheduleJob != null;
             target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
             params = scheduleJob.getParams();
             if (StringUtil.isBlank(params)) {
