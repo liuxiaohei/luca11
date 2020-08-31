@@ -2,17 +2,16 @@ package org.ld.grpc.client;
 
 import com.google.protobuf.*;
 
+import java.io.IOException;
+
 /**
  * The request message containing the user's name.
  */
-public final class GrpcRequest extends
-        GeneratedMessageV3 implements
-        MessageOrBuilder {
+public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBuilder {
     public static final int PARAMS_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcRequest DEFAULT_INSTANCE;
-    private static final Parser<GrpcRequest>
-            PARSER = new AbstractParser<>() {
+    private static final Parser<GrpcRequest> PARSER = new AbstractParser<>() {
         public GrpcRequest parsePartialFrom(
                 CodedInputStream input,
                 ExtensionRegistryLite extensionRegistry)
@@ -36,10 +35,7 @@ public final class GrpcRequest extends
         params_ = "";
     }
 
-    private GrpcRequest(
-            CodedInputStream input,
-            ExtensionRegistryLite extensionRegistry)
-            throws InvalidProtocolBufferException {
+    private GrpcRequest(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
         this();
         if (extensionRegistry == null) {
             throw new NullPointerException();
@@ -70,16 +66,14 @@ public final class GrpcRequest extends
         } catch (InvalidProtocolBufferException e) {
             throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
-            throw new InvalidProtocolBufferException(
-                    e).setUnfinishedMessage(this);
+            throw new InvalidProtocolBufferException(e).setUnfinishedMessage(this);
         } finally {
             this.unknownFields = unknownFields.build();
             makeExtensionsImmutable();
         }
     }
 
-    public static Descriptors.Descriptor
-    getDescriptor() {
+    public static Descriptors.Descriptor getDescriptor() {
         return GrpcProto.internal_static_GrpcRequest_descriptor;
     }
 
@@ -96,21 +90,14 @@ public final class GrpcRequest extends
     }
 
     @Override
-    public final UnknownFieldSet
-    getUnknownFields() {
+    public final UnknownFieldSet getUnknownFields() {
         return this.unknownFields;
     }
 
-    protected FieldAccessorTable
-    internalGetFieldAccessorTable() {
-        return GrpcProto.internal_static_GrpcRequest_fieldAccessorTable
-                .ensureFieldAccessorsInitialized(
-                        GrpcRequest.class, Builder.class);
+    protected FieldAccessorTable internalGetFieldAccessorTable() {
+        return GrpcProto.internal_static_GrpcRequest_fieldAccessorTable.ensureFieldAccessorsInitialized(GrpcRequest.class, Builder.class);
     }
 
-    /**
-     * <code>string params = 1;</code>
-     */
     public String getParams() {
         Object ref = params_;
         if (ref instanceof String) {
@@ -124,16 +111,10 @@ public final class GrpcRequest extends
         }
     }
 
-    /**
-     * <code>string params = 1;</code>
-     */
-    public ByteString
-    getParamsBytes() {
+    public ByteString getParamsBytes() {
         Object ref = params_;
         if (ref instanceof String) {
-            ByteString b =
-                    ByteString.copyFromUtf8(
-                            (String) ref);
+            ByteString b = ByteString.copyFromUtf8((String) ref);
             params_ = b;
             return b;
         } else {
@@ -145,13 +126,11 @@ public final class GrpcRequest extends
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
         if (isInitialized == 0) return false;
-
         memoizedIsInitialized = 1;
         return true;
     }
 
-    public void writeTo(CodedOutputStream output)
-            throws java.io.IOException {
+    public void writeTo(CodedOutputStream output) throws java.io.IOException {
         if (!getParamsBytes().isEmpty()) {
             GeneratedMessageV3.writeString(output, 1, params_);
         }
@@ -161,7 +140,6 @@ public final class GrpcRequest extends
     public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
-
         size = 0;
         if (!getParamsBytes().isEmpty()) {
             size += GeneratedMessageV3.computeStringSize(1, params_);
@@ -180,10 +158,8 @@ public final class GrpcRequest extends
             return super.equals(obj);
         }
         GrpcRequest other = (GrpcRequest) obj;
-
         boolean result;
-        result = getParams()
-                .equals(other.getParams());
+        result = getParams().equals(other.getParams());
         result = result && unknownFields.equals(other.unknownFields);
         return result;
     }
@@ -208,12 +184,12 @@ public final class GrpcRequest extends
 
     public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
-                ? new Builder() : new Builder().mergeFrom(this);
+                ? new Builder()
+                : new Builder().mergeFrom(this);
     }
 
     @Override
-    protected Builder newBuilderForType(
-            BuilderParent parent) {
+    protected Builder newBuilderForType(BuilderParent parent) {
         return new Builder(parent);
     }
 
@@ -226,48 +202,31 @@ public final class GrpcRequest extends
         return DEFAULT_INSTANCE;
     }
 
-    /**
-     * The request message containing the user's name.
-     */
-    public static final class Builder extends
-            GeneratedMessageV3.Builder<Builder> implements
-            MessageOrBuilder {
+    public static final class Builder extends GeneratedMessageV3.Builder<Builder> implements MessageOrBuilder {
         private Object params_ = "";
 
         private Builder() {
-            maybeForceBuilderInitialization();
         }
 
-        private Builder(
-                BuilderParent parent) {
+        private Builder(BuilderParent parent) {
             super(parent);
-            maybeForceBuilderInitialization();
         }
 
-        public static Descriptors.Descriptor
-        getDescriptor() {
+        public static Descriptors.Descriptor getDescriptor() {
             return GrpcProto.internal_static_GrpcRequest_descriptor;
         }
 
-        protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
-            return GrpcProto.internal_static_GrpcRequest_fieldAccessorTable
-                    .ensureFieldAccessorsInitialized(
-                            GrpcRequest.class, Builder.class);
-        }
-
-        private void maybeForceBuilderInitialization() {
+        protected FieldAccessorTable internalGetFieldAccessorTable() {
+            return GrpcProto.internal_static_GrpcRequest_fieldAccessorTable.ensureFieldAccessorsInitialized(GrpcRequest.class, Builder.class);
         }
 
         public Builder clear() {
             super.clear();
             params_ = "";
-
             return this;
         }
 
-        public Descriptors.Descriptor
-        getDescriptorForType() {
+        public Descriptors.Descriptor getDescriptorForType() {
             return GrpcProto.internal_static_GrpcRequest_descriptor;
         }
 
@@ -294,25 +253,19 @@ public final class GrpcRequest extends
             return super.clone();
         }
 
-        public Builder setField(
-                Descriptors.FieldDescriptor field,
-                Object value) {
+        public Builder setField(Descriptors.FieldDescriptor field, Object value) {
             return super.setField(field, value);
         }
 
-        public Builder clearField(
-                Descriptors.FieldDescriptor field) {
+        public Builder clearField(Descriptors.FieldDescriptor field) {
             return super.clearField(field);
         }
 
-        public Builder clearOneof(
-                Descriptors.OneofDescriptor oneof) {
+        public Builder clearOneof(Descriptors.OneofDescriptor oneof) {
             return super.clearOneof(oneof);
         }
 
-        public Builder setRepeatedField(
-                Descriptors.FieldDescriptor field,
-                int index, Object value) {
+        public Builder setRepeatedField(Descriptors.FieldDescriptor field, int index, Object value) {
             return super.setRepeatedField(field, index, value);
         }
 
@@ -346,10 +299,7 @@ public final class GrpcRequest extends
             return true;
         }
 
-        public Builder mergeFrom(
-                CodedInputStream input,
-                ExtensionRegistryLite extensionRegistry)
-                throws java.io.IOException {
+        public Builder mergeFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws IOException {
             GrpcRequest parsedMessage = null;
             try {
                 parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -367,8 +317,7 @@ public final class GrpcRequest extends
         public String getParams() {
             Object ref = params_;
             if (!(ref instanceof String)) {
-                ByteString bs =
-                        (ByteString) ref;
+                ByteString bs = (ByteString) ref;
                 String s = bs.toStringUtf8();
                 params_ = s;
                 return s;
@@ -377,31 +326,26 @@ public final class GrpcRequest extends
             }
         }
 
-        public Builder setParams(
-                String value) {
+        public Builder setParams(String value) {
             if (value == null) {
                 throw new NullPointerException();
             }
-
             params_ = value;
             onChanged();
             return this;
         }
 
         public Builder clearParams() {
-
             params_ = getDefaultInstance().getParams();
             onChanged();
             return this;
         }
 
-        public final Builder setUnknownFields(
-                final UnknownFieldSet unknownFields) {
+        public final Builder setUnknownFields(final UnknownFieldSet unknownFields) {
             return super.setUnknownFieldsProto3(unknownFields);
         }
 
-        public final Builder mergeUnknownFields(
-                final UnknownFieldSet unknownFields) {
+        public final Builder mergeUnknownFields(final UnknownFieldSet unknownFields) {
             return super.mergeUnknownFields(unknownFields);
         }
     }

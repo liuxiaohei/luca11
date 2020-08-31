@@ -2,6 +2,8 @@ package org.ld.grpc.client;
 
 import com.google.protobuf.*;
 
+import java.io.IOException;
+
 /**
  * The response message containing the greetings
  */
@@ -9,12 +11,8 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
     public static final int MESSAGE_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcReply DEFAULT_INSTANCE;
-    private static final Parser<GrpcReply>
-            PARSER = new AbstractParser<>() {
-        public GrpcReply parsePartialFrom(
-                CodedInputStream input,
-                ExtensionRegistryLite extensionRegistry)
-                throws InvalidProtocolBufferException {
+    private static final Parser<GrpcReply> PARSER = new AbstractParser<>() {
+        public GrpcReply parsePartialFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
             return new GrpcReply(input, extensionRegistry);
         }
     };
@@ -34,10 +32,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         message_ = "";
     }
 
-    private GrpcReply(
-            CodedInputStream input,
-            ExtensionRegistryLite extensionRegistry)
-            throws InvalidProtocolBufferException {
+    private GrpcReply(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
         this();
         if (extensionRegistry == null) {
             throw new NullPointerException();
@@ -75,8 +70,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         }
     }
 
-    public static Descriptors.Descriptor
-    getDescriptor() {
+    public static Descriptors.Descriptor getDescriptor() {
         return GrpcProto.internal_static_GrpcReply_descriptor;
     }
 
@@ -93,16 +87,12 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
     }
 
     @Override
-    public final UnknownFieldSet
-    getUnknownFields() {
+    public final UnknownFieldSet getUnknownFields() {
         return this.unknownFields;
     }
 
-    protected FieldAccessorTable
-    internalGetFieldAccessorTable() {
-        return GrpcProto.internal_static_GrpcReply_fieldAccessorTable
-                .ensureFieldAccessorsInitialized(
-                        GrpcReply.class, Builder.class);
+    protected FieldAccessorTable internalGetFieldAccessorTable() {
+        return GrpcProto.internal_static_GrpcReply_fieldAccessorTable.ensureFieldAccessorsInitialized(GrpcReply.class, Builder.class);
     }
 
     public String getMessage() {
@@ -110,21 +100,17 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         if (ref instanceof String) {
             return (String) ref;
         } else {
-            ByteString bs =
-                    (ByteString) ref;
+            ByteString bs = (ByteString) ref;
             String s = bs.toStringUtf8();
             message_ = s;
             return s;
         }
     }
 
-    public ByteString
-    getMessageBytes() {
+    public ByteString getMessageBytes() {
         Object ref = message_;
         if (ref instanceof String) {
-            ByteString b =
-                    ByteString.copyFromUtf8(
-                            (String) ref);
+            ByteString b = ByteString.copyFromUtf8((String) ref);
             message_ = b;
             return b;
         } else {
@@ -140,8 +126,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         return true;
     }
 
-    public void writeTo(CodedOutputStream output)
-            throws java.io.IOException {
+    public void writeTo(CodedOutputStream output) throws IOException {
         if (!getMessageBytes().isEmpty()) {
             GeneratedMessageV3.writeString(output, 1, message_);
         }
@@ -151,7 +136,6 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
     public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
-
         size = 0;
         if (!getMessageBytes().isEmpty()) {
             size += GeneratedMessageV3.computeStringSize(1, message_);
@@ -201,8 +185,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
     }
 
     @Override
-    protected Builder newBuilderForType(
-            BuilderParent parent) {
+    protected Builder newBuilderForType(BuilderParent parent) {
         return new Builder(parent);
     }
 
@@ -215,45 +198,33 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         return DEFAULT_INSTANCE;
     }
 
-    public static final class Builder extends
-            GeneratedMessageV3.Builder<Builder> implements
-            MessageOrBuilder {
+    public static final class Builder extends GeneratedMessageV3.Builder<Builder> implements MessageOrBuilder {
         private Object message_ = "";
 
         private Builder() {
-            maybeForceBuilderInitialization();
         }
 
-        private Builder(
-                BuilderParent parent) {
+        private Builder(BuilderParent parent) {
             super(parent);
-            maybeForceBuilderInitialization();
         }
 
-        public static Descriptors.Descriptor
-        getDescriptor() {
+        public static Descriptors.Descriptor getDescriptor() {
             return GrpcProto.internal_static_GrpcReply_descriptor;
         }
 
-        protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
+        protected FieldAccessorTable internalGetFieldAccessorTable() {
             return GrpcProto.internal_static_GrpcReply_fieldAccessorTable
                     .ensureFieldAccessorsInitialized(
                             GrpcReply.class, Builder.class);
         }
 
-        private void maybeForceBuilderInitialization() {
-        }
-
         public Builder clear() {
             super.clear();
             message_ = "";
-
             return this;
         }
 
-        public Descriptors.Descriptor
-        getDescriptorForType() {
+        public Descriptors.Descriptor getDescriptorForType() {
             return GrpcProto.internal_static_GrpcReply_descriptor;
         }
 
@@ -280,31 +251,23 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
             return super.clone();
         }
 
-        public Builder setField(
-                Descriptors.FieldDescriptor field,
-                Object value) {
+        public Builder setField(Descriptors.FieldDescriptor field, Object value) {
             return super.setField(field, value);
         }
 
-        public Builder clearField(
-                Descriptors.FieldDescriptor field) {
+        public Builder clearField(Descriptors.FieldDescriptor field) {
             return super.clearField(field);
         }
 
-        public Builder clearOneof(
-                Descriptors.OneofDescriptor oneof) {
+        public Builder clearOneof(Descriptors.OneofDescriptor oneof) {
             return super.clearOneof(oneof);
         }
 
-        public Builder setRepeatedField(
-                Descriptors.FieldDescriptor field,
-                int index, Object value) {
+        public Builder setRepeatedField(Descriptors.FieldDescriptor field, int index, Object value) {
             return super.setRepeatedField(field, index, value);
         }
 
-        public Builder addRepeatedField(
-                Descriptors.FieldDescriptor field,
-                Object value) {
+        public Builder addRepeatedField(Descriptors.FieldDescriptor field, Object value) {
             return super.addRepeatedField(field, value);
         }
 
@@ -332,10 +295,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
             return true;
         }
 
-        public Builder mergeFrom(
-                CodedInputStream input,
-                ExtensionRegistryLite extensionRegistry)
-                throws java.io.IOException {
+        public Builder mergeFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws IOException {
             GrpcReply parsedMessage = null;
             try {
                 parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -353,8 +313,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         public String getMessage() {
             Object ref = message_;
             if (!(ref instanceof String)) {
-                ByteString bs =
-                        (ByteString) ref;
+                ByteString bs = (ByteString) ref;
                 String s = bs.toStringUtf8();
                 message_ = s;
                 return s;
@@ -363,35 +322,28 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
             }
         }
 
-        public Builder setMessage(
-                String value) {
+        public Builder setMessage(String value) {
             if (value == null) {
                 throw new NullPointerException();
             }
-
             message_ = value;
             onChanged();
             return this;
         }
 
         public Builder clearMessage() {
-
             message_ = getDefaultInstance().getMessage();
             onChanged();
             return this;
         }
 
-        public final Builder setUnknownFields(
-                final UnknownFieldSet unknownFields) {
+        public final Builder setUnknownFields(final UnknownFieldSet unknownFields) {
             return super.setUnknownFieldsProto3(unknownFields);
         }
 
-        public final Builder mergeUnknownFields(
-                final UnknownFieldSet unknownFields) {
+        public final Builder mergeUnknownFields(final UnknownFieldSet unknownFields) {
             return super.mergeUnknownFields(unknownFields);
         }
-
     }
-
 }
 

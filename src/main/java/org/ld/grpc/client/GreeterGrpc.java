@@ -47,8 +47,7 @@ public final class GreeterGrpc {
         return getSendMessageMethod;
     }
 
-    public static GreeterBlockingStub newBlockingStub(
-            Channel channel) {
+    public static GreeterBlockingStub newBlockingStub(Channel channel) {
         return new GreeterBlockingStub(channel);
     }
 
@@ -69,9 +68,7 @@ public final class GreeterGrpc {
     }
 
     public static abstract class GreeterImplBase implements BindableService {
-
-        public void sendMessage(GrpcRequest request,
-                                StreamObserver<GrpcReply> responseObserver) {
+        public void sendMessage(GrpcRequest request, StreamObserver<GrpcReply> responseObserver) {
             asyncUnimplementedUnaryCall(getSendMessageMethod(), responseObserver);
         }
 
@@ -88,20 +85,17 @@ public final class GreeterGrpc {
             super(channel);
         }
 
-        private GreeterBlockingStub(Channel channel,
-                                    CallOptions callOptions) {
+        private GreeterBlockingStub(Channel channel, CallOptions callOptions) {
             super(channel, callOptions);
         }
 
         @Override
-        protected GreeterBlockingStub build(Channel channel,
-                                            CallOptions callOptions) {
+        protected GreeterBlockingStub build(Channel channel, CallOptions callOptions) {
             return new GreeterBlockingStub(channel, callOptions);
         }
 
         public GrpcReply sendMessage(GrpcRequest request) {
-            return blockingUnaryCall(
-                    getChannel(), getSendMessageMethod(), getCallOptions(), request);
+            return blockingUnaryCall(getChannel(), getSendMessageMethod(), getCallOptions(), request);
         }
     }
 
@@ -129,14 +123,12 @@ public final class GreeterGrpc {
         }
 
         @Override
-        public StreamObserver<Req> invoke(
-                StreamObserver<Resp> responseObserver) {
+        public StreamObserver<Req> invoke(StreamObserver<Resp> responseObserver) {
             throw new AssertionError();
         }
     }
 
-    private static abstract class GreeterBaseDescriptorSupplier
-            implements ProtoFileDescriptorSupplier, ProtoServiceDescriptorSupplier {
+    private static abstract class GreeterBaseDescriptorSupplier implements ProtoFileDescriptorSupplier, ProtoServiceDescriptorSupplier {
         GreeterBaseDescriptorSupplier() {
         }
 
@@ -151,15 +143,12 @@ public final class GreeterGrpc {
         }
     }
 
-    private static final class GreeterFileDescriptorSupplier
-            extends GreeterBaseDescriptorSupplier {
+    private static final class GreeterFileDescriptorSupplier extends GreeterBaseDescriptorSupplier {
         GreeterFileDescriptorSupplier() {
         }
     }
 
-    private static final class GreeterMethodDescriptorSupplier
-            extends GreeterBaseDescriptorSupplier
-            implements ProtoMethodDescriptorSupplier {
+    private static final class GreeterMethodDescriptorSupplier extends GreeterBaseDescriptorSupplier implements ProtoMethodDescriptorSupplier {
         private final String methodName;
 
         GreeterMethodDescriptorSupplier(String methodName) {
