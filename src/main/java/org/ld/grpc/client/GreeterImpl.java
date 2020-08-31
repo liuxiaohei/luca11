@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 @GrpcService(GreeterGrpc.class)
 public class GreeterImpl extends GreeterGrpc.GreeterImplBase {
+
     private Object target;
     private Method method;
     private String params;

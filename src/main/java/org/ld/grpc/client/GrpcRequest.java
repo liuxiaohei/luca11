@@ -1,5 +1,7 @@
 package org.ld.grpc.client;
 
+import com.google.protobuf.*;
+
 /**
  * <pre>
  * The request message containing the user's name.
@@ -8,17 +10,17 @@ package org.ld.grpc.client;
  * Protobuf type {@code GrpcRequest}
  */
 public final class GrpcRequest extends
-        com.google.protobuf.GeneratedMessageV3 implements
-        com.google.protobuf.MessageOrBuilder {
+        GeneratedMessageV3 implements
+        MessageOrBuilder {
     public static final int PARAMS_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcRequest DEFAULT_INSTANCE;
-    private static final com.google.protobuf.Parser<GrpcRequest>
-            PARSER = new com.google.protobuf.AbstractParser<>() {
+    private static final Parser<GrpcRequest>
+            PARSER = new AbstractParser<>() {
         public GrpcRequest parsePartialFrom(
-                com.google.protobuf.CodedInputStream input,
-                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                throws com.google.protobuf.InvalidProtocolBufferException {
+                CodedInputStream input,
+                ExtensionRegistryLite extensionRegistry)
+                throws InvalidProtocolBufferException {
             return new GrpcRequest(input, extensionRegistry);
         }
     };
@@ -30,7 +32,7 @@ public final class GrpcRequest extends
     private volatile Object params_;
     private byte memoizedIsInitialized = -1;
 
-    private GrpcRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    private GrpcRequest(GeneratedMessageV3.Builder<?> builder) {
         super(builder);
     }
 
@@ -39,15 +41,15 @@ public final class GrpcRequest extends
     }
 
     private GrpcRequest(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
+            CodedInputStream input,
+            ExtensionRegistryLite extensionRegistry)
+            throws InvalidProtocolBufferException {
         this();
         if (extensionRegistry == null) {
             throw new NullPointerException();
         }
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-                com.google.protobuf.UnknownFieldSet.newBuilder();
+        UnknownFieldSet.Builder unknownFields =
+                UnknownFieldSet.newBuilder();
         try {
             boolean done = false;
             while (!done) {
@@ -69,10 +71,10 @@ public final class GrpcRequest extends
                     }
                 }
             }
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        } catch (InvalidProtocolBufferException e) {
             throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
-            throw new com.google.protobuf.InvalidProtocolBufferException(
+            throw new InvalidProtocolBufferException(
                     e).setUnfinishedMessage(this);
         } finally {
             this.unknownFields = unknownFields.build();
@@ -80,7 +82,7 @@ public final class GrpcRequest extends
         }
     }
 
-    public static com.google.protobuf.Descriptors.Descriptor
+    public static Descriptors.Descriptor
     getDescriptor() {
         return GrpcProto.internal_static_GrpcRequest_descriptor;
     }
@@ -98,7 +100,7 @@ public final class GrpcRequest extends
     }
 
     @Override
-    public final com.google.protobuf.UnknownFieldSet
+    public final UnknownFieldSet
     getUnknownFields() {
         return this.unknownFields;
     }
@@ -118,8 +120,8 @@ public final class GrpcRequest extends
         if (ref instanceof String) {
             return (String) ref;
         } else {
-            com.google.protobuf.ByteString bs =
-                    (com.google.protobuf.ByteString) ref;
+            ByteString bs =
+                    (ByteString) ref;
             String s = bs.toStringUtf8();
             params_ = s;
             return s;
@@ -129,17 +131,17 @@ public final class GrpcRequest extends
     /**
      * <code>string params = 1;</code>
      */
-    public com.google.protobuf.ByteString
+    public ByteString
     getParamsBytes() {
         Object ref = params_;
         if (ref instanceof String) {
-            com.google.protobuf.ByteString b =
-                    com.google.protobuf.ByteString.copyFromUtf8(
+            ByteString b =
+                    ByteString.copyFromUtf8(
                             (String) ref);
             params_ = b;
             return b;
         } else {
-            return (com.google.protobuf.ByteString) ref;
+            return (ByteString) ref;
         }
     }
 
@@ -152,10 +154,10 @@ public final class GrpcRequest extends
         return true;
     }
 
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
+    public void writeTo(CodedOutputStream output)
             throws java.io.IOException {
         if (!getParamsBytes().isEmpty()) {
-            com.google.protobuf.GeneratedMessageV3.writeString(output, 1, params_);
+            GeneratedMessageV3.writeString(output, 1, params_);
         }
         unknownFields.writeTo(output);
     }
@@ -166,7 +168,7 @@ public final class GrpcRequest extends
 
         size = 0;
         if (!getParamsBytes().isEmpty()) {
-            size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, params_);
+            size += GeneratedMessageV3.computeStringSize(1, params_);
         }
         size += unknownFields.getSerializedSize();
         memoizedSize = size;
@@ -220,7 +222,7 @@ public final class GrpcRequest extends
     }
 
     @Override
-    public com.google.protobuf.Parser<GrpcRequest> getParserForType() {
+    public Parser<GrpcRequest> getParserForType() {
         return PARSER;
     }
 
@@ -236,8 +238,8 @@ public final class GrpcRequest extends
      * Protobuf type {@code GrpcRequest}
      */
     public static final class Builder extends
-            com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-            com.google.protobuf.MessageOrBuilder {
+            GeneratedMessageV3.Builder<Builder> implements
+            MessageOrBuilder {
         private Object params_ = "";
 
         private Builder() {
@@ -250,7 +252,7 @@ public final class GrpcRequest extends
             maybeForceBuilderInitialization();
         }
 
-        public static com.google.protobuf.Descriptors.Descriptor
+        public static Descriptors.Descriptor
         getDescriptor() {
             return GrpcProto.internal_static_GrpcRequest_descriptor;
         }
@@ -272,7 +274,7 @@ public final class GrpcRequest extends
             return this;
         }
 
-        public com.google.protobuf.Descriptors.Descriptor
+        public Descriptors.Descriptor
         getDescriptorForType() {
             return GrpcProto.internal_static_GrpcRequest_descriptor;
         }
@@ -301,34 +303,34 @@ public final class GrpcRequest extends
         }
 
         public Builder setField(
-                com.google.protobuf.Descriptors.FieldDescriptor field,
+                Descriptors.FieldDescriptor field,
                 Object value) {
             return super.setField(field, value);
         }
 
         public Builder clearField(
-                com.google.protobuf.Descriptors.FieldDescriptor field) {
+                Descriptors.FieldDescriptor field) {
             return super.clearField(field);
         }
 
         public Builder clearOneof(
-                com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+                Descriptors.OneofDescriptor oneof) {
             return super.clearOneof(oneof);
         }
 
         public Builder setRepeatedField(
-                com.google.protobuf.Descriptors.FieldDescriptor field,
+                Descriptors.FieldDescriptor field,
                 int index, Object value) {
             return super.setRepeatedField(field, index, value);
         }
 
         public Builder addRepeatedField(
-                com.google.protobuf.Descriptors.FieldDescriptor field,
+                Descriptors.FieldDescriptor field,
                 Object value) {
             return super.addRepeatedField(field, value);
         }
 
-        public Builder mergeFrom(com.google.protobuf.Message other) {
+        public Builder mergeFrom(Message other) {
             if (other instanceof GrpcRequest) {
                 return mergeFrom((GrpcRequest) other);
             } else {
@@ -353,13 +355,13 @@ public final class GrpcRequest extends
         }
 
         public Builder mergeFrom(
-                com.google.protobuf.CodedInputStream input,
-                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                CodedInputStream input,
+                ExtensionRegistryLite extensionRegistry)
                 throws java.io.IOException {
             GrpcRequest parsedMessage = null;
             try {
                 parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            } catch (InvalidProtocolBufferException e) {
                 parsedMessage = (GrpcRequest) e.getUnfinishedMessage();
                 throw e.unwrapIOException();
             } finally {
@@ -376,8 +378,8 @@ public final class GrpcRequest extends
         public String getParams() {
             Object ref = params_;
             if (!(ref instanceof String)) {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
+                ByteString bs =
+                        (ByteString) ref;
                 String s = bs.toStringUtf8();
                 params_ = s;
                 return s;
@@ -403,17 +405,17 @@ public final class GrpcRequest extends
         /**
          * <code>string params = 1;</code>
          */
-        public com.google.protobuf.ByteString
+        public ByteString
         getParamsBytes() {
             Object ref = params_;
             if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8(
+                ByteString b =
+                        ByteString.copyFromUtf8(
                                 (String) ref);
                 params_ = b;
                 return b;
             } else {
-                return (com.google.protobuf.ByteString) ref;
+                return (ByteString) ref;
             }
         }
 
@@ -425,12 +427,12 @@ public final class GrpcRequest extends
         }
 
         public final Builder setUnknownFields(
-                final com.google.protobuf.UnknownFieldSet unknownFields) {
+                final UnknownFieldSet unknownFields) {
             return super.setUnknownFieldsProto3(unknownFields);
         }
 
         public final Builder mergeUnknownFields(
-                final com.google.protobuf.UnknownFieldSet unknownFields) {
+                final UnknownFieldSet unknownFields) {
             return super.mergeUnknownFields(unknownFields);
         }
     }
