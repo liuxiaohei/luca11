@@ -9,7 +9,7 @@ package org.ld.grpc.client;
  */
 public final class GrpcReply extends
         com.google.protobuf.GeneratedMessageV3 implements
-        GrpcReplyOrBuilder {
+        com.google.protobuf.MessageOrBuilder {
     public static final int MESSAGE_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcReply DEFAULT_INSTANCE;
@@ -224,7 +224,7 @@ public final class GrpcReply extends
 
     public static final class Builder extends
             com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-            GrpcReplyOrBuilder {
+            com.google.protobuf.MessageOrBuilder {
         private Object message_ = "";
 
         private Builder() {

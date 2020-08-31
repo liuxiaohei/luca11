@@ -9,7 +9,7 @@ package org.ld.grpc.client;
  */
 public final class GrpcRequest extends
         com.google.protobuf.GeneratedMessageV3 implements
-        GrpcRequestOrBuilder {
+        com.google.protobuf.MessageOrBuilder {
     public static final int PARAMS_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcRequest DEFAULT_INSTANCE;
@@ -237,7 +237,7 @@ public final class GrpcRequest extends
      */
     public static final class Builder extends
             com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-            GrpcRequestOrBuilder {
+            com.google.protobuf.MessageOrBuilder {
         private Object params_ = "";
 
         private Builder() {
