@@ -12,13 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+@SuppressWarnings("unused")
 public class FileUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
@@ -166,7 +164,7 @@ public class FileUtil {
         } finally {
             if (deleteFileAfterRead && file.exists()) {
                 LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
-                if (file.getParentFile().exists() && file.getParentFile().listFiles().length == 0) {
+                if (file.getParentFile().exists() && Objects.requireNonNull(file.getParentFile().listFiles()).length == 0) {
                     LOG.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
                 }
             }
