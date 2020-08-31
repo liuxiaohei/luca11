@@ -8,7 +8,6 @@ import java.io.IOException;
  * The request message containing the user's name.
  */
 public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBuilder {
-    public static final int PARAMS_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcRequest DEFAULT_INSTANCE;
     private static final Parser<GrpcRequest> PARSER = new AbstractParser<>() {
@@ -171,6 +170,7 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         }
         int hash = 41;
         hash = (19 * hash) + getDescriptor().hashCode();
+        int PARAMS_FIELD_NUMBER = 1;
         hash = (37 * hash) + PARAMS_FIELD_NUMBER;
         hash = (53 * hash) + getParams().hashCode();
         hash = (29 * hash) + unknownFields.hashCode();

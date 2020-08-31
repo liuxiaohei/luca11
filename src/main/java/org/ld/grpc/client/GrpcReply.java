@@ -8,7 +8,6 @@ import java.io.IOException;
  * The response message containing the greetings
  */
 public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuilder {
-    public static final int MESSAGE_FIELD_NUMBER = 1;
     private static final long serialVersionUID = 0L;
     private static final GrpcReply DEFAULT_INSTANCE;
     private static final Parser<GrpcReply> PARSER = new AbstractParser<>() {
@@ -167,6 +166,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         }
         int hash = 41;
         hash = (19 * hash) + getDescriptor().hashCode();
+        int MESSAGE_FIELD_NUMBER = 1;
         hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
         hash = (53 * hash) + getMessage().hashCode();
         hash = (29 * hash) + unknownFields.hashCode();
