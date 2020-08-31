@@ -1,4 +1,4 @@
-package org.ld.utils.grpc.proto;
+package org.ld.grpc.client;
 
 import com.google.protobuf.Descriptors;
 import io.grpc.*;
@@ -27,18 +27,17 @@ public final class GreeterGrpc {
         if ((getSendMessageMethod = GreeterGrpc.getSendMessageMethod) == null) {
             synchronized (GreeterGrpc.class) {
                 if ((getSendMessageMethod = GreeterGrpc.getSendMessageMethod) == null) {
-                    GreeterGrpc.getSendMessageMethod = getSendMessageMethod =
-                            MethodDescriptor.<GrpcRequest, GrpcReply>newBuilder()
-                                    .setType(MethodDescriptor.MethodType.UNARY)
-                                    .setFullMethodName(generateFullMethodName(
-                                            "Greeter", "sendMessage"))
-                                    .setSampledToLocalTracing(true)
-                                    .setRequestMarshaller(ProtoUtils.marshaller(
-                                            GrpcRequest.getDefaultInstance()))
-                                    .setResponseMarshaller(ProtoUtils.marshaller(
-                                            GrpcReply.getDefaultInstance()))
-                                    .setSchemaDescriptor(new GreeterMethodDescriptorSupplier("sendMessage"))
-                                    .build();
+                    GreeterGrpc.getSendMessageMethod = getSendMessageMethod = MethodDescriptor.<GrpcRequest, GrpcReply>newBuilder()
+                            .setType(MethodDescriptor.MethodType.UNARY)
+                            .setFullMethodName(generateFullMethodName(
+                                    "Greeter", "sendMessage"))
+                            .setSampledToLocalTracing(true)
+                            .setRequestMarshaller(ProtoUtils.marshaller(
+                                    GrpcRequest.getDefaultInstance()))
+                            .setResponseMarshaller(ProtoUtils.marshaller(
+                                    GrpcReply.getDefaultInstance()))
+                            .setSchemaDescriptor(new GreeterMethodDescriptorSupplier("sendMessage"))
+                            .build();
                 }
             }
         }

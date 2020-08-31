@@ -9,16 +9,15 @@ import org.ld.utils.JobUtils;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.ld.utils.ZLogger;
-import org.ld.utils.grpc.proto.GreeterGrpc;
-import org.ld.utils.grpc.proto.GrpcReply;
-import org.ld.utils.grpc.proto.GrpcRequest;
+import org.ld.grpc.client.GreeterGrpc;
+import org.ld.grpc.client.GrpcReply;
+import org.ld.grpc.client.GrpcRequest;
 import org.quartz.Scheduler;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service

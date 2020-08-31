@@ -1,4 +1,4 @@
-package org.ld.utils.grpc.proto;
+package org.ld.grpc.client;
 
 import com.google.protobuf.*;
 
