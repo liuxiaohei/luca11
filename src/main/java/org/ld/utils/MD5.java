@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
 
+@SuppressWarnings("unused")
 public class MD5 {
 
     public static char[] num_chars = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',

@@ -1,20 +1,18 @@
 package org.ld.utils;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
+
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
 import org.springframework.http.HttpHeaders;
 
 import java.util.Date;
 
+@SuppressWarnings("unused")
 public class JwtUtils {
     public static final String TOKEN_HEADER = HttpHeaders.AUTHORIZATION;
     public static final String TOKEN_PREFIX = "Bearer ";
-    // 过期时间，这里设为5分钟
     private static final long EXPIRE_TIME = 5 * 60 * 1000;
-    // 密钥
     private static final String SECRET = "jwtsecretdemo";
 
     /**

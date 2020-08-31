@@ -4,6 +4,7 @@ import org.ld.uc.YCombinator;
 
 import java.util.function.Function;
 
+@SuppressWarnings("unused")
 public class SelfCallUtil {
 
     /**

@@ -5,6 +5,7 @@ import org.ld.exception.CodeStackException;
 import org.ld.pojo.Job;
 import org.quartz.*;
 
+@SuppressWarnings("unused")
 public class JobUtils {
 
     private final static String JOB_NAME = "TASK_";

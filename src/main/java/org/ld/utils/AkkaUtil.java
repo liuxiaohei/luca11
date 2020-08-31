@@ -3,7 +3,6 @@ package org.ld.utils;
 import akka.actor.*;
 import akka.pattern.AskableActorSelection;
 import akka.util.Timeout;
-import org.ld.utils.SpringBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import scala.concurrent.Await;
 

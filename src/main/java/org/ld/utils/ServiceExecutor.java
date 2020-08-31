@@ -2,6 +2,7 @@ package org.ld.utils;
 
 import java.util.concurrent.ForkJoinPool;
 
+@SuppressWarnings("unused")
 public class ServiceExecutor {
 
     private static class ServiceExecutorHolder {
