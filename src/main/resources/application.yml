@@ -1,10 +1,22 @@
 # 端口号
 server:
   port: 9999
+  address: 0.0.0.0
 # mybatis xml 地址
 mybatis:
   mapperLocations: classpath:/mapper/*.xml
 spring:
+  mvc:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+  application:
+    name: luca
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+  servlet:
+    multipart:
+      maxRequestSize: 50MB
+      maxFileSize: 50MB
   quartz:
     properties:
       org:
@@ -26,10 +38,19 @@ spring:
             threadsInheritContextClassLoaderOfInitializingThread: true
     #数据库方式
     job-store-type: jdbc
-      #初始化表结构
+    #初始化表结构
     #jdbc:
     #initialize-schema: never
-
+eureka:
+  instance:
+    lease-expiration-duration-in-seconds: 10
+    lease-renewal-interval-in-seconds: 5
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://node221:28182/eureka/,http://node222:28182/eureka/
+    fetchRegistry: true
+    registerWithEureka: true
 #  datasource:
 #    driver-class-name: com.mysql.jdbc.Driver        # 配置MySQL的驱动程序类
 #    url: jdbc:mysql://127.0.0.1:3306/luca?useSSL=false # 数据库连接地址
