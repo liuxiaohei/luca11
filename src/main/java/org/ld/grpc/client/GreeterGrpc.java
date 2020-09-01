@@ -57,8 +57,10 @@ public final class GreeterGrpc {
             synchronized (GreeterGrpc.class) {
                 result = serviceDescriptor;
                 if (result == null) {
-                    serviceDescriptor = result = ServiceDescriptor.newBuilder(SERVICE_NAME)
-                            .setSchemaDescriptor(new GreeterFileDescriptorSupplier())
+                    serviceDescriptor
+                            = result
+                            = ServiceDescriptor.newBuilder(SERVICE_NAME)
+                            .setSchemaDescriptor(new GreeterBaseDescriptorSupplier())
                             .addMethod(getSendMessageMethod())
                             .build();
                 }
@@ -68,6 +70,7 @@ public final class GreeterGrpc {
     }
 
     public static abstract class GreeterImplBase implements BindableService {
+
         public void sendMessage(GrpcRequest request, StreamObserver<GrpcReply> responseObserver) {
             asyncUnimplementedUnaryCall(getSendMessageMethod(), responseObserver);
         }
@@ -81,6 +84,7 @@ public final class GreeterGrpc {
     }
 
     public static final class GreeterBlockingStub extends AbstractStub<GreeterBlockingStub> {
+
         private GreeterBlockingStub(Channel channel) {
             super(channel);
         }
@@ -128,7 +132,7 @@ public final class GreeterGrpc {
         }
     }
 
-    private static abstract class GreeterBaseDescriptorSupplier implements ProtoFileDescriptorSupplier, ProtoServiceDescriptorSupplier {
+    private static class GreeterBaseDescriptorSupplier implements ProtoFileDescriptorSupplier, ProtoServiceDescriptorSupplier {
         GreeterBaseDescriptorSupplier() {
         }
 
@@ -140,11 +144,6 @@ public final class GreeterGrpc {
         @Override
         public Descriptors.ServiceDescriptor getServiceDescriptor() {
             return getFileDescriptor().findServiceByName("Greeter");
-        }
-    }
-
-    private static final class GreeterFileDescriptorSupplier extends GreeterBaseDescriptorSupplier {
-        GreeterFileDescriptorSupplier() {
         }
     }
 

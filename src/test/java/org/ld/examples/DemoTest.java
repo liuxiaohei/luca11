@@ -148,9 +148,12 @@ public class DemoTest {
 
     @Test
     public void  demo1() {
-        System.out.println("\n\013hello.proto\"\035\n\013GrpcRequest\022\016\n\006params\030\001" +
-                " \001(\t\"\034\n\tGrpcReply\022\017\n\007message\030\001 \001(\t24\n\007Gr" +
-                "eeter\022)\n\013sendMessage\022\014.GrpcRequest\032\n.Grp" +
-                "cReply\"\000B\023B\tGrpcProtoP\001\242\002\003HLWb\006proto3");
+        System.out.println("\n\013hello.proto" +
+                "\"\035\n\013GrpcRequest" +
+                "\022\016\n\006params\030\001 \001" +
+                "(\t\"\034\n\tGrpcReply\022\017\n\007" +
+                "message\030\001 \001(\t24\n\007Greeter\022)\n\013" +
+                "sendMessage\022\014.GrpcRequest\032\n" +
+                ".GrpcReply\"\000B\023B\tGrpcProtoP\001\242\002\003HLWb\006proto3");
     }
 }

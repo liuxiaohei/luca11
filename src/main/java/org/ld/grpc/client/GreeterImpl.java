@@ -57,8 +57,7 @@ public class GreeterImpl extends GreeterGrpc.GreeterImplBase {
             message = "UNKNOWN";
             log.error("任务执行失败:{}，任务id:{}", message, scheduleJob.getId());
         }
-        GrpcReply reply = GrpcReply.newBuilder().setMessage((message)).build();
-        responseObserver.onNext(reply);
+        responseObserver.onNext(GrpcReply.newBuilder().setMessage((message)).build());
         responseObserver.onCompleted();
     }
 }
