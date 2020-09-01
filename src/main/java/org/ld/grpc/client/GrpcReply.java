@@ -36,8 +36,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         if (extensionRegistry == null) {
             throw new NullPointerException();
         }
-        UnknownFieldSet.Builder unknownFields =
-                UnknownFieldSet.newBuilder();
+        UnknownFieldSet.Builder unknownFields = UnknownFieldSet.newBuilder();
         try {
             boolean done = false;
             while (!done) {

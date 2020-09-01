@@ -18,12 +18,8 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 public final class GreeterGrpc {
 
     public static final String SERVICE_NAME = "Greeter";
-    private static final int METHODID_SEND_MESSAGE = 0;
     private static volatile MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
     private static volatile ServiceDescriptor serviceDescriptor;
-
-    private GreeterGrpc() {
-    }
 
     public static MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod() {
         MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
@@ -69,7 +65,7 @@ public final class GreeterGrpc {
         return result;
     }
 
-    public static abstract class GreeterImplBase implements BindableService {
+    public static class GreeterImplBase implements BindableService {
 
         public void sendMessage(GrpcRequest request, StreamObserver<GrpcReply> responseObserver) {
             asyncUnimplementedUnaryCall(getSendMessageMethod(), responseObserver);
@@ -78,7 +74,7 @@ public final class GreeterGrpc {
         @Override
         public final ServerServiceDefinition bindService() {
             return ServerServiceDefinition.builder(getServiceDescriptor())
-                    .addMethod(getSendMessageMethod(), asyncUnaryCall(new MethodHandlers<>(this, METHODID_SEND_MESSAGE)))
+                    .addMethod(getSendMessageMethod(), asyncUnaryCall(new MethodHandlers<>(this, 0)))
                     .build();
         }
     }
@@ -108,6 +104,7 @@ public final class GreeterGrpc {
             ServerCalls.ServerStreamingMethod<Req, Resp>,
             ServerCalls.ClientStreamingMethod<Req, Resp>,
             ServerCalls.BidiStreamingMethod<Req, Resp> {
+
         private final GreeterImplBase serviceImpl;
         private final int methodId;
 
@@ -118,8 +115,8 @@ public final class GreeterGrpc {
 
         @Override
         @SuppressWarnings("unchecked")
-        public void invoke(Req request, StreamObserver<METHOD_SEND_MESSAGE> responseObserver) {
-            if (methodId == METHODID_SEND_MESSAGE) {
+        public void invoke(Req request, StreamObserver<Resp> responseObserver) {
+            if (methodId == 0) {
                 serviceImpl.sendMessage((GrpcRequest) request, (StreamObserver<GrpcReply>) responseObserver);
             } else {
                 throw new AssertionError();
@@ -133,8 +130,6 @@ public final class GreeterGrpc {
     }
 
     private static class GreeterBaseDescriptorSupplier implements ProtoFileDescriptorSupplier, ProtoServiceDescriptorSupplier {
-        GreeterBaseDescriptorSupplier() {
-        }
 
         @Override
         public Descriptors.FileDescriptor getFileDescriptor() {
@@ -148,6 +143,7 @@ public final class GreeterGrpc {
     }
 
     private static final class GreeterMethodDescriptorSupplier extends GreeterBaseDescriptorSupplier implements ProtoMethodDescriptorSupplier {
+
         private final String methodName;
 
         GreeterMethodDescriptorSupplier(String methodName) {
