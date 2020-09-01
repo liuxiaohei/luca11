@@ -118,7 +118,7 @@ public final class GreeterGrpc {
 
         @Override
         @SuppressWarnings("unchecked")
-        public void invoke(Req request, StreamObserver<Resp> responseObserver) {
+        public void invoke(Req request, StreamObserver<METHOD_SEND_MESSAGE> responseObserver) {
             if (methodId == METHODID_SEND_MESSAGE) {
                 serviceImpl.sendMessage((GrpcRequest) request, (StreamObserver<GrpcReply>) responseObserver);
             } else {
