@@ -273,7 +273,7 @@ public class LucaConfig {
                 .map(e -> e.split(targetDb)[0])
                 .filter(e -> !e.contains("useSSL")).map(e -> e + "?useSSL=false")
                 .orElse("");
-        final var initSql = "CREATE DATABASE IF NOT EXISTS " + targetDb;
+        final var initSql = "CREATE DATABASE IF NOT EXISTS " + targetDb + " CHARACTER SET utf8";
         final var flyway = Flyway
                 .configure()
                 .dataSource(
