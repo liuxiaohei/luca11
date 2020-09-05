@@ -51,7 +51,7 @@ eureka:
     preferIpAddress: true
   client:
     serviceUrl:
-      defaultZone: http://node221:28182/eureka/,http://node222:28182/eureka/
+      defaultZone: http://127.0.0.1:9998/eureka/
     fetchRegistry: true
     registerWithEureka: true
 #  datasource:

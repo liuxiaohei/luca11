@@ -19,6 +19,7 @@
 
   <modules>
     <module>luca-server</module>
+    <module>eureka</module>
   </modules>
 
   <dependencyManagement>
