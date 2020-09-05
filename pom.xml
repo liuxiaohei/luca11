@@ -27,6 +27,7 @@
         <module>luca-gray</module>
         <module>luca-grpc-client</module>
         <module>luca-es</module>
+        <module>mybatis-gen</module>
     </modules>
 
     <dependencyManagement>
