@@ -25,7 +25,8 @@
         <module>luca-web</module>
         <module>luca-base</module>
         <module>luca-gray</module>
-        <module>luca-scheduler-client</module>
+        <module>luca-grpc-client</module>
+        <module>luca-es</module>
     </modules>
 
     <dependencyManagement>
