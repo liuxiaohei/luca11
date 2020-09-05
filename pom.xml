@@ -19,7 +19,7 @@
 
     <modules>
         <module>luca-server</module>
-        <module>eureka</module>
+        <module>luca-eureka</module>
         <module>luca-common</module>
         <module>luca-mq</module>
         <module>luca-web</module>
@@ -27,7 +27,7 @@
         <module>luca-gray</module>
         <module>luca-grpc-client</module>
         <module>luca-es</module>
-        <module>mybatis-gen-plugin</module>
+        <module>luca-mybatis-gen-plugin</module>
     </modules>
 
     <dependencyManagement>
