@@ -31,6 +31,7 @@
         <module>luca-mybatis-gen-plugin</module>
         <module>luca-webflux</module>
         <module>luca-feign-client</module>
+        <module>luca-fsm</module>
     </modules>
     <dependencies>
         <!--lombok-->
