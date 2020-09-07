@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <properties>
+        <spring-cloud-version>2.2.0.RELEASE</spring-cloud-version>
     </properties>
 
     <modules>
@@ -29,6 +30,7 @@
         <module>luca-es</module>
         <module>luca-mybatis-gen-plugin</module>
         <module>luca-webflux</module>
+        <module>luca-feign-client</module>
     </modules>
     <dependencies>
         <!--lombok-->
