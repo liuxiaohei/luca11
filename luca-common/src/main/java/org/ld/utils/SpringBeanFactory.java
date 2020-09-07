@@ -6,8 +6,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 
-import javax.validation.constraints.NotNull;
-
 @SuppressWarnings("unused")
 @Configuration
 public class SpringBeanFactory implements ApplicationContextAware {
@@ -48,7 +46,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(@NotNull ApplicationContext context) throws BeansException {
+    public void setApplicationContext(ApplicationContext context) throws BeansException {
         applicationContext = context;
     }
 }
