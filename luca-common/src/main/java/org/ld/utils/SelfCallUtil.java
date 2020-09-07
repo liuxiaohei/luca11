@@ -32,7 +32,7 @@ public class SelfCallUtil {
                 .apply(
                         yCombinator::apply
                 )                                        // 这一行括号里面写的是递归函数的参数 自己如何调用自己 返回一个普通的函数
-                .apply(t);                             // 调用普通函数传入参数得到结果
+                .apply(t);                               // 调用普通函数传入参数得到结果
 
     }
 }
