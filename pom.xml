@@ -30,15 +30,29 @@
         <module>luca-mybatis-gen-plugin</module>
         <module>luca-webflux</module>
     </modules>
-
+    <dependencies>
+        <!--lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--  Swagger3 swagger3.0.0     https://blog.csdn.net/lilinhai548/article/details/107394670-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+    </dependencies>
     <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.8</version>
-            </dependency>
-        </dependencies>
+        <!--        <dependencies>-->
+        <!--            <dependency>-->
+        <!--                <groupId>org.projectlombok</groupId>-->
+        <!--                <artifactId>lombok</artifactId>-->
+        <!--                <version>1.18.8</version>-->
+        <!--            </dependency>-->
+        <!--        </dependencies>-->
     </dependencyManagement>
 
     <build>
