@@ -3,15 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>luca-server</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>luca</name>
-    <description>Demo project for Spring Boot</description>
     <parent>
         <artifactId>luca11-parent</artifactId>
         <groupId>org.ld</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <artifactId>luca-server</artifactId>
+    <packaging>jar</packaging>
+    <name>luca</name>
+    <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>11</java.version>
         <app.version>0.0.1-SNAPSHOT</app.version>
@@ -326,6 +326,7 @@
                 <version>3.1.2</version>
             </plugin>
         </plugins>
+        <finalName>${project.artifactId}</finalName>
     </build>
 
 </project>
