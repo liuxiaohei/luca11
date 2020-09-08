@@ -32,6 +32,7 @@
         <module>luca-webflux</module>
         <module>luca-feign-client</module>
         <module>luca-fsm</module>
+        <module>luca-gateway</module>
     </modules>
     <dependencies>
         <!--lombok-->
