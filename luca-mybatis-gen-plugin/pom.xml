@@ -8,18 +8,19 @@
         <groupId>org.ld</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mybatis-gen</artifactId>
+    <artifactId>luca-mybatis-gen-plugin</artifactId>
+    <properties>
+        <java.version>11</java.version>
+    </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
+                <version>3.8.0</version>
             </plugin>
         </plugins>
+        <finalName>${project.artifactId}</finalName>
     </build>
 
     <dependencies>
@@ -48,5 +49,4 @@
             <version>2.1.1</version>
         </dependency>
     </dependencies>
-
 </project>

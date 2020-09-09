@@ -65,7 +65,6 @@ import java.util.concurrent.ForkJoinPool;
  *
  * @author ld
  */
-@SuppressWarnings("unused")
 @Configuration
 @EnableOpenApi
 @Log4j2

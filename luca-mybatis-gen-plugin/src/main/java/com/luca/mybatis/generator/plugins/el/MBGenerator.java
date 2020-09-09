@@ -90,7 +90,6 @@ final public class MBGenerator {
         JavaMethod m = new JavaMethod();
         for (Object o : args) {
             if (o == null) continue;
-
             if (o instanceof JavaVisibility) m.setVisibility((JavaVisibility) o);
             else if (o instanceof FullyQualifiedJavaType) m.setReturnType((FullyQualifiedJavaType) o);
             else if (o instanceof Parameter) m.addParameter((Parameter) o);

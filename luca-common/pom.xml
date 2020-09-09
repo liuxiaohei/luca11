@@ -24,6 +24,10 @@
             <artifactId>java-jwt</artifactId>
             <version>3.8.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <java.version>11</java.version>
