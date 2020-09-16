@@ -5,8 +5,7 @@ import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.Flyway;
 import org.ld.annotation.NeedToken;
-import org.ld.beans.OnErrorResp;
-import org.ld.beans.OnSuccessResp;
+import org.ld.beans.RespBean;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
@@ -159,8 +158,8 @@ public class LucaConfig {
                 Preconditions.checkNotNull(result.getReturnValue(), "response is null!");
                 var body = ((Mono<Object>) result.getReturnValue())
                         .map(o -> {
-                            if (o instanceof OnSuccessResp) {
-                                return (OnSuccessResp<Object>) o; // 防止多余的封装
+                            if (o instanceof RespBean) {
+                                return (RespBean<Object>) o; // 防止多余的封装
                             }
                             final var snowflakeId = Optional.ofNullable(AroundController.UUIDS.get())
                                     .orElseGet(() -> SnowflakeId.get().toString());
@@ -168,7 +167,7 @@ public class LucaConfig {
                             log.info(Optional.ofNullable(AroundController.UUIDS.get())
                                     .map(e -> e + ":")
                                     .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
-                            return new OnSuccessResp<>(o);
+                            return new RespBean<>(o);
                         });
                 return writeBody(body, MethodParameterHolder.param, exchange);
             }
@@ -225,9 +224,9 @@ public class LucaConfig {
     static class GlobalExceptionHandler {
         @ExceptionHandler(Exception.class)
         @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-        public OnErrorResp exceptionHandler(Throwable e) {
+        public RespBean exceptionHandler(Throwable e) {
             log.error(AroundController.UUIDS.get(), e);
-            return new OnErrorResp(e);
+            return new RespBean(e);
         }
     }
 

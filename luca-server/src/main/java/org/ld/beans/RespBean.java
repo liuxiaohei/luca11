@@ -1,5 +1,7 @@
 package org.ld.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.ld.enums.SystemErrorCodeEnum;
@@ -13,18 +15,22 @@ import java.util.stream.Stream;
 
 @NoArgsConstructor
 @Data
-public class OnErrorResp {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true) // 反序列化时忽略未知属性
+public class RespBean<T> {
+    private T data;
     private Integer errorCode;
     private String errorMsgDescription;
     private String message;
     private String[] stackTrace;
+    private Boolean success;
 
-    @SuppressWarnings("unused")
-    public Boolean getSuccess() {
-        return false;
+    public RespBean(T data) {
+        this.data = data;
+        this.success = true;
     }
 
-    public OnErrorResp(Throwable e) {
+    public RespBean(Throwable e) {
         final var se = Optional.of(e)
                 .map(t -> {
                     var t1 = t;
@@ -56,6 +62,11 @@ public class OnErrorResp {
                 .filter(i -> !i.getCode().equals(SystemErrorCodeEnum.UNKNOWN.getCode()))
                 .map(ErrorCode::getMessage)
                 .orElseGet(e::getMessage));
+        this.setSuccess(false);
         this.setMessage(e.getMessage());
+    }
+
+    public Boolean getSuccess() {
+        return success;
     }
 }

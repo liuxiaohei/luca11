@@ -16,35 +16,29 @@
             <artifactId>luca-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--feign-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <version>${spring-cloud-version}</version>
-        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>io.github.openfeign</groupId>-->
 <!--            <artifactId>feign-okhttp</artifactId>-->
 <!--        </dependency>-->
         <!--turbine -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
-            <version>${spring-cloud-version}</version>
-        </dependency>
-        <!--hystrix-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-            <version>${spring-cloud-version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>-->
+<!--            <version>${spring-cloud-version}</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash;hystrix&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>-->
+<!--            <version>${spring-cloud-version}</version>-->
+<!--        </dependency>-->
         <!-- Spring Cloud -->
         <!-- 链路跟踪 -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-zipkin</artifactId>
-            <version>${spring-cloud-version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-zipkin</artifactId>-->
+<!--            <version>${spring-cloud-version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
