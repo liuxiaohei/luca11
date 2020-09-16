@@ -6,7 +6,7 @@ import java.util.concurrent.ForkJoinPool;
 /**
  *
  */
-public class CPUServiceExecutor {
+public class CPUFJServiceExecutor {
 
     private static class ServiceExecutorHolder {
         private static final ExecutorService Executor = new ForkJoinPool(

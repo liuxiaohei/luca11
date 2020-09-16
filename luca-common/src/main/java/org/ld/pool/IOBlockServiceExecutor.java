@@ -1,7 +1,8 @@
 package org.ld.pool;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import java.util.concurrent.*;
 
 /**
  *
@@ -9,12 +10,20 @@ import java.util.concurrent.ForkJoinPool;
 public class IOBlockServiceExecutor {
 
     private static class ServiceExecutorHolder {
-        private static final ExecutorService Executor = new ForkJoinPool(
+        private static final ExecutorService Executor = new ThreadPoolExecutor(
                 100,
-                ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-                null,
-                false);
-
+                100,
+                60L,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder()
+                        .setDaemon(true)
+                        .setNameFormat("luca-thread-%d").build(),
+                (r, e) -> {
+                    throw new RejectedExecutionException("Task " + r.toString() +
+                            " rejected from " +
+                            e.toString());
+                });
     }
 
     public static ExecutorService getInstance() {
