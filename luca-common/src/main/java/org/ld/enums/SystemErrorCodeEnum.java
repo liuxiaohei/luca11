@@ -3,6 +3,7 @@ package org.ld.enums;
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
 import org.ld.utils.ZLogger;
+import org.springframework.dao.DataAccessException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public enum SystemErrorCodeEnum {
     INDEX_OUTBIDS_EXCEPTION(8, IndexOutOfBoundsException.class, "索引越界异常，当操作一个字符串或者数组的时候经常遇到的异常"),
     ARITHMETIC_EXCEPTION(9, ArithmeticException.class, "算术异常，发生在数字的算术运算时的异常，如一个数字除以 0。"),
     SQL_EXCEPTION(10, SQLException.class, "数据库访问失败"),
-//    DATA_ACCESS_FAILED(11, DataAccessException.class, "数据访问失败"),
+    DATA_ACCESS_FAILED(11, DataAccessException.class, "数据访问失败"),
     UNSUPPORTED_OPERATION_EXCEPTION(12, UnsupportedOperationException.class, "不支持的方法异常。指明请求的方法不被支持情况的异常"),
     TYPE_NOT_PRESENT_EXCEPTION(13, TypeNotPresentException.class, "类型不存在异常。当应用试图以某个类型名称的字符串表达方式访问该类型，但是根据给定的名称又找不到该类型是抛出该异常。该异常与 ClassNotFoundException的区别在于该异常是unchecked（不被检查）异常，而ClassNotFoundException 是checked（被检查）异常。"),
     STRING_INDEX_OUT_OF_BOUNDS_EXCEPTION(14, StringIndexOutOfBoundsException.class, "字符串索引越界异常。当使用索引值访问某个字符串中的字符，而该索引值小于0或大于等于序列大小时，抛出该异常。"),
