@@ -1,4 +1,4 @@
-package org.ld.config;
+package org.ld.websocket;
 import org.ld.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.socket.*;

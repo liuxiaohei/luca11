@@ -1,7 +1,6 @@
 package org.ld.config;
 
 import akka.actor.ActorSystem;
-import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.Flyway;
 import org.ld.annotation.NeedToken;
@@ -155,7 +154,7 @@ public class LucaConfig {
             @Override
             @SuppressWarnings("unchecked")
             public Mono<Void> handleResult(@NotNull ServerWebExchange exchange, @NotNull HandlerResult result) {
-                Preconditions.checkNotNull(result.getReturnValue(), "response is null!");
+                Objects.requireNonNull(result.getReturnValue(), "response is null!");
                 var body = ((Mono<Object>) result.getReturnValue())
                         .map(o -> {
                             if (o instanceof RespBean) {
@@ -172,19 +171,6 @@ public class LucaConfig {
                 return writeBody(body, MethodParameterHolder.param, exchange);
             }
         };
-    }
-
-    //    https://www.jianshu.com/p/d117bf98b4f2
-    //    https://www.jianshu.com/p/b584c3dcc44a
-    @Bean
-    public HandlerMapping handlerMapping() {
-        // 对相应的URL进行添加处理器
-        Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put("/hello", new MyWebSocketHandler());
-        SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-        mapping.setUrlMap(map);
-        mapping.setOrder(-1);
-        return mapping;
     }
 
     @Bean
