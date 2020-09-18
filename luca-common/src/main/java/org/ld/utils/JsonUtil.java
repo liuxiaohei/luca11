@@ -70,9 +70,12 @@ public class JsonUtil {
 
     private static final Logger LOG = ZLogger.newInstance();
 
+    /**
+     * json字符串转对象
+     */
     public static <T> T json2Obj(String json, Class<T> cls) {
+        LucaDeserializationProblemHandler handler = new LucaDeserializationProblemHandler();
         try {
-            LucaDeserializationProblemHandler handler = new LucaDeserializationProblemHandler();
             ObjectMapper objectMapper = new ObjectMapper().addHandler(handler);
             T t = objectMapper.readValue(json, cls);
             if (handler.hasUnknownProperty()) {
@@ -80,6 +83,9 @@ public class JsonUtil {
             }
             return t;
         } catch (Exception e) {
+            String id = getShortUuid();
+            LOG.error(id + " json转换异常:" + json);
+            LOG.error(id + " className" + cls.getName());
             throw new CodeStackException(e);
         }
     }

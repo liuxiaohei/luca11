@@ -3,6 +3,7 @@ package org.ld.examples;
 import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
 import org.ld.actors.HelloWorldMain;
+import org.ld.beans.JobBean;
 import org.ld.utils.FileUtil;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
@@ -166,7 +167,7 @@ public class DemoTest {
 
     @Test
     public void demo3() {
-        List a = JsonUtil.json2List("[1,2,3,4,5,6,7,8,9,10]",Integer.class);
+        JsonUtil.json2Obj("{\"abc\":null,\"name\":null,\"serviceName\":null,\"beanName\":\"ssssrrrr\",\"methodName\":null,\"cronExpression\":null,\"params\":null,\"status\":null,\"host\":null,\"port\":null,\"createTime\":null}",JobBean.class);
         System.out.println("");
     }
 }

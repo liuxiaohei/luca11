@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 提取出未知属性 可打印
@@ -42,19 +43,10 @@ public class LucaDeserializationProblemHandler extends DeserializationProblemHan
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("UnknownPropertyWrapper {\n");
-        for (Map.Entry<UnknownProperty, String> entry : unknownProperties.entrySet()) {
-            builder.append('\t')
-                    .append(entry.getKey().getType().getSimpleName())
-                    .append('.')
-                    .append(entry.getKey().getFieldName())
-                    .append(' ')
-                    .append(entry.getValue())
-                    .append('\n');
-        }
-        return builder.append('}').toString();
+        return unknownProperties.entrySet().stream()
+                .map(e -> '\t' + e.getKey().getType().getSimpleName() + '.' + e.getKey().getFieldName() + ' ' + e.getValue() + '\n')
+                .collect(Collectors.joining("","UnknownProperty {\n","}"));
     }
-
 
     @AllArgsConstructor
     @Getter
