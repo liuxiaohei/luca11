@@ -2,6 +2,8 @@ package org.ld.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,7 +229,8 @@ public class FileUtil {
             while ((tempStr = reader.readLine()) != null) {
                 sbf.append(tempStr);
             }
-            return new TextFile(sbf.toString(), fileName, null, file.length());
+            String md5 = DigestUtils.md5Hex(new FileInputStream(fileName));
+            return new TextFile(sbf.toString(), fileName, md5, file.length());
         } catch (IOException e) {
             throw new CodeStackException(e);
         } finally {
@@ -264,10 +267,11 @@ public class FileUtil {
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class TextFile {
         String text;
         String filePath;
-        String md5;// todo;
+        String md5;
         long fileSize;
     }
 
