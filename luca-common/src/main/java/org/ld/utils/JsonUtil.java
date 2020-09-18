@@ -24,11 +24,13 @@ import java.util.stream.Stream;
 public class JsonUtil {
 
     public static <T> List<T> json2List(String json, Class<T> cls) {
-        var jsonNode = toJsonNode(json);
-        if (jsonNode == null) return Collections.emptyList();
         var objectMapper = new ObjectMapper();
         var type = objectMapper.getTypeFactory().constructCollectionType(List.class, cls);
-        return objectMapper.convertValue(jsonNode, type);
+        try {
+            return objectMapper.readValue(json, type);
+        } catch (JsonProcessingException e) {
+            throw new CodeStackException(e);
+        }
     }
 
     /**
@@ -69,15 +71,17 @@ public class JsonUtil {
     private static final Logger LOG = ZLogger.newInstance();
 
     public static <T> T json2Obj(String json, Class<T> cls) {
-        var jsonNode = toJsonNode(json);
-        if (jsonNode == null) return null;
-        LucaDeserializationProblemHandler handler = new LucaDeserializationProblemHandler();
-        ObjectMapper objectMapper = new ObjectMapper().addHandler(handler);
-        T t = objectMapper.convertValue(jsonNode, cls);
-        if (handler.hasUnknownProperty()) {
-            LOG.info("Converted to " + cls.toString() + ", unknown properties: " + handler.toString());
+        try {
+            LucaDeserializationProblemHandler handler = new LucaDeserializationProblemHandler();
+            ObjectMapper objectMapper = new ObjectMapper().addHandler(handler);
+            T t = objectMapper.readValue(json, cls);
+            if (handler.hasUnknownProperty()) {
+                LOG.warn("Converted to " + cls.toString() + ", unknown properties: " + handler.toString());
+            }
+            return t;
+        } catch (Exception e) {
+            throw new CodeStackException(e);
         }
-        return t;
     }
 
     public static Map<String, String> json2Map(String json) {
@@ -85,15 +89,6 @@ public class JsonUtil {
         try {
             return new ObjectMapper().readValue(json, new TypeReference<>() {
             });
-        } catch (IOException e) {
-            throw new CodeStackException(e);
-        }
-    }
-
-    private static JsonNode toJsonNode(String expression) {
-        if (StringUtil.isBlank(expression)) return null;
-        try {
-            return new ObjectMapper().readTree(expression);
         } catch (IOException e) {
             throw new CodeStackException(e);
         }

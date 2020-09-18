@@ -1,7 +1,14 @@
 package org.ld.beans;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class JobBean {
     public Integer id;
     //任务名称

@@ -163,4 +163,10 @@ public class DemoTest {
         FileUtil.TextFile file =  FileUtil.readText("/Users/liudi/Downloads/demo.json",false);
         System.out.println(file);
     }
+
+    @Test
+    public void demo3() {
+        List a = JsonUtil.json2List("[1,2,3,4,5,6,7,8,9,10]",Integer.class);
+        System.out.println("");
+    }
 }
