@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.ld.exception.CodeStackException;
+import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
@@ -65,11 +66,18 @@ public class JsonUtil {
         }
     }
 
+    private static final Logger LOG = ZLogger.newInstance();
+
     public static <T> T json2Obj(String json, Class<T> cls) {
         var jsonNode = toJsonNode(json);
         if (jsonNode == null) return null;
-        var objectMapper = new ObjectMapper();
-        return objectMapper.convertValue(jsonNode, cls);
+        LucaDeserializationProblemHandler handler = new LucaDeserializationProblemHandler();
+        ObjectMapper objectMapper = new ObjectMapper().addHandler(handler);
+        T t = objectMapper.convertValue(jsonNode, cls);
+        if (handler.hasUnknownProperty()) {
+            LOG.info("Converted to " + cls.toString() + ", unknown properties: " + handler.toString());
+        }
+        return t;
     }
 
     public static Map<String, String> json2Map(String json) {
