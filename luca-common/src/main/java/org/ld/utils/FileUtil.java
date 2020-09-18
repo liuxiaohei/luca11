@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 操作本地文件工具类
@@ -52,27 +53,22 @@ public class FileUtil {
                     public int read() throws IOException {
                         return in.read();
                     }
-
                     @Override
                     public int read(@NotNull byte[] b) throws IOException {
                         return in.read(b);
                     }
-
                     @Override
                     public int read(@NotNull byte[] b, int off, int len) throws IOException {
                         return in.read(b, off, len);
                     }
-
                     @Override
                     public long skip(long n) throws IOException {
                         return in.skip(n);
                     }
-
                     @Override
                     public int available() throws IOException {
                         return in.available();
                     }
-
                     @Override
                     public void close() throws IOException {
                         in.close();
@@ -83,17 +79,14 @@ public class FileUtil {
                             }
                         } // 自动删除文件
                     }
-
                     @Override
                     public synchronized void mark(int readlimit) {
                         in.mark(readlimit);
                     }
-
                     @Override
                     public synchronized void reset() throws IOException {
                         in.reset();
                     }
-
                     @Override
                     public boolean markSupported() {
                         return super.markSupported();
@@ -274,6 +267,71 @@ public class FileUtil {
         String filePath;
         String md5;
         long fileSize;
+    }
+
+    private static final int BUFFER_SIZE = 2 * 1024;
+
+    /**
+     * https://blog.csdn.net/lidai352710967/article/details/89887978
+     * 压缩本地文件
+     */
+    public static void toZip(String srcDir, OutputStream out, boolean KeepDirStructure) {
+        long start = System.currentTimeMillis();
+        try (ZipOutputStream zos = new ZipOutputStream(out)) {
+            File sourceFile = new File(srcDir);
+            compress(sourceFile, zos, sourceFile.getName(), KeepDirStructure);
+            long end = System.currentTimeMillis();
+            delTempChild(sourceFile);
+            System.out.println("压缩完成，耗时：" + (end - start) + " ms");
+        } catch (Exception e) {
+            throw new RuntimeException("zip error from ZipUtils", e);
+        }
+    }
+
+    /**
+     * 递归删除文件夹
+     */
+    public static void delTempChild(File file) {
+        if (file.isDirectory()) {
+            String[] children = file.list();//获取文件夹下所有子文件夹
+            for (String child : children) {
+                delTempChild(new File(file, child));
+            }
+        }
+        file.delete();
+    }
+
+    private static void compress(File sourceFile,
+                                 ZipOutputStream zos,
+                                 String name,
+                                 boolean KeepDirStructure) throws Exception {
+        byte[] buf = new byte[BUFFER_SIZE];
+        if (sourceFile.isFile()) {
+            zos.putNextEntry(new ZipEntry(name));
+            int len;
+            FileInputStream in = new FileInputStream(sourceFile);
+            while ((len = in.read(buf)) != -1) {
+                zos.write(buf, 0, len);
+            }
+            zos.closeEntry();
+            in.close();
+        } else {
+            File[] listFiles = sourceFile.listFiles();
+            if (listFiles == null || listFiles.length == 0) {
+                if (KeepDirStructure) {
+                    zos.putNextEntry(new ZipEntry(name + "/"));
+                    zos.closeEntry();
+                }
+            } else {
+                for (File file : listFiles) {
+                    if (KeepDirStructure) {
+                        compress(file, zos, name + "/" + file.getName(), KeepDirStructure);
+                    } else {
+                        compress(file, zos, file.getName(), KeepDirStructure);
+                    }
+                }
+            }
+        }
     }
 
 }
