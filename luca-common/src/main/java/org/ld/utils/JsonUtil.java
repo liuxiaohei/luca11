@@ -1,9 +1,13 @@
 package org.ld.utils;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
@@ -74,23 +78,36 @@ public class JsonUtil {
      * json字符串转对象
      */
     public static <T> T json2Obj(String json, Class<T> cls) {
-        LucaDeserializationProblemHandler handler = new LucaDeserializationProblemHandler();
+        final List<String> unknownProperties = new ArrayList<>();
+        var handler = new DeserializationProblemHandler() {
+            @Override
+            @SuppressWarnings("all")
+            public boolean handleUnknownProperty(DeserializationContext ctxt,
+                                                 JsonParser jp,
+                                                 JsonDeserializer<?> deserializer,
+                                                 Object beanOrClass, String propertyName)
+                    throws IOException {
+                var beanClass = Optional.of(beanOrClass).filter(e -> e instanceof Class).map(e -> (Class) e).orElseGet(beanOrClass::getClass);
+                unknownProperties.add(beanClass.getSimpleName() + "." + propertyName + ':' + jp.getValueAsString());
+                return true;
+            }
+        };
         try {
-            ObjectMapper objectMapper = new ObjectMapper().addHandler(handler);
-            T t = objectMapper.readValue(json, cls);
-            if (handler.hasUnknownProperty()) {
-                LOG.warn("Converted to " + cls.toString() + ", unknown properties: " + handler.toString());
+            var objectMapper = new ObjectMapper().addHandler(handler);
+            var t = objectMapper.readValue(json, cls);
+            if (!unknownProperties.isEmpty()) {
+                LOG.warn("Converted to " + cls.toString() + ", unknown properties: " + unknownProperties.stream().map(e -> '\t' + e + '\n').collect(Collectors.joining("", "UnknownProperties (\n", ")")));
             }
             return t;
         } catch (Exception e) {
-            String id = getShortUuid();
+            var id = getShortUuid();
             LOG.error(id + " json转换异常:" + json);
             LOG.error(id + " className" + cls.getName());
             throw new CodeStackException(e);
         }
     }
 
-    public static Map<String, String> json2Map(String json) {
+    public static Map<String, String> json2StringMap(String json) {
         if (StringUtil.isBlank(json)) return Collections.emptyMap();
         try {
             return new ObjectMapper().readValue(json, new TypeReference<>() {
