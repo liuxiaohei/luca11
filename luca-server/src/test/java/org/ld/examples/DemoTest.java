@@ -3,6 +3,7 @@ package org.ld.examples;
 import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
 import org.ld.actors.HelloWorldMain;
+import org.ld.utils.FileUtil;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
@@ -155,5 +156,11 @@ public class DemoTest {
                 "message\030\001 \001(\t24\n\007Greeter\022)\n\013" +
                 "sendMessage\022\014.GrpcRequest\032\n" +
                 ".GrpcReply\"\000B\023B\tGrpcProtoP\001\242\002\003HLWb\006proto3");
+    }
+
+    @Test
+    public void demo2() {
+        FileUtil.TextFile file =  FileUtil.readText("/Users/liudi/Downloads/demo.json",false);
+        System.out.println(file);
     }
 }

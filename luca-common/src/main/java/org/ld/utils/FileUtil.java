@@ -1,6 +1,7 @@
 package org.ld.utils;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -265,7 +266,7 @@ public class FileUtil {
         }
     }
 
-    @Getter
+    @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class TextFile {
