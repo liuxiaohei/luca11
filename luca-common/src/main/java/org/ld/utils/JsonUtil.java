@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.ld.exception.CodeStackException;
+import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -29,11 +30,21 @@ public class JsonUtil {
         return objectMapper.convertValue(jsonNode, type);
     }
 
+    /**
+     * 深拷贝对象
+     */
     public static <T> T copyObj(T t, Class<T> clazz) {
         if (null == t) {
             return null;
         }
-        return json2Obj(obj2Json(t),clazz);
+        try {
+            T t1 = clazz.getDeclaredConstructor().newInstance();
+            BeanUtils.copyProperties(t, t1);
+            return t1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return json2Obj(obj2Json(t), clazz);
+        }
     }
 
     public static String obj2Json(Object obj) {
