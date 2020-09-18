@@ -1,4 +1,4 @@
-package org.ld.mq;
+package org.ld.rabbitmq;
 
 
 import com.rabbitmq.client.Channel;

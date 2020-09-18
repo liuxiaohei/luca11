@@ -1,4 +1,4 @@
-package org.ld.mq;
+package org.ld.rabbitmq;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +15,7 @@ import java.util.Map;
  * @author ld
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {org.ld.mq.TestServer.class})
+@SpringBootTest(classes = {org.ld.rabbitmq.TestServer.class})
 public class MiscTest {
 
     @Test

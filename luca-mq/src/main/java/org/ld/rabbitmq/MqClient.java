@@ -1,4 +1,4 @@
-package org.ld.mq;
+package org.ld.rabbitmq;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Configuration;
