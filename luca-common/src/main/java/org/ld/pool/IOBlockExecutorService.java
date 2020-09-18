@@ -7,7 +7,7 @@ import java.util.concurrent.*;
 /**
  *
  */
-public class IOBlockServiceExecutor {
+public class IOBlockExecutorService {
 
     private static class ServiceExecutorHolder {
         private static final ExecutorService Executor = new ThreadPoolExecutor(
