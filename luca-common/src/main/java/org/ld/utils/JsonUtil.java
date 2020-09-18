@@ -49,7 +49,7 @@ public class JsonUtil {
             BeanUtils.copyProperties(t, t1);
             return t1;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage());
             return json2Obj(obj2Json(t), clazz);
         }
     }
@@ -96,10 +96,10 @@ public class JsonUtil {
             var objectMapper = new ObjectMapper().addHandler(handler);
             var t = objectMapper.readValue(json, cls);
             if (!unknownProperties.isEmpty()) {
-                LOG.warn("Converted to " + cls.toString() + ", unknown properties: " + unknownProperties.stream().map(e -> '\t' + e + '\n').collect(Collectors.joining("", "UnknownProperties (\n", ")")));
+                LOG.warn("unknown properties: " + obj2PrettyJson(unknownProperties));
             }
             return t;
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             var id = getShortUuid();
             LOG.error(id + " json转换异常:" + json);
             LOG.error(id + " className" + cls.getName());
@@ -200,19 +200,5 @@ public class JsonUtil {
                 .map(i -> i % 0x3E)
                 .map(i -> chars[i])
                 .collect(Collectors.joining());
-    }
-
-    /**
-     * 生成随机字母
-     */
-    private String randomChar() {
-        var chars = "abcdefghijklmnopqrstuvwxyz";
-        return "" + chars.charAt((int) (Math.random() * 26));
-    }
-
-    private String stuffix(String fileName) {
-        return Optional.ofNullable(fileName)
-                .filter(e -> e.contains("."))
-                .map(e -> e.substring(e.lastIndexOf(".") + 1)).orElse("jpg");
     }
 }

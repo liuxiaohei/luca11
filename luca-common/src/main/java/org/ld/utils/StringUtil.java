@@ -1,6 +1,7 @@
 package org.ld.utils;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 @SuppressWarnings("all")
 public class StringUtil {
@@ -52,6 +53,23 @@ public class StringUtil {
 
     public static boolean isNotBlank(CharSequence cs) {
         return !isBlank(cs);
+    }
+
+    /**
+     * 生成随机字母
+     */
+    public static String randomChar() {
+        var chars = "abcdefghijklmnopqrstuvwxyz";
+        return "" + chars.charAt((int) (Math.random() * 26));
+    }
+
+    /**
+     * 获取指定字符串按照delimiter分割后得到的后缀
+     */
+    public static String stuffix(String str, String delimiter, Supplier<String> other) {
+        return Optional.ofNullable(str)
+                .filter(e -> e.contains(delimiter))
+                .map(e -> e.substring(e.lastIndexOf(".") + 1)).orElseGet(other);
     }
 
 }
