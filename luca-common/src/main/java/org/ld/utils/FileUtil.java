@@ -18,6 +18,9 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/**
+ * 操作本地文件工具类
+ */
 public class FileUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
@@ -28,7 +31,8 @@ public class FileUtil {
      */
     public static ResponseEntity<FileSystemResource> getFileSystemResourceFile(
             File file,
-            Boolean deleteFileAfterClose) {
+            Boolean deleteFileAfterClose,
+            Boolean deleteDirAfterClose) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Content-Disposition", "attachment; filename=" + file.getName());
@@ -71,6 +75,9 @@ public class FileUtil {
                         in.close();
                         if (deleteFileAfterClose && file.exists()) {
                             LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
+                            if (deleteDirAfterClose && file.getParentFile().exists() && file.getParentFile().listFiles().length == 0) {
+                                LOG.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
+                            }
                         } // 自动删除文件
                     }
 
@@ -96,43 +103,6 @@ public class FileUtil {
                 .contentLength(file.length())
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(fileSystemResource);
-    }
-
-    /**
-     * 解压文件到指定路径
-     */
-    public static List<String> unZip(File zipFile, String targetDir, Boolean deleteZipFile) {
-        File targetDirFile = new File(targetDir);
-        if (!targetDirFile.exists()) {
-            targetDirFile.mkdirs();
-        }
-        List<String> paths = new ArrayList<>();
-        try (ZipFile zip = new ZipFile(zipFile, Charset.forName("gbk"))) {
-            for (Enumeration<?> entries = zip.entries(); entries.hasMoreElements(); ) {
-                ZipEntry entry = (ZipEntry) entries.nextElement();
-                String zipEntryName = entry.getName();
-                try (InputStream in = zip.getInputStream(entry)) {
-                    String outPath = targetDir + File.separator + zipEntryName;
-                    try (OutputStream out = new FileOutputStream(outPath)) {
-                        byte[] buf1 = new byte[2048];
-                        int len;
-                        while ((len = in.read(buf1)) > 0) {
-                            out.write(buf1, 0, len);
-                        }
-                    }
-                    paths.add(outPath);
-                }
-            }
-        } catch (IOException e) {
-            throw new CodeStackException(e);
-        } finally {
-            if (deleteZipFile && zipFile.exists()) {
-                if (!zipFile.delete()) {
-                    LOG.warn("删除文件{}失败", zipFile.getName());
-                }
-            }
-        }
-        return paths;
     }
 
     /**
@@ -172,6 +142,28 @@ public class FileUtil {
     }
 
     /**
+     * 上传文件到指定的路径
+     */
+    public static void saveFile(MultipartFile f,
+                                String dirBasePath) throws IOException {
+        String fileName = f.getOriginalFilename();
+        String type = f.getContentType();
+        System.out.println(fileName + " ," + type);
+        String filePath = dirBasePath + File.separator;
+        if (!FileUtil.isDir(filePath)) {
+            FileUtil.makeDirs(filePath);
+        }
+        File file = new File(dirBasePath + File.separator + fileName);
+        file.createNewFile();
+        f.transferTo(file);
+    }
+
+    public static boolean isDir(String dirPath) {
+        File f = new File(dirPath);
+        return f.exists() && f.isDirectory();
+    }
+
+    /**
      * 读取Fileduixiang并持久化到本地
      */
     public static File asFile(MultipartFile file) {
@@ -186,6 +178,45 @@ public class FileUtil {
     }
 
     /**
+     * 创建多级目录
+     */
+    public static void makeDirs(String path) {
+        File file = new File(path);
+        // 如果文件夹不存在则创建
+        if (!file.exists() && !file.isDirectory()) {
+            file.mkdirs();
+        } else {
+            System.out.println("创建目录失败：" + path);
+        }
+    }
+
+    /**
+     * 递归获取指定路径下的所有文件
+     */
+    public static void traverseFolder(String path, List<File> result) {
+        File file = new File(path);
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            if (null == files || files.length == 0) {
+                System.out.println("文件夹是空的!");
+            } else {
+                for (File file2 : files) {
+                    if (file2.isDirectory()) {
+                        System.out.println("文件夹:    " + file2.getName());
+                        traverseFolder(file2.getAbsolutePath(), result);
+                    } else {
+                        result.add(file2);
+                        System.out.println("文件:      " + file2.getName());
+                    }
+                }
+            }
+        } else {
+            System.out.println("文件不存在!");
+        }
+    }
+
+
+    /**
      * 读取执行文本文件的内容
      */
     public static TextFile readText(String fileName, Boolean deleteFileAfterRead) {
@@ -196,7 +227,7 @@ public class FileUtil {
             while ((tempStr = reader.readLine()) != null) {
                 sbf.append(tempStr);
             }
-            return new TextFile(sbf.toString(), fileName,file.length());
+            return new TextFile(sbf.toString(), fileName, null, file.length());
         } catch (IOException e) {
             throw new CodeStackException(e);
         } finally {
@@ -236,6 +267,7 @@ public class FileUtil {
     public static class TextFile {
         String text;
         String filePath;
+        String md5;// todo;
         long fileSize;
     }
 
