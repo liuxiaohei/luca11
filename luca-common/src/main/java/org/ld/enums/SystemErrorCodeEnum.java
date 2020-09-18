@@ -1,5 +1,6 @@
 package org.ld.enums;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
 import org.ld.utils.ZLogger;
@@ -20,6 +21,7 @@ public enum SystemErrorCodeEnum {
     UNKNOWN(-1, Integer.class, "未知异常"),
     NULL_POINTER_EXCEPTION(1, NullPointerException.class, "空指针异常"),
     OUT_OF_MEMORY_ERROR(2, OutOfMemoryError.class, "内存溢出异常"),
+    JsonProcessingException(47, JsonProcessingException.class,"json转换异常"),
     IO_EXCEPTION(3, IOException.class, "IO异常"),
     FILE_NOTFOUND_EXCEPTION(4, FileNotFoundException.class, "找不到文件异常"),
     CLASS_NOT_FOUND_EXCEPTION(5, ClassNotFoundException.class, "类找不到异常"),

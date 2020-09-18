@@ -167,7 +167,7 @@ public class DemoTest {
 
     @Test
     public void demo3() {
-        JsonUtil.json2Obj("{\"abc\":null,\"name\":null,\"serviceName\":null,\"beanName\":\"ssssrrrr\",\"methodName\":null,\"cronExpression\":null,\"params\":null,\"status\":null,\"host\":null,\"port\":null,\"createTime\":null}",JobBean.class);
+        JsonUtil.json2Obj("{\"abc\":w,\"sds\":null,\"serviceName\":null,\"beanName\":\"ssssrrrr\",\"ssss\":null,\"cronExpression\":null,\"params\":null,\"status\":null,\"host\":null,\"port\":null,\"createTime\":null}",JobBean.class);
         System.out.println("");
     }
 }
