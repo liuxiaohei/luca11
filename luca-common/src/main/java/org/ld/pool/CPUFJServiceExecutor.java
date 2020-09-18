@@ -14,7 +14,6 @@ public class CPUFJServiceExecutor {
                 ForkJoinPool.defaultForkJoinWorkerThreadFactory,
                 null,
                 false);
-
     }
 
     public static ExecutorService getInstance() {

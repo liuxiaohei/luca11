@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 /**
  * json工具
  */
-@SuppressWarnings("unused")
 public class JsonUtil {
 
     public static <T> List<T> json2List(String json, Class<T> cls) {

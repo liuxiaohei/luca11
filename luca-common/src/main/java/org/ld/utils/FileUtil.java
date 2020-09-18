@@ -1,5 +1,7 @@
 package org.ld.utils;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,6 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-@SuppressWarnings("unused")
 public class FileUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
@@ -99,6 +100,43 @@ public class FileUtil {
 
     /**
      * 解压文件到指定路径
+     */
+    public static List<String> unZip(File zipFile, String targetDir, Boolean deleteZipFile) {
+        File targetDirFile = new File(targetDir);
+        if (!targetDirFile.exists()) {
+            targetDirFile.mkdirs();
+        }
+        List<String> paths = new ArrayList<>();
+        try (ZipFile zip = new ZipFile(zipFile, Charset.forName("gbk"))) {
+            for (Enumeration<?> entries = zip.entries(); entries.hasMoreElements(); ) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                String zipEntryName = entry.getName();
+                try (InputStream in = zip.getInputStream(entry)) {
+                    String outPath = targetDir + File.separator + zipEntryName;
+                    try (OutputStream out = new FileOutputStream(outPath)) {
+                        byte[] buf1 = new byte[2048];
+                        int len;
+                        while ((len = in.read(buf1)) > 0) {
+                            out.write(buf1, 0, len);
+                        }
+                    }
+                    paths.add(outPath);
+                }
+            }
+        } catch (IOException e) {
+            throw new CodeStackException(e);
+        } finally {
+            if (deleteZipFile && zipFile.exists()) {
+                if (!zipFile.delete()) {
+                    LOG.warn("删除文件{}失败", zipFile.getName());
+                }
+            }
+        }
+        return paths;
+    }
+
+    /**
+     * 解压文件到指定路径
      * 并且换回解压目录
      */
     public static List<String> unZip(File zipFile, Boolean deleteZipFile) {
@@ -150,7 +188,7 @@ public class FileUtil {
     /**
      * 读取执行文本文件的内容
      */
-    public static String readText(String fileName, Boolean deleteFileAfterRead) {
+    public static TextFile readText(String fileName, Boolean deleteFileAfterRead) {
         File file = new File(fileName);
         StringBuilder sbf = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -158,7 +196,7 @@ public class FileUtil {
             while ((tempStr = reader.readLine()) != null) {
                 sbf.append(tempStr);
             }
-            return sbf.toString();
+            return new TextFile(sbf.toString(), fileName,file.length());
         } catch (IOException e) {
             throw new CodeStackException(e);
         } finally {
@@ -169,6 +207,36 @@ public class FileUtil {
                 }
             }
         }
+    }
+
+    public static void deleteTextFile(String fileName) {
+        File file = new File(fileName);
+        if (file.exists()) {
+            LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
+            if (file.getParentFile().exists() && Objects.requireNonNull(file.getParentFile().listFiles()).length == 0) {
+                LOG.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
+            }
+        }
+    }
+
+    public static byte[] toByteArray(InputStream in) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024 * 4];
+        int n = 0;
+        while ((n = in.read(buffer)) != -1) {
+            out.write(buffer, 0, n);
+        }
+        try (ByteArrayOutputStream o = out) {
+            return out.toByteArray();
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class TextFile {
+        String text;
+        String filePath;
+        long fileSize;
     }
 
 }
