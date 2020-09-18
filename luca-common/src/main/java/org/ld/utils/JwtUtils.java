@@ -37,7 +37,7 @@ public class JwtUtils {
      * @param token 令牌
      */
     public static void verify(String token) {
-        try{
+        try {
             var name = getName(token);
             var algorithm = Algorithm.HMAC256(SECRET);
             var verifier = JWT.require(algorithm)
@@ -45,20 +45,21 @@ public class JwtUtils {
                     //.withSubject(name)
                     .build();
             verifier.verify(token);
-        } catch (Exception e){
-            throw new CodeStackException(UserErrorCodeEnum.USELESS_TOKEN,e);
+        } catch (Exception e) {
+            throw new CodeStackException(UserErrorCodeEnum.USELESS_TOKEN, e);
         }
     }
 
     /**
      * 获得token中的信息
+     *
      * @return token中包含的名称
      */
     public static String getName(String token) {
         try {
             var jwt = JWT.decode(token);
             return jwt.getClaim("name").asString();
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
