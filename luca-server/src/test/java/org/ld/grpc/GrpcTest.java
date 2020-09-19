@@ -2,6 +2,7 @@ package org.ld.grpc;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ld.LucaApplication;
@@ -24,31 +25,28 @@ import java.util.concurrent.TimeUnit;
 @Import(GrpcServer.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {LucaApplication.class})
+@Slf4j
 public class GrpcTest {
-    private Logger log = ZLogger.newInstance();
     @Resource
     private GrpcServerProperties grpcProperties;
-    private ManagedChannel channel;
-
-    private GreeterGrpc.GreeterBlockingStub blockingStub;
 
     @Test
     public void test() throws InterruptedException {
         GrpcBean beanTest = new GrpcBean();
         beanTest.beanName = "grpcServer";
         beanTest.methodName = "run";
-        this.channel = ManagedChannelBuilder.forAddress(grpcProperties.getAddress(), grpcProperties.getPort())
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(grpcProperties.getAddress(), grpcProperties.getPort())
                 .usePlaintext()
                 .build();
-        this.blockingStub = GreeterGrpc.newBlockingStub(channel);
+        GreeterGrpc.GreeterBlockingStub blockingStub = GreeterGrpc.newBlockingStub(channel);
         GrpcRequest request = GrpcRequest.newBuilder().setParams(JsonUtil.obj2Json(beanTest)).build();
         try {
             GrpcReply grpcReply = blockingStub.sendMessage(request);
-            log.error("grpc启动测试结果:{}", grpcReply.getMessage());
+            log.info("grpc启动测试结果:{}", grpcReply.getMessage());
         } catch (Exception e) {
             log.error("grpc启动异常:{}", e.getMessage());
         } finally {
-            this.channel.shutdown().awaitTermination(500, TimeUnit.SECONDS);
+            channel.shutdown().awaitTermination(500, TimeUnit.SECONDS);
         }
     }
 }

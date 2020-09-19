@@ -12,23 +12,6 @@
     <packaging>jar</packaging>
     <name>luca</name>
     <description>Demo project for Spring Boot</description>
-    <properties>
-        <java.version>11</java.version>
-        <app.version>0.0.1-SNAPSHOT</app.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
-        <maven-archetype-plugin.version>3.0.1</maven-archetype-plugin.version>
-        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
-        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
-        <maven-surefire-plugin.version>2.5</maven-surefire-plugin.version>
-        <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
-        <grpc.version>1.13.1</grpc.version>
-        <protobuf.version>3.5.1</protobuf.version>
-        <protoc.version>3.5.1-1</protoc.version>
-        <netty.tcnative.version>2.0.7.Final</netty.tcnative.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -224,22 +207,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
             </plugin>
             <!--			mvn mybatis-generator:generate-->
             <plugin>
