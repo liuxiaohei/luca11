@@ -217,9 +217,7 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         }
 
         public Builder clear() {
-            super.clear();
-            params_ = "";
-            return this;
+            return null;
         }
 
         public Descriptors.Descriptor getDescriptorForType() {
@@ -227,7 +225,7 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         }
 
         public GrpcRequest getDefaultInstanceForType() {
-            return GrpcRequest.getDefaultInstance();
+            return null;
         }
 
         public GrpcRequest build() {
@@ -245,50 +243,34 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
             return result;
         }
 
-        public Builder clone() {
-            return super.clone();
-        }
-
         public Builder setField(Descriptors.FieldDescriptor field, Object value) {
-            return super.setField(field, value);
+            return null;
         }
 
         public Builder clearField(Descriptors.FieldDescriptor field) {
-            return super.clearField(field);
+            return null;
         }
 
         public Builder clearOneof(Descriptors.OneofDescriptor oneof) {
-            return super.clearOneof(oneof);
+            return null;
         }
 
         public Builder setRepeatedField(Descriptors.FieldDescriptor field, int index, Object value) {
-            return super.setRepeatedField(field, index, value);
+            return null;
         }
 
         public Builder addRepeatedField(
                 Descriptors.FieldDescriptor field,
                 Object value) {
-            return super.addRepeatedField(field, value);
+            return null;
         }
 
         public Builder mergeFrom(Message other) {
-            if (other instanceof GrpcRequest) {
-                return mergeFrom((GrpcRequest) other);
-            } else {
-                super.mergeFrom(other);
-                return this;
-            }
+            return null;
         }
 
         public Builder mergeFrom(GrpcRequest other) {
-            if (other == GrpcRequest.getDefaultInstance()) return this;
-            if (!other.getParams().isEmpty()) {
-                params_ = other.params_;
-                onChanged();
-            }
-            this.mergeUnknownFields(other.unknownFields);
-            onChanged();
-            return this;
+            return null;
         }
 
         public final boolean isInitialized() {
@@ -296,30 +278,11 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         }
 
         public Builder mergeFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws IOException {
-            GrpcRequest parsedMessage = null;
-            try {
-                parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-            } catch (InvalidProtocolBufferException e) {
-                parsedMessage = (GrpcRequest) e.getUnfinishedMessage();
-                throw e.unwrapIOException();
-            } finally {
-                if (parsedMessage != null) {
-                    mergeFrom(parsedMessage);
-                }
-            }
-            return this;
+            return null;
         }
 
         public String getParams() {
-            Object ref = params_;
-            if (!(ref instanceof String)) {
-                ByteString bs = (ByteString) ref;
-                String s = bs.toStringUtf8();
-                params_ = s;
-                return s;
-            } else {
-                return (String) ref;
-            }
+            return null;
         }
 
         public Builder setParams(String value) {
@@ -331,18 +294,12 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
             return this;
         }
 
-        public Builder clearParams() {
-            params_ = getDefaultInstance().getParams();
-            onChanged();
-            return this;
-        }
-
         public final Builder setUnknownFields(final UnknownFieldSet unknownFields) {
-            return super.setUnknownFieldsProto3(unknownFields);
+            return null;
         }
 
         public final Builder mergeUnknownFields(final UnknownFieldSet unknownFields) {
-            return super.mergeUnknownFields(unknownFields);
+            return null;
         }
     }
 
