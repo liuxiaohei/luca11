@@ -23,8 +23,8 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
     private volatile Object message_;
     private byte memoizedIsInitialized = -1;
 
-    private GrpcReply(GeneratedMessageV3.Builder<?> builder) {
-        super(builder);
+    public GrpcReply(String value) {
+        message_ = value;
     }
 
     private GrpcReply() {
@@ -70,14 +70,6 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
 
     public static Descriptors.Descriptor getDescriptor() {
         return null;
-    }
-
-    public static Builder newBuilder() {
-        return DEFAULT_INSTANCE.toBuilder();
-    }
-
-    public static Builder newBuilder(GrpcReply prototype) {
-        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
 
     public static GrpcReply getDefaultInstance() {
@@ -158,34 +150,17 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         return result;
     }
 
-    @Override
-    public int hashCode() {
-        if (memoizedHashCode != 0) {
-            return memoizedHashCode;
-        }
-        int hash = 41;
-        hash = (19 * hash) + getDescriptor().hashCode();
-        int MESSAGE_FIELD_NUMBER = 1;
-        hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
-        hash = (53 * hash) + getMessage().hashCode();
-        hash = (29 * hash) + unknownFields.hashCode();
-        memoizedHashCode = hash;
-        return hash;
-    }
-
     public Builder newBuilderForType() {
-        return newBuilder();
+        return null;
     }
 
     public Builder toBuilder() {
-        return this == DEFAULT_INSTANCE
-                ? new Builder()
-                : new Builder().mergeFrom(this);
+        return null;
     }
 
     @Override
     protected Builder newBuilderForType(BuilderParent parent) {
-        return new Builder(parent);
+        return null;
     }
 
     @Override
@@ -197,146 +172,5 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         return DEFAULT_INSTANCE;
     }
 
-    public static final class Builder extends GeneratedMessageV3.Builder<Builder> implements MessageOrBuilder {
-        private Object message_ = "";
-
-        private Builder() {
-        }
-
-        private Builder(BuilderParent parent) {
-            super(parent);
-        }
-
-        protected FieldAccessorTable internalGetFieldAccessorTable() {
-            return null;
-        }
-
-        public Builder clear() {
-            super.clear();
-            message_ = "";
-            return this;
-        }
-
-        public Descriptors.Descriptor getDescriptorForType() {
-            return null;
-        }
-
-        public GrpcReply getDefaultInstanceForType() {
-            return GrpcReply.getDefaultInstance();
-        }
-
-        public GrpcReply build() {
-            GrpcReply result = buildPartial();
-            if (!result.isInitialized()) {
-                throw newUninitializedMessageException(result);
-            }
-            return result;
-        }
-
-        public GrpcReply buildPartial() {
-            GrpcReply result = new GrpcReply(this);
-            result.message_ = message_;
-            onBuilt();
-            return result;
-        }
-
-        public Builder clone() {
-            return super.clone();
-        }
-
-        public Builder setField(Descriptors.FieldDescriptor field, Object value) {
-            return super.setField(field, value);
-        }
-
-        public Builder clearField(Descriptors.FieldDescriptor field) {
-            return super.clearField(field);
-        }
-
-        public Builder clearOneof(Descriptors.OneofDescriptor oneof) {
-            return super.clearOneof(oneof);
-        }
-
-        public Builder setRepeatedField(Descriptors.FieldDescriptor field, int index, Object value) {
-            return super.setRepeatedField(field, index, value);
-        }
-
-        public Builder addRepeatedField(Descriptors.FieldDescriptor field, Object value) {
-            return super.addRepeatedField(field, value);
-        }
-
-        public Builder mergeFrom(Message other) {
-            if (other instanceof GrpcReply) {
-                return mergeFrom((GrpcReply) other);
-            } else {
-                super.mergeFrom(other);
-                return this;
-            }
-        }
-
-        public Builder mergeFrom(GrpcReply other) {
-            if (other == GrpcReply.getDefaultInstance()) return this;
-            if (!other.getMessage().isEmpty()) {
-                message_ = other.message_;
-                onChanged();
-            }
-            this.mergeUnknownFields(other.unknownFields);
-            onChanged();
-            return this;
-        }
-
-        public final boolean isInitialized() {
-            return true;
-        }
-
-        public Builder mergeFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws IOException {
-            GrpcReply parsedMessage = null;
-            try {
-                parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-            } catch (InvalidProtocolBufferException e) {
-                parsedMessage = (GrpcReply) e.getUnfinishedMessage();
-                throw e.unwrapIOException();
-            } finally {
-                if (parsedMessage != null) {
-                    mergeFrom(parsedMessage);
-                }
-            }
-            return this;
-        }
-
-        public String getMessage() {
-            Object ref = message_;
-            if (!(ref instanceof String)) {
-                ByteString bs = (ByteString) ref;
-                String s = bs.toStringUtf8();
-                message_ = s;
-                return s;
-            } else {
-                return (String) ref;
-            }
-        }
-
-        public Builder setMessage(String value) {
-            if (value == null) {
-                throw new NullPointerException();
-            }
-            message_ = value;
-            onChanged();
-            return this;
-        }
-
-        public Builder clearMessage() {
-            message_ = getDefaultInstance().getMessage();
-            onChanged();
-            return this;
-        }
-
-        public final Builder setUnknownFields(final UnknownFieldSet unknownFields) {
-            return super.setUnknownFieldsProto3(unknownFields);
-        }
-
-        public final Builder mergeUnknownFields(final UnknownFieldSet unknownFields) {
-            return super.mergeUnknownFields(unknownFields);
-        }
-    }
 }
 
