@@ -9,8 +9,7 @@ import org.ld.LucaApplication;
 import org.ld.beans.GrpcBean;
 import org.ld.beans.GrpcServer;
 import org.ld.grpc.client.LucaGrpc;
-import org.ld.grpc.client.GrpcReply;
-import org.ld.grpc.client.GrpcRequest;
+import org.ld.grpc.client.GrpcObject;
 import org.ld.grpc.server.GrpcServerProperties;
 import org.ld.utils.JsonUtil;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,10 +36,10 @@ public class GrpcTest {
                 .usePlaintext()
                 .build();
         LucaGrpc.GreeterBlockingStub blockingStub = new LucaGrpc.GreeterBlockingStub(channel);
-        GrpcRequest request = new GrpcRequest(JsonUtil.obj2Json(beanTest));
+        GrpcObject request = new GrpcObject(JsonUtil.obj2Json(beanTest));
         try {
-            GrpcReply grpcReply = blockingStub.sendMessage(request);
-            log.info("grpc启动测试结果:{}", grpcReply.getMessage());
+            GrpcObject grpcReply = blockingStub.sendMessage(request);
+            log.info("grpc启动测试结果:{}", grpcReply.getValue());
         } catch (Exception e) {
             log.error("grpc启动异常:{}", e.getMessage());
         } finally {

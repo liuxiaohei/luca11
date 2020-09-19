@@ -5,24 +5,24 @@ import com.google.protobuf.*;
 import java.io.IOException;
 
 /**
- * The response message containing the greetings
+ * grpc通信传输的对象
  */
-public final class GrpcReply extends GeneratedMessageV3 {
+public final class GrpcObject extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
 
-    private volatile Object message_;
+    private volatile Object value;
     private byte memoizedIsInitialized = -1;
 
-    public GrpcReply(String value) {
-        message_ = value;
+    public GrpcObject(String value) {
+        this.value = value;
     }
 
-    public GrpcReply() {
-        message_ = "";
+    public GrpcObject() {
+        value = "";
     }
 
-    private GrpcReply(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
-        message_ = "";
+    private GrpcObject(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
+        value = "";
         UnknownFieldSet.Builder unknownFields = UnknownFieldSet.newBuilder();
         try {
             boolean done = false;
@@ -39,7 +39,7 @@ public final class GrpcReply extends GeneratedMessageV3 {
                         break;
                     }
                     case 10: {
-                        message_ = input.readStringRequireUtf8();
+                        value = input.readStringRequireUtf8();
                         break;
                     }
                 }
@@ -59,27 +59,23 @@ public final class GrpcReply extends GeneratedMessageV3 {
         return this.unknownFields;
     }
 
-    protected FieldAccessorTable internalGetFieldAccessorTable() {
-        return null;
-    }
-
-    public String getMessage() {
-        Object ref = message_;
+    public String getValue() {
+        Object ref = value;
         if (ref instanceof String) {
             return (String) ref;
         } else {
             ByteString bs = (ByteString) ref;
             String s = bs.toStringUtf8();
-            message_ = s;
+            value = s;
             return s;
         }
     }
 
     private ByteString getMessageBytes() {
-        Object ref = message_;
+        Object ref = value;
         if (ref instanceof String) {
             ByteString b = ByteString.copyFromUtf8((String) ref);
-            message_ = b;
+            value = b;
             return b;
         } else {
             return (ByteString) ref;
@@ -96,7 +92,7 @@ public final class GrpcReply extends GeneratedMessageV3 {
 
     public void writeTo(CodedOutputStream output) throws IOException {
         if (!getMessageBytes().isEmpty()) {
-            GeneratedMessageV3.writeString(output, 1, message_);
+            GeneratedMessageV3.writeString(output, 1, value);
         }
         unknownFields.writeTo(output);
     }
@@ -109,36 +105,43 @@ public final class GrpcReply extends GeneratedMessageV3 {
         if (size != -1) return size;
         size = 0;
         if (!getMessageBytes().isEmpty()) {
-            size += GeneratedMessageV3.computeStringSize(1, message_);
+            size += GeneratedMessageV3.computeStringSize(1, value);
         }
         size += unknownFields.getSerializedSize();
         memoizedSize = size;
         return size;
     }
 
-    public Builder newBuilderForType() {
-        return null;
-    }
-
-    public Builder toBuilder() {
-        return null;
-    }
-
     @Override
-    protected Builder newBuilderForType(BuilderParent parent) {
-        return null;
-    }
-
-    @Override
-    public Parser<GrpcReply> getParserForType() {
+    public Parser<GrpcObject> getParserForType() {
         return new AbstractParser<>() {
-            public GrpcReply parsePartialFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
-                return new GrpcReply(input, extensionRegistry);
+            public GrpcObject parsePartialFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
+                return new GrpcObject(input, extensionRegistry);
             }
         };
     }
 
-    public GrpcReply getDefaultInstanceForType() {
+    public GrpcObject getDefaultInstanceForType() {
+        return null;
+    }
+
+    @Deprecated
+    public Builder newBuilderForType() {
+        return null;
+    }
+
+    @Deprecated
+    public Builder toBuilder() {
+        return null;
+    }
+
+    @Deprecated
+    protected Builder newBuilderForType(BuilderParent parent) {
+        return null;
+    }
+
+    @Deprecated
+    protected FieldAccessorTable internalGetFieldAccessorTable() {
         return null;
     }
 

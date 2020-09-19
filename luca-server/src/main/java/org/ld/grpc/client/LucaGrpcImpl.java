@@ -31,8 +31,8 @@ public class LucaGrpcImpl implements BindableService {
      * @param req              传入参数
      * @param responseObserver 返回结果
      */
-    public void sendMessage(GrpcRequest req, StreamObserver<GrpcReply> responseObserver) {
-        String name = req.getParams();
+    public void sendMessage(GrpcObject req, StreamObserver<GrpcObject> responseObserver) {
+        String name = req.getValue();
         ScheduleJob scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
         String message = "SUCCESS";
         try {
@@ -60,14 +60,14 @@ public class LucaGrpcImpl implements BindableService {
             message = "UNKNOWN";
             log.error("任务执行失败:{}，任务id:{}", message, scheduleJob.getId());
         }
-        responseObserver.onNext(new GrpcReply(message));
+        responseObserver.onNext(new GrpcObject(message));
         responseObserver.onCompleted();
     }
 
     @Override
     public final ServerServiceDefinition bindService() {
         return ServerServiceDefinition.builder(LucaGrpc.getServiceDescriptor())
-                .addMethod(LucaGrpc.getSendMessageMethod(), asyncUnaryCall(new LucaGrpc.MethodHandlers<GrpcRequest,GrpcReply>(this, 0)))
+                .addMethod(LucaGrpc.getSendMessageMethod(), asyncUnaryCall(new LucaGrpc.MethodHandlers<GrpcObject, GrpcObject>(this, 0)))
                 .build();
     }
 }

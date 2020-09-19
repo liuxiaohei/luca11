@@ -14,23 +14,23 @@ import static io.grpc.stub.ClientCalls.blockingUnaryCall;
 public final class LucaGrpc {
 
     public static final String SERVICE_NAME = "luca";
-    private static volatile MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
+    private static volatile MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod;
     private static volatile ServiceDescriptor serviceDescriptor;
 
-    public static MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod() {
-        MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
+    public static MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod() {
+        MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod;
         if ((getSendMessageMethod = LucaGrpc.getSendMessageMethod) == null) {
             synchronized (LucaGrpc.class) {
                 if ((getSendMessageMethod = LucaGrpc.getSendMessageMethod) == null) {
                     LucaGrpc.getSendMessageMethod
                             = getSendMessageMethod
                             = MethodDescriptor
-                            .<GrpcRequest, GrpcReply>newBuilder()
+                            .<GrpcObject, GrpcObject>newBuilder()
                             .setType(MethodDescriptor.MethodType.UNARY)
                             .setFullMethodName("luca/sendMessage")
                             .setSampledToLocalTracing(true)
-                            .setRequestMarshaller(ProtoUtils.marshaller(new GrpcRequest()))
-                            .setResponseMarshaller(ProtoUtils.marshaller(new GrpcReply()))
+                            .setRequestMarshaller(ProtoUtils.marshaller(new GrpcObject()))
+                            .setResponseMarshaller(ProtoUtils.marshaller(new GrpcObject()))
                             .build();
                 }
             }
@@ -70,7 +70,7 @@ public final class LucaGrpc {
             return new GreeterBlockingStub(channel, callOptions);
         }
 
-        public GrpcReply sendMessage(GrpcRequest request) {
+        public GrpcObject sendMessage(GrpcObject request) {
             return blockingUnaryCall(getChannel(), getSendMessageMethod(), getCallOptions(), request);
         }
     }
@@ -93,7 +93,7 @@ public final class LucaGrpc {
         @SuppressWarnings("unchecked")
         public void invoke(T request, StreamObserver<R> responseObserver) {
             if (methodId == 0) {
-                serviceImpl.sendMessage((GrpcRequest) request, (StreamObserver<GrpcReply>) responseObserver);
+                serviceImpl.sendMessage((GrpcObject) request, (StreamObserver<GrpcObject>) responseObserver);
             } else {
                 throw new AssertionError();
             }
