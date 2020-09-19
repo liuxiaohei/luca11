@@ -58,7 +58,7 @@ public class GrpcServerAutoConfiguration {
     }
 
     @Bean
-    public LucaGrpc greeterImpl() {
+    public LucaGrpc lucagrpc() {
         return new LucaGrpc();
     }
 

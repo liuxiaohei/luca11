@@ -1,13 +1,18 @@
 package org.ld.grpc.client;
 
 import com.google.protobuf.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 
 /**
  * grpc通信传输的对象
- * // todo 拿掉
  */
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 public final class GrpcObject extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
 
