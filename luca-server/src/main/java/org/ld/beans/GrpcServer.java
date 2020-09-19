@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GrpcServer {
-    public void run() {
+    private void run() {
         System.out.println("gprc启动测试ing.....");
     }
 }

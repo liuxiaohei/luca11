@@ -1,10 +1,6 @@
 package org.ld.grpc.client;
 
-import com.google.protobuf.Descriptors;
 import io.grpc.*;
-import io.grpc.protobuf.ProtoFileDescriptorSupplier;
-import io.grpc.protobuf.ProtoMethodDescriptorSupplier;
-import io.grpc.protobuf.ProtoServiceDescriptorSupplier;
 import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.AbstractStub;
 import io.grpc.stub.ServerCalls;
@@ -35,7 +31,6 @@ public final class GreeterGrpc {
                             .setSampledToLocalTracing(true)
                             .setRequestMarshaller(ProtoUtils.marshaller(GrpcRequest.getDefaultInstance()))
                             .setResponseMarshaller(ProtoUtils.marshaller(GrpcReply.getDefaultInstance()))
-                            .setSchemaDescriptor(new GreeterMethodDescriptorSupplier("sendMessage"))
                             .build();
                 }
             }
@@ -56,7 +51,6 @@ public final class GreeterGrpc {
                     serviceDescriptor
                             = result
                             = ServiceDescriptor.newBuilder(SERVICE_NAME)
-                            .setSchemaDescriptor(new GreeterBaseDescriptorSupplier())
                             .addMethod(getSendMessageMethod())
                             .build();
                 }
@@ -129,30 +123,4 @@ public final class GreeterGrpc {
         }
     }
 
-    private static class GreeterBaseDescriptorSupplier implements ProtoFileDescriptorSupplier, ProtoServiceDescriptorSupplier {
-
-        @Override
-        public Descriptors.FileDescriptor getFileDescriptor() {
-            return GrpcProto.getDescriptor();
-        }
-
-        @Override
-        public Descriptors.ServiceDescriptor getServiceDescriptor() {
-            return getFileDescriptor().findServiceByName("Greeter");
-        }
-    }
-
-    private static final class GreeterMethodDescriptorSupplier extends GreeterBaseDescriptorSupplier implements ProtoMethodDescriptorSupplier {
-
-        private final String methodName;
-
-        GreeterMethodDescriptorSupplier(String methodName) {
-            this.methodName = methodName;
-        }
-
-        @Override
-        public Descriptors.MethodDescriptor getMethodDescriptor() {
-            return getServiceDescriptor().findMethodByName(methodName);
-        }
-    }
 }

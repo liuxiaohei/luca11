@@ -69,7 +69,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
     }
 
     public static Descriptors.Descriptor getDescriptor() {
-        return GrpcProto.internal_static_GrpcReply_descriptor;
+        return null;
     }
 
     public static Builder newBuilder() {
@@ -90,7 +90,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
     }
 
     protected FieldAccessorTable internalGetFieldAccessorTable() {
-        return GrpcProto.internal_static_GrpcReply_fieldAccessorTable.ensureFieldAccessorsInitialized(GrpcReply.class, Builder.class);
+        return null;
     }
 
     public String getMessage() {
@@ -207,14 +207,8 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
             super(parent);
         }
 
-        public static Descriptors.Descriptor getDescriptor() {
-            return GrpcProto.internal_static_GrpcReply_descriptor;
-        }
-
         protected FieldAccessorTable internalGetFieldAccessorTable() {
-            return GrpcProto.internal_static_GrpcReply_fieldAccessorTable
-                    .ensureFieldAccessorsInitialized(
-                            GrpcReply.class, Builder.class);
+            return null;
         }
 
         public Builder clear() {
@@ -224,7 +218,7 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         }
 
         public Descriptors.Descriptor getDescriptorForType() {
-            return GrpcProto.internal_static_GrpcReply_descriptor;
+            return null;
         }
 
         public GrpcReply getDefaultInstanceForType() {

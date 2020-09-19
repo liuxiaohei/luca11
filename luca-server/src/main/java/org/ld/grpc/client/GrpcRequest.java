@@ -72,10 +72,6 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         }
     }
 
-    public static Descriptors.Descriptor getDescriptor() {
-        return GrpcProto.internal_static_GrpcRequest_descriptor;
-    }
-
     public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
     }
@@ -93,8 +89,8 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         return this.unknownFields;
     }
 
-    protected FieldAccessorTable internalGetFieldAccessorTable() {
-        return GrpcProto.internal_static_GrpcRequest_fieldAccessorTable.ensureFieldAccessorsInitialized(GrpcRequest.class, Builder.class);
+    public FieldAccessorTable internalGetFieldAccessorTable() {
+        return null;
     }
 
     public String getParams() {
@@ -169,7 +165,7 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
             return memoizedHashCode;
         }
         int hash = 41;
-        hash = (19 * hash) + getDescriptor().hashCode();
+//        hash = (19 * hash) + getDescriptor().hashCode();
         int PARAMS_FIELD_NUMBER = 1;
         hash = (37 * hash) + PARAMS_FIELD_NUMBER;
         hash = (53 * hash) + getParams().hashCode();
@@ -213,11 +209,11 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         }
 
         public static Descriptors.Descriptor getDescriptor() {
-            return GrpcProto.internal_static_GrpcRequest_descriptor;
+            return null;
         }
 
         protected FieldAccessorTable internalGetFieldAccessorTable() {
-            return GrpcProto.internal_static_GrpcRequest_fieldAccessorTable.ensureFieldAccessorsInitialized(GrpcRequest.class, Builder.class);
+            return null;
         }
 
         public Builder clear() {
@@ -227,7 +223,7 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         }
 
         public Descriptors.Descriptor getDescriptorForType() {
-            return GrpcProto.internal_static_GrpcRequest_descriptor;
+            return null;
         }
 
         public GrpcRequest getDefaultInstanceForType() {
