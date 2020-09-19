@@ -100,6 +100,9 @@ public final class GrpcRequest extends GeneratedMessageV3 {
         unknownFields.writeTo(output);
     }
 
+    /**
+     * 不能删 会卡住
+     */
     public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;

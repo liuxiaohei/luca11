@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * The response message containing the greetings
  */
-public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuilder {
+public final class GrpcReply extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
 
     private volatile Object message_;
@@ -101,6 +101,9 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         unknownFields.writeTo(output);
     }
 
+    /**
+     * 不能删 会卡住
+     */
     public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
