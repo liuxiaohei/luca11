@@ -42,7 +42,7 @@ public class RpcService {
                 .forAddress(job.getHost(), job.getPort())
                 .usePlaintext()
                 .build();
-        GreeterGrpc.GreeterBlockingStub blockingStub = GreeterGrpc.newBlockingStub(channel);
+        GreeterGrpc.GreeterBlockingStub blockingStub = new GreeterGrpc.GreeterBlockingStub(channel);
         GrpcRequest request = new GrpcRequest(JsonUtil.obj2Json(job));
         try {
             GrpcReply grpcReply = blockingStub.sendMessage(request);

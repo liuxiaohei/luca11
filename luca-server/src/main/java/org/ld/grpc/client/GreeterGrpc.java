@@ -6,7 +6,6 @@ import io.grpc.stub.AbstractStub;
 import io.grpc.stub.ServerCalls;
 import io.grpc.stub.StreamObserver;
 
-import static io.grpc.MethodDescriptor.generateFullMethodName;
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
@@ -27,19 +26,15 @@ public final class GreeterGrpc {
                             = MethodDescriptor
                             .<GrpcRequest, GrpcReply>newBuilder()
                             .setType(MethodDescriptor.MethodType.UNARY)
-                            .setFullMethodName(generateFullMethodName("Greeter", "sendMessage"))
+                            .setFullMethodName("Greeter/sendMessage")
                             .setSampledToLocalTracing(true)
-                            .setRequestMarshaller(ProtoUtils.marshaller(GrpcRequest.getDefaultInstance()))
-                            .setResponseMarshaller(ProtoUtils.marshaller(GrpcReply.getDefaultInstance()))
+                            .setRequestMarshaller(ProtoUtils.marshaller(new GrpcRequest()))
+                            .setResponseMarshaller(ProtoUtils.marshaller(new GrpcReply()))
                             .build();
                 }
             }
         }
         return getSendMessageMethod;
-    }
-
-    public static GreeterBlockingStub newBlockingStub(Channel channel) {
-        return new GreeterBlockingStub(channel);
     }
 
     public static ServiceDescriptor getServiceDescriptor() {
@@ -75,7 +70,7 @@ public final class GreeterGrpc {
 
     public static final class GreeterBlockingStub extends AbstractStub<GreeterBlockingStub> {
 
-        private GreeterBlockingStub(Channel channel) {
+        public GreeterBlockingStub(Channel channel) {
             super(channel);
         }
 

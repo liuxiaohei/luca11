@@ -7,19 +7,6 @@ import com.google.protobuf.*;
  */
 public final class GrpcRequest extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
-    private static final GrpcRequest DEFAULT_INSTANCE;
-    private static final Parser<GrpcRequest> PARSER = new AbstractParser<>() {
-        public GrpcRequest parsePartialFrom(
-                CodedInputStream input,
-                ExtensionRegistryLite extensionRegistry)
-                throws InvalidProtocolBufferException {
-            return new GrpcRequest(input, extensionRegistry);
-        }
-    };
-
-    static {
-        DEFAULT_INSTANCE = new GrpcRequest();
-    }
 
     private volatile Object params_;
     private byte memoizedIsInitialized = -1;
@@ -28,17 +15,13 @@ public final class GrpcRequest extends GeneratedMessageV3 {
         params_ = value;
     }
 
-    private GrpcRequest() {
+    public GrpcRequest() {
         params_ = "";
     }
 
     private GrpcRequest(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
-        this();
-        if (extensionRegistry == null) {
-            throw new NullPointerException();
-        }
-        UnknownFieldSet.Builder unknownFields =
-                UnknownFieldSet.newBuilder();
+        params_ = "";
+        UnknownFieldSet.Builder unknownFields = UnknownFieldSet.newBuilder();
         try {
             boolean done = false;
             while (!done) {
@@ -48,8 +31,7 @@ public final class GrpcRequest extends GeneratedMessageV3 {
                         done = true;
                         break;
                     default: {
-                        if (!parseUnknownFieldProto3(
-                                input, unknownFields, extensionRegistry, tag)) {
+                        if (!parseUnknownFieldProto3(input, unknownFields, extensionRegistry, tag)) {
                             done = true;
                         }
                         break;
@@ -68,10 +50,6 @@ public final class GrpcRequest extends GeneratedMessageV3 {
             this.unknownFields = unknownFields.build();
             makeExtensionsImmutable();
         }
-    }
-
-    public static GrpcRequest getDefaultInstance() {
-        return DEFAULT_INSTANCE;
     }
 
     @Override
@@ -149,11 +127,18 @@ public final class GrpcRequest extends GeneratedMessageV3 {
 
     @Override
     public Parser<GrpcRequest> getParserForType() {
-        return PARSER;
+        return new AbstractParser<>() {
+            public GrpcRequest parsePartialFrom(
+                    CodedInputStream input,
+                    ExtensionRegistryLite extensionRegistry)
+                    throws InvalidProtocolBufferException {
+                return new GrpcRequest(input, extensionRegistry);
+            }
+        };
     }
 
     public GrpcRequest getDefaultInstanceForType() {
-        return DEFAULT_INSTANCE;
+        return null;
     }
 }
 
