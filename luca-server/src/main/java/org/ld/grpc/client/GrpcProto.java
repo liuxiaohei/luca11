@@ -9,27 +9,8 @@ public final class GrpcProto {
     static final GeneratedMessageV3.FieldAccessorTable internal_static_GrpcRequest_fieldAccessorTable;
     static final Descriptors.Descriptor internal_static_GrpcReply_descriptor;
     static final GeneratedMessageV3.FieldAccessorTable internal_static_GrpcReply_fieldAccessorTable;
-    private static Descriptors.FileDescriptor descriptor;
 
     static {
-        String[] descriptorData = {
-                "\n\013hello.proto" +
-                        "\"\035\n\013GrpcRequest" +
-                        "\022\016\n\006params\030\001 \001" +
-                        "(\t\"\034\n\tGrpcReply\022\017\n\007" +
-                        "message\030\001 \001(\t24\n\007Greeter\022)\n\013" +
-                        "sendMessage\022\014.GrpcRequest\032\n" +
-                        ".GrpcReply\"\000B\023B\tGrpcProtoP\001\242\002\003HLWb\006proto3"
-        };
-        Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-                new Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-                    public ExtensionRegistry assignDescriptors(
-                            Descriptors.FileDescriptor root) {
-                        descriptor = root;
-                        return null;
-                    }
-                };
-        Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(descriptorData, new Descriptors.FileDescriptor[]{}, assigner);
         internal_static_GrpcRequest_descriptor = getDescriptor().getMessageTypes().get(0);
         internal_static_GrpcRequest_fieldAccessorTable = new GeneratedMessageV3.FieldAccessorTable(internal_static_GrpcRequest_descriptor,
                 new String[]{"Params",});
@@ -42,7 +23,7 @@ public final class GrpcProto {
     }
 
     public static Descriptors.FileDescriptor getDescriptor() {
-        return descriptor;
+        return null;
     }
 
 }
