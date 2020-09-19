@@ -2,6 +2,8 @@ package org.ld.grpc.client;
 
 import com.google.protobuf.*;
 
+import java.io.IOException;
+
 /**
  * The request message containing the user's name.
  */
@@ -93,7 +95,7 @@ public final class GrpcRequest extends GeneratedMessageV3 {
         return true;
     }
 
-    public void writeTo(CodedOutputStream output) throws java.io.IOException {
+    public void writeTo(CodedOutputStream output) throws IOException {
         if (!getParamsBytes().isEmpty()) {
             GeneratedMessageV3.writeString(output, 1, params_);
         }
