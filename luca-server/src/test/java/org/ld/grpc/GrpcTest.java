@@ -39,7 +39,7 @@ public class GrpcTest {
                 .usePlaintext()
                 .build();
         GreeterGrpc.GreeterBlockingStub blockingStub = GreeterGrpc.newBlockingStub(channel);
-        GrpcRequest request = GrpcRequest.newBuilder().setParams(JsonUtil.obj2Json(beanTest)).build();
+        GrpcRequest request = new GrpcRequest(JsonUtil.obj2Json(beanTest));
         try {
             GrpcReply grpcReply = blockingStub.sendMessage(request);
             log.info("grpc启动测试结果:{}", grpcReply.getMessage());

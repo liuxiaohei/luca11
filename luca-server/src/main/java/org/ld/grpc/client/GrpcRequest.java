@@ -2,12 +2,10 @@ package org.ld.grpc.client;
 
 import com.google.protobuf.*;
 
-import java.io.IOException;
-
 /**
  * The request message containing the user's name.
  */
-public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBuilder {
+public final class GrpcRequest extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
     private static final GrpcRequest DEFAULT_INSTANCE;
     private static final Parser<GrpcRequest> PARSER = new AbstractParser<>() {
@@ -26,8 +24,8 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
     private volatile Object params_;
     private byte memoizedIsInitialized = -1;
 
-    private GrpcRequest(GeneratedMessageV3.Builder<?> builder) {
-        super(builder);
+    public GrpcRequest(String value) {
+        params_ = value;
     }
 
     private GrpcRequest() {
@@ -70,14 +68,6 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
             this.unknownFields = unknownFields.build();
             makeExtensionsImmutable();
         }
-    }
-
-    public static Builder newBuilder() {
-        return DEFAULT_INSTANCE.toBuilder();
-    }
-
-    public static Builder newBuilder(GrpcRequest prototype) {
-        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
 
     public static GrpcRequest getDefaultInstance() {
@@ -159,34 +149,17 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
         return result;
     }
 
-    @Override
-    public int hashCode() {
-        if (memoizedHashCode != 0) {
-            return memoizedHashCode;
-        }
-        int hash = 41;
-//        hash = (19 * hash) + getDescriptor().hashCode();
-        int PARAMS_FIELD_NUMBER = 1;
-        hash = (37 * hash) + PARAMS_FIELD_NUMBER;
-        hash = (53 * hash) + getParams().hashCode();
-        hash = (29 * hash) + unknownFields.hashCode();
-        memoizedHashCode = hash;
-        return hash;
-    }
-
     public Builder newBuilderForType() {
-        return newBuilder();
+        return null;
     }
 
     public Builder toBuilder() {
-        return this == DEFAULT_INSTANCE
-                ? new Builder()
-                : new Builder().mergeFrom(this);
+        return null;
     }
 
     @Override
     protected Builder newBuilderForType(BuilderParent parent) {
-        return new Builder(parent);
+        return null;
     }
 
     @Override
@@ -197,111 +170,5 @@ public final class GrpcRequest extends GeneratedMessageV3 implements MessageOrBu
     public GrpcRequest getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
     }
-
-    public static final class Builder extends GeneratedMessageV3.Builder<Builder> implements MessageOrBuilder {
-        private Object params_ = "";
-
-        private Builder() {
-        }
-
-        private Builder(BuilderParent parent) {
-            super(parent);
-        }
-
-        public static Descriptors.Descriptor getDescriptor() {
-            return null;
-        }
-
-        protected FieldAccessorTable internalGetFieldAccessorTable() {
-            return null;
-        }
-
-        public Builder clear() {
-            return null;
-        }
-
-        public Descriptors.Descriptor getDescriptorForType() {
-            return null;
-        }
-
-        public GrpcRequest getDefaultInstanceForType() {
-            return null;
-        }
-
-        public GrpcRequest build() {
-            GrpcRequest result = buildPartial();
-            if (!result.isInitialized()) {
-                throw newUninitializedMessageException(result);
-            }
-            return result;
-        }
-
-        public GrpcRequest buildPartial() {
-            GrpcRequest result = new GrpcRequest(this);
-            result.params_ = params_;
-            onBuilt();
-            return result;
-        }
-
-        public Builder setField(Descriptors.FieldDescriptor field, Object value) {
-            return null;
-        }
-
-        public Builder clearField(Descriptors.FieldDescriptor field) {
-            return null;
-        }
-
-        public Builder clearOneof(Descriptors.OneofDescriptor oneof) {
-            return null;
-        }
-
-        public Builder setRepeatedField(Descriptors.FieldDescriptor field, int index, Object value) {
-            return null;
-        }
-
-        public Builder addRepeatedField(
-                Descriptors.FieldDescriptor field,
-                Object value) {
-            return null;
-        }
-
-        public Builder mergeFrom(Message other) {
-            return null;
-        }
-
-        public Builder mergeFrom(GrpcRequest other) {
-            return null;
-        }
-
-        public final boolean isInitialized() {
-            return true;
-        }
-
-        public Builder mergeFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws IOException {
-            return null;
-        }
-
-        public String getParams() {
-            return null;
-        }
-
-        public Builder setParams(String value) {
-            if (value == null) {
-                throw new NullPointerException();
-            }
-            params_ = value;
-            onChanged();
-            return this;
-        }
-
-        public final Builder setUnknownFields(final UnknownFieldSet unknownFields) {
-            return null;
-        }
-
-        public final Builder mergeUnknownFields(final UnknownFieldSet unknownFields) {
-            return null;
-        }
-    }
-
 }
 
