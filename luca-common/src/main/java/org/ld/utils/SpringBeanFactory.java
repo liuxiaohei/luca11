@@ -5,6 +5,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.Nullable;
+
+import java.lang.annotation.Annotation;
 
 @SuppressWarnings("unused")
 @Configuration
@@ -45,8 +48,43 @@ public class SpringBeanFactory implements ApplicationContextAware {
         }
     }
 
+    public static <A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> clazz) {
+        try {
+            return applicationContext.findAnnotationOnBean(beanName,clazz);
+        } catch (BeansException e) {
+            throw new CodeStackException(e);
+        }
+    }
+
+    public static <T> T getBean(String beanName, Class<T> clazz) {
+        try {
+            return applicationContext.getBean(beanName,clazz);
+        } catch (BeansException e) {
+            throw new CodeStackException(e);
+        }
+    }
+
+    public static String[] getBeanNamesForType(@Nullable Class<?> clazz) {
+        try {
+            return applicationContext.getBeanNamesForType(clazz);
+        } catch (BeansException e) {
+            throw new CodeStackException(e);
+        }
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
         applicationContext = context;
+    }
+
+    /**
+     * 获取Bean 实例
+     */
+    public static String[] getBeanNamesForAnnotation(Class<? extends Annotation> clazz) {
+        try {
+            return applicationContext.getBeanNamesForAnnotation(clazz);
+        } catch (BeansException e) {
+            throw new CodeStackException(e);
+        }
     }
 }

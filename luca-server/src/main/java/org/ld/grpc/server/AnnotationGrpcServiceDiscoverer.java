@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware, GrpcServiceDiscoverer {
+public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
@@ -40,7 +40,6 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
     /**
      * 获取GrpcServiceDefinition对象集合
      */
-    @Override
     public Collection<GrpcServiceDefinition> findGrpcServices() {
         Collection<String> beanNames = findGrpcServiceBeanNames();
         List<GrpcServiceDefinition> definitions = Lists.newArrayListWithCapacity(beanNames.size());

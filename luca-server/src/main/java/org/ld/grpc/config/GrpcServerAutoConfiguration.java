@@ -44,7 +44,7 @@ public class GrpcServerAutoConfiguration {
      */
     @ConditionalOnClass(Channel.class)
     @Bean
-    public NettyGrpcServerFactory nettyGrpcServiceFactory(GrpcServerProperties properties, GrpcServiceDiscoverer discoverer) {
+    public NettyGrpcServerFactory nettyGrpcServiceFactory(GrpcServerProperties properties, AnnotationGrpcServiceDiscoverer discoverer) {
         NettyGrpcServerFactory factory = new NettyGrpcServerFactory(properties);
         for (GrpcServiceDefinition service : discoverer.findGrpcServices()) {
             factory.addService(service);
