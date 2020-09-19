@@ -134,21 +134,6 @@ public final class GrpcRequest extends GeneratedMessageV3 {
         return size;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof GrpcRequest)) {
-            return super.equals(obj);
-        }
-        GrpcRequest other = (GrpcRequest) obj;
-        boolean result;
-        result = getParams().equals(other.getParams());
-        result = result && unknownFields.equals(other.unknownFields);
-        return result;
-    }
-
     public Builder newBuilderForType() {
         return null;
     }

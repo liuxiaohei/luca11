@@ -135,21 +135,6 @@ public final class GrpcReply extends GeneratedMessageV3 implements MessageOrBuil
         return size;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof GrpcReply)) {
-            return super.equals(obj);
-        }
-        GrpcReply other = (GrpcReply) obj;
-        boolean result;
-        result = getMessage().equals(other.getMessage());
-        result = result && unknownFields.equals(other.unknownFields);
-        return result;
-    }
-
     public Builder newBuilderForType() {
         return null;
     }
