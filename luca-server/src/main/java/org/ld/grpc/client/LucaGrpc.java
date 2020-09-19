@@ -10,23 +10,23 @@ import static io.grpc.stub.ClientCalls.blockingUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
-public final class GreeterGrpc {
+public final class LucaGrpc {
 
-    public static final String SERVICE_NAME = "Greeter";
+    public static final String SERVICE_NAME = "luca";
     private static volatile MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
     private static volatile ServiceDescriptor serviceDescriptor;
 
     public static MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod() {
         MethodDescriptor<GrpcRequest, GrpcReply> getSendMessageMethod;
-        if ((getSendMessageMethod = GreeterGrpc.getSendMessageMethod) == null) {
-            synchronized (GreeterGrpc.class) {
-                if ((getSendMessageMethod = GreeterGrpc.getSendMessageMethod) == null) {
-                    GreeterGrpc.getSendMessageMethod
+        if ((getSendMessageMethod = LucaGrpc.getSendMessageMethod) == null) {
+            synchronized (LucaGrpc.class) {
+                if ((getSendMessageMethod = LucaGrpc.getSendMessageMethod) == null) {
+                    LucaGrpc.getSendMessageMethod
                             = getSendMessageMethod
                             = MethodDescriptor
                             .<GrpcRequest, GrpcReply>newBuilder()
                             .setType(MethodDescriptor.MethodType.UNARY)
-                            .setFullMethodName("Greeter/sendMessage")
+                            .setFullMethodName("luca/sendMessage")
                             .setSampledToLocalTracing(true)
                             .setRequestMarshaller(ProtoUtils.marshaller(new GrpcRequest()))
                             .setResponseMarshaller(ProtoUtils.marshaller(new GrpcReply()))
@@ -37,10 +37,10 @@ public final class GreeterGrpc {
         return getSendMessageMethod;
     }
 
-    public static ServiceDescriptor getServiceDescriptor() {
+    private static ServiceDescriptor getServiceDescriptor() {
         ServiceDescriptor result = serviceDescriptor;
         if (result == null) {
-            synchronized (GreeterGrpc.class) {
+            synchronized (LucaGrpc.class) {
                 result = serviceDescriptor;
                 if (result == null) {
                     serviceDescriptor
@@ -117,5 +117,4 @@ public final class GreeterGrpc {
             throw new AssertionError();
         }
     }
-
 }

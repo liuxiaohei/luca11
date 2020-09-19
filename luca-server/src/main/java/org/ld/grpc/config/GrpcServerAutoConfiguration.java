@@ -3,7 +3,7 @@ package org.ld.grpc.config;
 import io.grpc.Server;
 import io.grpc.services.HealthStatusManager;
 import io.netty.channel.Channel;
-import org.ld.grpc.client.GreeterImpl;
+import org.ld.grpc.client.LucaGrpcImpl;
 import org.ld.grpc.server.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -58,8 +58,8 @@ public class GrpcServerAutoConfiguration {
     }
 
     @Bean
-    public GreeterImpl greeterImpl() {
-        return new GreeterImpl();
+    public LucaGrpcImpl greeterImpl() {
+        return new LucaGrpcImpl();
     }
 
 }

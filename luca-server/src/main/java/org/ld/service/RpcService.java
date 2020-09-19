@@ -9,7 +9,7 @@ import org.ld.utils.JobUtils;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.ld.utils.ZLogger;
-import org.ld.grpc.client.GreeterGrpc;
+import org.ld.grpc.client.LucaGrpc;
 import org.ld.grpc.client.GrpcReply;
 import org.ld.grpc.client.GrpcRequest;
 import org.quartz.Scheduler;
@@ -42,7 +42,7 @@ public class RpcService {
                 .forAddress(job.getHost(), job.getPort())
                 .usePlaintext()
                 .build();
-        GreeterGrpc.GreeterBlockingStub blockingStub = new GreeterGrpc.GreeterBlockingStub(channel);
+        LucaGrpc.GreeterBlockingStub blockingStub = new LucaGrpc.GreeterBlockingStub(channel);
         GrpcRequest request = new GrpcRequest(JsonUtil.obj2Json(job));
         try {
             GrpcReply grpcReply = blockingStub.sendMessage(request);
