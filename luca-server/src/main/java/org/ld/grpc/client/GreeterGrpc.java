@@ -93,11 +93,11 @@ public final class GreeterGrpc {
         }
     }
 
-    private static final class MethodHandlers<Req, Resp> implements
-            ServerCalls.UnaryMethod<Req, Resp>,
-            ServerCalls.ServerStreamingMethod<Req, Resp>,
-            ServerCalls.ClientStreamingMethod<Req, Resp>,
-            ServerCalls.BidiStreamingMethod<Req, Resp> {
+    private static final class MethodHandlers<T, R> implements
+            ServerCalls.UnaryMethod<T, R>,
+            ServerCalls.ServerStreamingMethod<T, R>,
+            ServerCalls.ClientStreamingMethod<T, R>,
+            ServerCalls.BidiStreamingMethod<T, R> {
 
         private final GreeterImplBase serviceImpl;
         private final int methodId;
@@ -109,7 +109,7 @@ public final class GreeterGrpc {
 
         @Override
         @SuppressWarnings("unchecked")
-        public void invoke(Req request, StreamObserver<Resp> responseObserver) {
+        public void invoke(T request, StreamObserver<R> responseObserver) {
             if (methodId == 0) {
                 serviceImpl.sendMessage((GrpcRequest) request, (StreamObserver<GrpcReply>) responseObserver);
             } else {
@@ -118,7 +118,7 @@ public final class GreeterGrpc {
         }
 
         @Override
-        public StreamObserver<Req> invoke(StreamObserver<Resp> responseObserver) {
+        public StreamObserver<T> invoke(StreamObserver<R> responseObserver) {
             throw new AssertionError();
         }
     }
