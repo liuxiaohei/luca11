@@ -3,8 +3,6 @@ package org.ld.grpc.client;
 import io.grpc.*;
 import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.AbstractStub;
-import io.grpc.stub.ServerCalls;
-import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.grpc.server.GrpcService;
@@ -30,48 +28,45 @@ public final class LucaGrpc implements BindableService {
     private Method method;
     private String params;
 
-    /**
-     * grpc服务端接受消息方法
-     * 通过反射调用具体需要执行方法
-     * @param req              传入参数
-     * @param responseObserver 返回结果
-     */
-    public void sendMessage(GrpcObject req, StreamObserver<GrpcObject> responseObserver) {
-        String name = req.getValue();
-        ScheduleJob scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
-        String message = "SUCCESS";
-        try {
-            target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
-            params = scheduleJob.getParams();
-            if (StringUtil.isBlank(params)) {
-                method = target.getClass().getDeclaredMethod(scheduleJob.getMethodName());
-            } else {
-                method = target.getClass().getDeclaredMethod(scheduleJob.getMethodName(), String.class);
-            }
-            ReflectionUtils.makeAccessible(method);
-            CompletableFuture.runAsync(() -> {
-                try {
-                    if (StringUtil.isBlank(params)) {
-                        method.invoke(target);
-                    } else {
-                        method.invoke(target, params);
-                    }
-                } catch (Exception e) {
-                    log.error("执行定时任务失败:{},任务id:{}", e, scheduleJob.getId());
-                }
-            });
-        } catch (Exception e) {
-            message = "UNKNOWN";
-            log.error("任务执行失败:{}，任务id:{}", message, scheduleJob.getId());
-        }
-        responseObserver.onNext(new GrpcObject(message));
-        responseObserver.onCompleted();
-    }
-
     @Override
     public final ServerServiceDefinition bindService() {
-        return ServerServiceDefinition.builder(LucaGrpc.getServiceDescriptor())
-                .addMethod(getSendMessageMethod(), asyncUnaryCall(new LucaGrpc.MethodHandlers<>(this, 0)))
+        return ServerServiceDefinition
+                .builder(getServiceDescriptor())
+                .addMethod(
+                        getSendMessageMethod(),
+                        asyncUnaryCall((req,responseObserver) -> {
+                            // grpc服务端接受消息方法
+                            // 通过反射调用具体需要执行方法
+                            String name = req.getValue();
+                            ScheduleJob scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
+                            String message = "SUCCESS";
+                            try {
+                                target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
+                                params = scheduleJob.getParams();
+                                if (StringUtil.isBlank(params)) {
+                                    method = target.getClass().getDeclaredMethod(scheduleJob.getMethodName());
+                                } else {
+                                    method = target.getClass().getDeclaredMethod(scheduleJob.getMethodName(), String.class);
+                                }
+                                ReflectionUtils.makeAccessible(method);
+                                CompletableFuture.runAsync(() -> {
+                                    try {
+                                        if (StringUtil.isBlank(params)) {
+                                            method.invoke(target);
+                                        } else {
+                                            method.invoke(target, params);
+                                        }
+                                    } catch (Exception e) {
+                                        log.error("执行定时任务失败:{},任务id:{}", e, scheduleJob.getId());
+                                    }
+                                });
+                            } catch (Exception e) {
+                                message = "UNKNOWN";
+                                log.error("任务执行失败:{}，任务id:{}", message, scheduleJob.getId());
+                            }
+                            responseObserver.onNext(new GrpcObject(message));
+                            responseObserver.onCompleted();
+                        }))
                 .build();
     }
 
@@ -133,33 +128,4 @@ public final class LucaGrpc implements BindableService {
         }
     }
 
-    static final class MethodHandlers<T, R> implements
-            ServerCalls.UnaryMethod<T, R>,
-            ServerCalls.ServerStreamingMethod<T, R>,
-            ServerCalls.ClientStreamingMethod<T, R>,
-            ServerCalls.BidiStreamingMethod<T, R> {
-
-        private final LucaGrpc serviceImpl;
-        private final int methodId;
-
-        MethodHandlers(LucaGrpc serviceImpl, int methodId) {
-            this.serviceImpl = serviceImpl;
-            this.methodId = methodId;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public void invoke(T request, StreamObserver<R> responseObserver) {
-            if (methodId == 0) {
-                serviceImpl.sendMessage((GrpcObject) request, (StreamObserver<GrpcObject>) responseObserver);
-            } else {
-                throw new AssertionError();
-            }
-        }
-
-        @Override
-        public StreamObserver<T> invoke(StreamObserver<R> responseObserver) {
-            throw new AssertionError();
-        }
-    }
 }
