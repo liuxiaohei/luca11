@@ -21,9 +21,7 @@ import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 @Slf4j
 public final class LucaGrpc implements BindableService {
 
-    public static final String SERVICE_NAME = "luca";
-    private static volatile MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod;
-    private static volatile ServiceDescriptor serviceDescriptor;
+    private static final String SERVICE_NAME = "luca";
     private Object target;
     private Method method;
     private String params;
@@ -31,10 +29,10 @@ public final class LucaGrpc implements BindableService {
     @Override
     public final ServerServiceDefinition bindService() {
         return ServerServiceDefinition
-                .builder(getServiceDescriptor())
+                .builder(ServiceDescriptorHolder.serviceDescriptor)
                 .addMethod(
-                        getSendMessageMethod(),
-                        asyncUnaryCall((req,responseObserver) -> {
+                        MethodDescriptorHolder.methodDescriptor,
+                        asyncUnaryCall((req, responseObserver) -> {
                             // grpc服务端接受消息方法
                             // 通过反射调用具体需要执行方法
                             String name = req.getValue();
@@ -70,42 +68,30 @@ public final class LucaGrpc implements BindableService {
                 .build();
     }
 
-    private static MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod() {
-        MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod;
-        if ((getSendMessageMethod = LucaGrpc.getSendMessageMethod) == null) {
-            synchronized (LucaGrpc.class) {
-                if ((getSendMessageMethod = LucaGrpc.getSendMessageMethod) == null) {
-                    LucaGrpc.getSendMessageMethod
-                            = getSendMessageMethod
-                            = MethodDescriptor
-                            .<GrpcObject, GrpcObject>newBuilder()
-                            .setType(MethodDescriptor.MethodType.UNARY)
-                            .setFullMethodName("luca/sendMessage")
-                            .setSampledToLocalTracing(true)
-                            .setRequestMarshaller(ProtoUtils.marshaller(new GrpcObject()))
-                            .setResponseMarshaller(ProtoUtils.marshaller(new GrpcObject()))
-                            .build();
-                }
-            }
-        }
-        return getSendMessageMethod;
+    /**
+     * 单例获取方法的输入输出的描述
+     */
+    private static class MethodDescriptorHolder {
+        private static final MethodDescriptor<GrpcObject, GrpcObject> methodDescriptor =
+                MethodDescriptor
+                        .<GrpcObject, GrpcObject>newBuilder()
+                        .setType(MethodDescriptor.MethodType.UNARY)
+                        .setFullMethodName(SERVICE_NAME + "/sendMessage")
+                        .setSampledToLocalTracing(true)
+                        .setRequestMarshaller(ProtoUtils.marshaller(new GrpcObject()))
+                        .setResponseMarshaller(ProtoUtils.marshaller(new GrpcObject()))
+                        .build();
     }
 
-    private static ServiceDescriptor getServiceDescriptor() {
-        ServiceDescriptor result = serviceDescriptor;
-        if (result == null) {
-            synchronized (LucaGrpc.class) {
-                result = serviceDescriptor;
-                if (result == null) {
-                    serviceDescriptor
-                            = result
-                            = ServiceDescriptor.newBuilder(SERVICE_NAME)
-                            .addMethod(getSendMessageMethod())
-                            .build();
-                }
-            }
-        }
-        return result;
+    /**
+     * 整体服务的描述
+     */
+    private static class ServiceDescriptorHolder {
+        private static final ServiceDescriptor serviceDescriptor =
+                ServiceDescriptor
+                        .newBuilder(SERVICE_NAME)
+                        .addMethod(MethodDescriptorHolder.methodDescriptor)
+                        .build();
     }
 
     public static final class GreeterBlockingStub extends AbstractStub<GreeterBlockingStub> {
@@ -124,7 +110,7 @@ public final class LucaGrpc implements BindableService {
         }
 
         public GrpcObject sendMessage(GrpcObject request) {
-            return blockingUnaryCall(getChannel(), getSendMessageMethod(), getCallOptions(), request);
+            return blockingUnaryCall(getChannel(), MethodDescriptorHolder.methodDescriptor, getCallOptions(), request);
         }
     }
 
