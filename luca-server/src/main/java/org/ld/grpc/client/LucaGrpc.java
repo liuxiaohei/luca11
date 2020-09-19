@@ -1,5 +1,6 @@
 package org.ld.grpc.client;
 
+import com.google.common.base.Preconditions;
 import io.grpc.*;
 import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.AbstractStub;
@@ -94,24 +95,7 @@ public final class LucaGrpc implements BindableService {
                         .build();
     }
 
-    public static final class GreeterBlockingStub extends AbstractStub<GreeterBlockingStub> {
-
-        public GreeterBlockingStub(Channel channel) {
-            super(channel);
-        }
-
-        private GreeterBlockingStub(Channel channel, CallOptions callOptions) {
-            super(channel, callOptions);
-        }
-
-        @Override
-        protected GreeterBlockingStub build(Channel channel, CallOptions callOptions) {
-            return new GreeterBlockingStub(channel, callOptions);
-        }
-
-        public GrpcObject sendMessage(GrpcObject request) {
-            return blockingUnaryCall(getChannel(), MethodDescriptorHolder.methodDescriptor, getCallOptions(), request);
-        }
+    public static GrpcObject sendMessage(Channel channel,GrpcObject request) {
+        return blockingUnaryCall(channel, MethodDescriptorHolder.methodDescriptor, CallOptions.DEFAULT, request);
     }
-
 }

@@ -35,10 +35,9 @@ public class GrpcTest {
         ManagedChannel channel = ManagedChannelBuilder.forAddress(grpcProperties.getAddress(), grpcProperties.getPort())
                 .usePlaintext()
                 .build();
-        LucaGrpc.GreeterBlockingStub blockingStub = new LucaGrpc.GreeterBlockingStub(channel);
         GrpcObject request = new GrpcObject(JsonUtil.obj2Json(beanTest));
         try {
-            GrpcObject grpcReply = blockingStub.sendMessage(request);
+            GrpcObject grpcReply = LucaGrpc.sendMessage(channel, request);
             log.info("grpc启动测试结果:{}", grpcReply.getValue());
         } catch (Exception e) {
             log.error("grpc启动异常:{}", e.getMessage());

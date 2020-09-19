@@ -41,10 +41,9 @@ public class RpcService {
                 .forAddress(job.getHost(), job.getPort())
                 .usePlaintext()
                 .build();
-        LucaGrpc.GreeterBlockingStub blockingStub = new LucaGrpc.GreeterBlockingStub(channel);
         GrpcObject request = new GrpcObject(JsonUtil.obj2Json(job));
         try {
-            GrpcObject grpcReply = blockingStub.sendMessage(request);
+            GrpcObject grpcReply = LucaGrpc.sendMessage(channel,request);
             if ("UNKNOWN".equals(grpcReply.getValue())) {
                 log.error("任务执行失败:{}，任务id:{}", grpcReply.getValue(), job.getId());
             }
