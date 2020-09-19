@@ -1,9 +1,7 @@
 package org.ld.grpc.client;
 
-import com.google.common.base.Preconditions;
 import io.grpc.*;
 import io.grpc.protobuf.ProtoUtils;
-import io.grpc.stub.AbstractStub;
 import lombok.extern.slf4j.Slf4j;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.grpc.server.GrpcService;
@@ -23,9 +21,6 @@ import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 public final class LucaGrpc implements BindableService {
 
     private static final String SERVICE_NAME = "luca";
-    private Object target;
-    private Method method;
-    private String params;
 
     @Override
     public final ServerServiceDefinition bindService() {
@@ -40,8 +35,9 @@ public final class LucaGrpc implements BindableService {
                             ScheduleJob scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
                             String message = "SUCCESS";
                             try {
-                                target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
-                                params = scheduleJob.getParams();
+                                Object target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
+                                String params = scheduleJob.getParams();
+                                Method method;
                                 if (StringUtil.isBlank(params)) {
                                     method = target.getClass().getDeclaredMethod(scheduleJob.getMethodName());
                                 } else {
@@ -95,6 +91,9 @@ public final class LucaGrpc implements BindableService {
                         .build();
     }
 
+    /**
+     * 向远程发送一个请求
+     */
     public static GrpcObject sendMessage(Channel channel,GrpcObject request) {
         return blockingUnaryCall(channel, MethodDescriptorHolder.methodDescriptor, CallOptions.DEFAULT, request);
     }

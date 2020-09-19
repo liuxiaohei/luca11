@@ -6,6 +6,7 @@ import java.io.IOException;
 
 /**
  * grpc通信传输的对象
+ * // todo 拿掉
  */
 public final class GrpcObject extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
