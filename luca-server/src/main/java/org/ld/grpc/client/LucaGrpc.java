@@ -1,14 +1,15 @@
 package org.ld.grpc.client;
 
-import io.grpc.*;
+import io.grpc.CallOptions;
+import io.grpc.Channel;
+import io.grpc.MethodDescriptor;
+import io.grpc.ServiceDescriptor;
 import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.AbstractStub;
 import io.grpc.stub.ServerCalls;
 import io.grpc.stub.StreamObserver;
 
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
-import static io.grpc.stub.ServerCalls.asyncUnaryCall;
-import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
 public final class LucaGrpc {
 
@@ -37,7 +38,7 @@ public final class LucaGrpc {
         return getSendMessageMethod;
     }
 
-    private static ServiceDescriptor getServiceDescriptor() {
+    public static ServiceDescriptor getServiceDescriptor() {
         ServiceDescriptor result = serviceDescriptor;
         if (result == null) {
             synchronized (LucaGrpc.class) {
@@ -52,20 +53,6 @@ public final class LucaGrpc {
             }
         }
         return result;
-    }
-
-    public static class GreeterImplBase implements BindableService {
-
-        public void sendMessage(GrpcRequest request, StreamObserver<GrpcReply> responseObserver) {
-            asyncUnimplementedUnaryCall(getSendMessageMethod(), responseObserver);
-        }
-
-        @Override
-        public final ServerServiceDefinition bindService() {
-            return ServerServiceDefinition.builder(getServiceDescriptor())
-                    .addMethod(getSendMessageMethod(), asyncUnaryCall(new MethodHandlers<>(this, 0)))
-                    .build();
-        }
     }
 
     public static final class GreeterBlockingStub extends AbstractStub<GreeterBlockingStub> {
@@ -88,16 +75,16 @@ public final class LucaGrpc {
         }
     }
 
-    private static final class MethodHandlers<T, R> implements
+    static final class MethodHandlers<T, R> implements
             ServerCalls.UnaryMethod<T, R>,
             ServerCalls.ServerStreamingMethod<T, R>,
             ServerCalls.ClientStreamingMethod<T, R>,
             ServerCalls.BidiStreamingMethod<T, R> {
 
-        private final GreeterImplBase serviceImpl;
+        private final LucaGrpcImpl serviceImpl;
         private final int methodId;
 
-        MethodHandlers(GreeterImplBase serviceImpl, int methodId) {
+        MethodHandlers(LucaGrpcImpl serviceImpl, int methodId) {
             this.serviceImpl = serviceImpl;
             this.methodId = methodId;
         }

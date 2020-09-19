@@ -1,5 +1,7 @@
 package org.ld.grpc.client;
 
+import io.grpc.BindableService;
+import io.grpc.ServerServiceDefinition;
 import io.grpc.stub.StreamObserver;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.grpc.server.GrpcService;
@@ -13,8 +15,10 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 
+import static io.grpc.stub.ServerCalls.asyncUnaryCall;
+
 @GrpcService(LucaGrpc.class)
-public class LucaGrpcImpl extends LucaGrpc.GreeterImplBase {
+public class LucaGrpcImpl implements BindableService {
 
     private Object target;
     private Method method;
@@ -27,7 +31,6 @@ public class LucaGrpcImpl extends LucaGrpc.GreeterImplBase {
      * @param req              传入参数
      * @param responseObserver 返回结果
      */
-    @Override
     public void sendMessage(GrpcRequest req, StreamObserver<GrpcReply> responseObserver) {
         String name = req.getParams();
         ScheduleJob scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
@@ -59,5 +62,12 @@ public class LucaGrpcImpl extends LucaGrpc.GreeterImplBase {
         }
         responseObserver.onNext(new GrpcReply(message));
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public final ServerServiceDefinition bindService() {
+        return ServerServiceDefinition.builder(LucaGrpc.getServiceDescriptor())
+                .addMethod(LucaGrpc.getSendMessageMethod(), asyncUnaryCall(new LucaGrpc.MethodHandlers<GrpcRequest,GrpcReply>(this, 0)))
+                .build();
     }
 }
