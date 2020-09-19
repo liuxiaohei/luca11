@@ -1,23 +1,81 @@
 package org.ld.grpc.client;
 
-import io.grpc.CallOptions;
-import io.grpc.Channel;
-import io.grpc.MethodDescriptor;
-import io.grpc.ServiceDescriptor;
+import io.grpc.*;
 import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.AbstractStub;
 import io.grpc.stub.ServerCalls;
 import io.grpc.stub.StreamObserver;
+import lombok.extern.slf4j.Slf4j;
+import org.ld.grpc.schedule.ScheduleJob;
+import org.ld.grpc.server.GrpcService;
+import org.ld.utils.JsonUtil;
+import org.ld.utils.SpringBeanFactory;
+import org.ld.utils.StringUtil;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.CompletableFuture;
 
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
+import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 
-public final class LucaGrpc {
+@GrpcService(LucaGrpc.class)
+@Slf4j
+public final class LucaGrpc implements BindableService {
 
     public static final String SERVICE_NAME = "luca";
     private static volatile MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod;
     private static volatile ServiceDescriptor serviceDescriptor;
+    private Object target;
+    private Method method;
+    private String params;
 
-    public static MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod() {
+    /**
+     * grpc服务端接受消息方法
+     * 通过反射调用具体需要执行方法
+     * @param req              传入参数
+     * @param responseObserver 返回结果
+     */
+    public void sendMessage(GrpcObject req, StreamObserver<GrpcObject> responseObserver) {
+        String name = req.getValue();
+        ScheduleJob scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
+        String message = "SUCCESS";
+        try {
+            target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
+            params = scheduleJob.getParams();
+            if (StringUtil.isBlank(params)) {
+                method = target.getClass().getDeclaredMethod(scheduleJob.getMethodName());
+            } else {
+                method = target.getClass().getDeclaredMethod(scheduleJob.getMethodName(), String.class);
+            }
+            ReflectionUtils.makeAccessible(method);
+            CompletableFuture.runAsync(() -> {
+                try {
+                    if (StringUtil.isBlank(params)) {
+                        method.invoke(target);
+                    } else {
+                        method.invoke(target, params);
+                    }
+                } catch (Exception e) {
+                    log.error("执行定时任务失败:{},任务id:{}", e, scheduleJob.getId());
+                }
+            });
+        } catch (Exception e) {
+            message = "UNKNOWN";
+            log.error("任务执行失败:{}，任务id:{}", message, scheduleJob.getId());
+        }
+        responseObserver.onNext(new GrpcObject(message));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public final ServerServiceDefinition bindService() {
+        return ServerServiceDefinition.builder(LucaGrpc.getServiceDescriptor())
+                .addMethod(getSendMessageMethod(), asyncUnaryCall(new LucaGrpc.MethodHandlers<>(this, 0)))
+                .build();
+    }
+
+    private static MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod() {
         MethodDescriptor<GrpcObject, GrpcObject> getSendMessageMethod;
         if ((getSendMessageMethod = LucaGrpc.getSendMessageMethod) == null) {
             synchronized (LucaGrpc.class) {
@@ -38,7 +96,7 @@ public final class LucaGrpc {
         return getSendMessageMethod;
     }
 
-    public static ServiceDescriptor getServiceDescriptor() {
+    private static ServiceDescriptor getServiceDescriptor() {
         ServiceDescriptor result = serviceDescriptor;
         if (result == null) {
             synchronized (LucaGrpc.class) {
@@ -81,10 +139,10 @@ public final class LucaGrpc {
             ServerCalls.ClientStreamingMethod<T, R>,
             ServerCalls.BidiStreamingMethod<T, R> {
 
-        private final LucaGrpcImpl serviceImpl;
+        private final LucaGrpc serviceImpl;
         private final int methodId;
 
-        MethodHandlers(LucaGrpcImpl serviceImpl, int methodId) {
+        MethodHandlers(LucaGrpc serviceImpl, int methodId) {
             this.serviceImpl = serviceImpl;
             this.methodId = methodId;
         }
