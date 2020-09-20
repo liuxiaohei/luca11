@@ -20,10 +20,8 @@ public class ScheduleJobRunnable extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        ScheduleJob scheduleJob = (ScheduleJob) context.getMergedJobDataMap()
-                .get(ScheduleJob.JOB_PARAM_KEY);
+        ScheduleJob scheduleJob = (ScheduleJob) context.getMergedJobDataMap().get(ScheduleJob.JOB_PARAM_KEY);
         try {
-            //执行任务
             logger.debug("任务准备执行，任务ID：" + scheduleJob.getId());
             target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
             params = scheduleJob.getParams();

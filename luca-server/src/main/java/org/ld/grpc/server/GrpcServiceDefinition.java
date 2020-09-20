@@ -7,9 +7,7 @@ public class GrpcServiceDefinition {
     private final Class<?> beanClazz;
     private final ServerServiceDefinition definition;
 
-    public GrpcServiceDefinition(String beanName, Class<?> beanClazz,
-                                 ServerServiceDefinition definition) {
-        super();
+    public GrpcServiceDefinition(String beanName, Class<?> beanClazz, ServerServiceDefinition definition) {
         this.beanName = beanName;
         this.beanClazz = beanClazz;
         this.definition = definition;

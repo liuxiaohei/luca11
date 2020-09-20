@@ -6,20 +6,18 @@ import io.grpc.Server;
 import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.services.HealthStatusManager;
-import org.ld.utils.ZLogger;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-
+@Slf4j
 public class NettyGrpcServerFactory {
 
     private final GrpcServerProperties properties;
     private final List<GrpcServiceDefinition> services = Lists.newLinkedList();
-    private Logger log = ZLogger.newInstance();
     @Autowired
     private HealthStatusManager healthStatusManager;
 
