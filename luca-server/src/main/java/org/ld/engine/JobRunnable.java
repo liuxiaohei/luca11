@@ -24,7 +24,6 @@ public class JobRunnable extends QuartzJobBean {
             log.info("任务准备执行，任务ID：" + job.getId());
             SpringBeanFactory.getBean(RpcService.class).sendClient(job);
         } catch (Exception e) {
-            log.info("任务执行完毕，任务ID：{}", job.getId());
             log.error("任务执行失败，任务ID:{}", job.getId(), e);
         }
     }

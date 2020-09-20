@@ -40,7 +40,7 @@ public class SocketTest {
         }).start();
         try {
             final var socket = new ServerSocket(port);
-            for (; ; ) {
+            while (true) {
                 new Thread(() -> {
                     OutputStream out;
                     try (final var clientSocket = socket.accept()) {
