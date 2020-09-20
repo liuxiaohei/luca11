@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties
-@ConditionalOnClass({Server.class, GrpcServerFactory.class})
+@ConditionalOnClass({Server.class, NettyGrpcServerFactory.class})
 public class GrpcServerAutoConfiguration {
 
     @Bean
@@ -53,7 +53,7 @@ public class GrpcServerAutoConfiguration {
     }
 
     @Bean
-    public GrpcServerLifecycle grpcServerLifecycle(GrpcServerFactory factory) {
+    public GrpcServerLifecycle grpcServerLifecycle(NettyGrpcServerFactory factory) {
         return new GrpcServerLifecycle(factory);
     }
 

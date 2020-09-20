@@ -11,11 +11,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GrpcServerLifecycle implements SmartLifecycle {
     private static final AtomicInteger serverCounter = new AtomicInteger(-1);
-    private final GrpcServerFactory factory;
+    private final NettyGrpcServerFactory factory;
     private volatile Server server;
     private final Logger log = ZLogger.newInstance();
 
-    public GrpcServerLifecycle(GrpcServerFactory factory) {
+    public GrpcServerLifecycle(NettyGrpcServerFactory factory) {
         this.factory = factory;
     }
 

@@ -15,7 +15,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 
-public class NettyGrpcServerFactory implements GrpcServerFactory {
+public class NettyGrpcServerFactory {
 
     private final GrpcServerProperties properties;
     private final List<GrpcServiceDefinition> services = Lists.newLinkedList();
@@ -32,7 +32,6 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
      *
      * @return Server 注册进来的服务
      */
-    @Override
     public Server createServer() {
         NettyServerBuilder builder = NettyServerBuilder.forAddress(
                 new InetSocketAddress(InetAddresses.forString(getAddress()), getPort()));
@@ -57,17 +56,14 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
         return builder.build();
     }
 
-    @Override
     public String getAddress() {
         return this.properties.getAddress();
     }
 
-    @Override
     public int getPort() {
         return this.properties.getPort();
     }
 
-    @Override
     public void addService(GrpcServiceDefinition service) {
         this.services.add(service);
     }
@@ -75,7 +71,6 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
     /**
      * 移除服务
      */
-    @Override
     public void destroy() {
         for (GrpcServiceDefinition grpcServiceDefinition : services) {
             String serviceName = grpcServiceDefinition.getDefinition().getServiceDescriptor().getName();
