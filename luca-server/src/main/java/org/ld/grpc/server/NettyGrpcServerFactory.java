@@ -17,6 +17,7 @@ import java.util.List;
 public class NettyGrpcServerFactory {
 
     private final GrpcServerProperties properties;
+
     private final List<GrpcServiceDefinition> services = Lists.newLinkedList();
     @Autowired
     private HealthStatusManager healthStatusManager;
@@ -31,8 +32,7 @@ public class NettyGrpcServerFactory {
      * @return Server 注册进来的服务
      */
     public Server createServer() {
-        NettyServerBuilder builder = NettyServerBuilder.forAddress(
-                new InetSocketAddress(InetAddresses.forString(getAddress()), getPort()));
+        NettyServerBuilder builder = NettyServerBuilder.forAddress(new InetSocketAddress(InetAddresses.forString(getAddress()), getPort()));
         // support health check
         builder.addService(healthStatusManager.getHealthService());
         for (GrpcServiceDefinition service : this.services) {
