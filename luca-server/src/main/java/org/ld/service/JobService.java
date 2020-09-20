@@ -4,8 +4,8 @@ import org.ld.beans.JobBean;
 import org.ld.beans.JobQuery;
 import org.ld.beans.PageData;
 import org.ld.beans.ServiceBean;
+import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.mapper.JobMapper;
-import org.ld.pojo.Job;
 import org.ld.pojo.JobExample;
 import org.ld.utils.JobUtils;
 import org.ld.utils.StringUtil;
@@ -63,7 +63,7 @@ public class JobService {
         if (jobBean.host == null || jobBean.port == null) {
             throw new RuntimeException("error_service_rpc_null");
         }
-        Job job = couponJob(jobBean);
+        ScheduleJob job = couponJob(jobBean);
         int count = jobMapper.insertSelective(job);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_save"));
         JobUtils.createScheduleJob(scheduler, job);
@@ -71,8 +71,8 @@ public class JobService {
         return jobBean;
     }
 
-    private Job couponJob(JobBean jobBean) {
-        Job job = new Job();
+    private ScheduleJob couponJob(JobBean jobBean) {
+        ScheduleJob job = new ScheduleJob();
         job.setBeanName(jobBean.beanName);
         job.setServiceName(jobBean.serviceName);
         job.setName(jobBean.name);
@@ -85,7 +85,7 @@ public class JobService {
 
     @Transactional
     public void delete(Integer jobId) {
-        Job job = getAndCheckJob(jobId);
+        ScheduleJob job = getAndCheckJob(jobId);
         job.setDeleted(1);
         int count = jobMapper.updateByPrimaryKeySelective(job);
         Optional.of(count)
@@ -96,7 +96,7 @@ public class JobService {
 
     @Transactional
     public void update(JobBean jobBean) {
-        Job job = getAndCheckJob(jobBean.id);
+        ScheduleJob job = getAndCheckJob(jobBean.id);
         checkAndSet(jobBean, job);
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
@@ -105,7 +105,7 @@ public class JobService {
         criteria.andIdNotEqualTo(jobBean.id);
         Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new RuntimeException("error_job_name"));
         validate(jobBean);
-        Job jobReq = couponJob(jobBean);
+        ScheduleJob jobReq = couponJob(jobBean);
         jobReq.setId(job.getId());
         jobReq.setStatus(job.getStatus());
         int count = jobMapper.updateByPrimaryKeySelective(jobReq);
@@ -113,7 +113,7 @@ public class JobService {
         JobUtils.updateScheduleJob(scheduler, jobReq);
     }
 
-    private void checkAndSet(JobBean jobBean, Job job) {
+    private void checkAndSet(JobBean jobBean, ScheduleJob job) {
         jobBean.name = Optional.ofNullable(jobBean.name).orElse(job.getName());
         jobBean.beanName = Optional.ofNullable(jobBean.beanName).orElse(job.getBeanName());
         jobBean.methodName = Optional.ofNullable(jobBean.methodName).orElse(job.getMethodName());
@@ -152,7 +152,7 @@ public class JobService {
         //query.setAll(Boolean.FALSE);
         jobExample.setOffset(query.getOffSet());
         jobExample.setLimit(query.getLimit());
-        List<Job> jobs = jobMapper.selectByExample(jobExample);
+        List<ScheduleJob> jobs = jobMapper.selectByExample(jobExample);
         if (StringUtil.isEmpty(jobs)) {
             pageData.setList(new ArrayList<>());
             return pageData;
@@ -161,7 +161,7 @@ public class JobService {
         return pageData;
     }
 
-    private List<JobBean> convertJobs(List<Job> jobs) {
+    private List<JobBean> convertJobs(List<ScheduleJob> jobs) {
         return jobs.stream().map(e -> {
             JobBean jobBean = new JobBean();
             jobBean.id = e.getId();
@@ -179,13 +179,13 @@ public class JobService {
     }
 
     public void run(Integer jobId) {
-        Job job = jobMapper.selectByPrimaryKey(jobId);
+        ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         JobUtils.run(scheduler, job);
     }
 
     @Transactional
     public void pauseJob(Integer jobId) {
-        Job job = jobMapper.selectByPrimaryKey(jobId);
+        ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(JobUtils.STATUS);
         int count = jobMapper.updateByPrimaryKeySelective(job);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
@@ -194,7 +194,7 @@ public class JobService {
 
     @Transactional
     public void resumeJob(Integer jobId) {
-        Job job = jobMapper.selectByPrimaryKey(jobId);
+        ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(0);
         jobMapper.updateByPrimaryKeySelective(job);
         JobUtils.resumeJob(scheduler, jobId);
@@ -219,8 +219,8 @@ public class JobService {
 
     }
 
-    private Job getAndCheckJob(Integer jobId) {
-        Job job = jobMapper.selectByPrimaryKey(jobId);
+    private ScheduleJob getAndCheckJob(Integer jobId) {
+        ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         Optional.of(job)
                 .filter(e -> job.getDeleted().equals(0))
                 .orElseThrow(() -> new RuntimeException("error_job_delete_status"));

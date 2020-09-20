@@ -2,7 +2,7 @@ package org.ld.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.ld.pojo.Job;
+import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.pojo.JobExample;
 
 import java.util.List;
@@ -15,19 +15,19 @@ public interface JobMapper {
 
     int deleteByPrimaryKey(Integer id);
 
-    int insert(Job record);
+    int insert(ScheduleJob record);
 
-    int insertSelective(Job record);
+    int insertSelective(ScheduleJob record);
 
-    List<Job> selectByExample(JobExample example);
+    List<ScheduleJob> selectByExample(JobExample example);
 
-    Job selectByPrimaryKey(Integer id);
+    ScheduleJob selectByPrimaryKey(Integer id);
 
-    int updateByExampleSelective(@Param("record") Job record, @Param("example") JobExample example);
+    int updateByExampleSelective(@Param("record") ScheduleJob record, @Param("example") JobExample example);
 
-    int updateByExample(@Param("record") Job record, @Param("example") JobExample example);
+    int updateByExample(@Param("record") ScheduleJob record, @Param("example") JobExample example);
 
-    int updateByPrimaryKeySelective(Job record);
+    int updateByPrimaryKeySelective(ScheduleJob record);
 
-    int updateByPrimaryKey(Job record);
+    int updateByPrimaryKey(ScheduleJob record);
 }

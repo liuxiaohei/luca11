@@ -11,6 +11,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnaryCall;
@@ -92,7 +93,41 @@ public final class LucaGrpc implements BindableService {
     /**
      * 向远程发送一个请求
      */
-    public static GrpcMessage sendMessage(Channel channel, GrpcMessage request) {
-        return blockingUnaryCall(channel, MethodDescriptorHolder.methodDescriptor, CallOptions.DEFAULT, request);
+    public static String sendMessage(String ip, int grpcPort, ScheduleJob req) {
+        return sendMessage(ip,grpcPort,GrpcMessage.obj(req)).getStringObj();
+    }
+
+    /**
+     * 向远程发送一个请求
+     */
+    private static GrpcMessage sendMessage(String ip, int grpcPort, GrpcMessage request) {
+        ManagedChannel channel = null;
+        try {
+            channel = ManagedChannelBuilder.forAddress(ip, grpcPort)
+                    .usePlaintext()
+                    .build();
+            var grpcReply = blockingUnaryCall(channel, MethodDescriptorHolder.methodDescriptor, CallOptions.DEFAULT, request);
+            if ("UNKNOWN".equals(grpcReply.getStringObj())) {
+                var scheduleJob = request.getObj(ScheduleJob.class);
+                log.error("任务执行失败:{}，任务id:{}", grpcReply.getStringObj(), scheduleJob.getId());
+            }
+            if ("SUCCESS".equals(grpcReply.getStringObj())) {
+                var scheduleJob = request.getObj(ScheduleJob.class);
+                log.info("任务执行成功:{}，任务id:{}", grpcReply.getStringObj(), scheduleJob.getId());
+            }
+            return grpcReply;
+        } catch (Exception e) {
+            log.error("grpc启动异常:{}", e.getMessage());
+            throw e;
+        } finally {
+            try {
+                if (channel != null) {
+                    channel.shutdown().awaitTermination(500, TimeUnit.SECONDS);
+                }
+            } catch (InterruptedException e1) {
+                Thread.currentThread().interrupt();
+                log.error("", e1);
+            }
+        }
     }
 }

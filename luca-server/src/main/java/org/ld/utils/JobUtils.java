@@ -2,7 +2,7 @@ package org.ld.utils;
 
 import org.ld.engine.JobRunnable;
 import org.ld.exception.CodeStackException;
-import org.ld.pojo.Job;
+import org.ld.grpc.schedule.ScheduleJob;
 import org.quartz.*;
 
 @SuppressWarnings("unused")
@@ -30,7 +30,7 @@ public class JobUtils {
         }
     }
 
-    public static void createScheduleJob(Scheduler scheduler, org.ld.pojo.Job scheduleJob) {
+    public static void createScheduleJob(Scheduler scheduler, ScheduleJob scheduleJob) {
         try {
             JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class).withIdentity(getJobKey(scheduleJob.getId())
             ).build();
@@ -45,7 +45,7 @@ public class JobUtils {
         }
     }
 
-    public static void updateScheduleJob(Scheduler scheduler, org.ld.pojo.Job scheduleJob) {
+    public static void updateScheduleJob(Scheduler scheduler, ScheduleJob scheduleJob) {
         try {
             TriggerKey triggerKey = getTriggerKey(scheduleJob.getId());
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression())
@@ -63,7 +63,7 @@ public class JobUtils {
         }
     }
 
-    public static void run(Scheduler scheduler, Job job) {
+    public static void run(Scheduler scheduler, ScheduleJob job) {
         try {
             JobDataMap dataMap = new JobDataMap();
             dataMap.put(JOB_PARAM_KEY, job);

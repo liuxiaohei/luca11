@@ -1,6 +1,6 @@
 package org.ld.task;
 
-import org.ld.pojo.Job;
+import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.utils.StringUtil;
 import org.ld.utils.ZLogger;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class RefreshServiceTask {
     @Resource
     private DiscoveryClient discoveryClient;
 
-    public static final Map<String, List<Job>> servicesMap = new ConcurrentHashMap<>();
+    public static final Map<String, List<ScheduleJob>> servicesMap = new ConcurrentHashMap<>();
 
     @Resource
     private LoadBalancerClient loadBalancerClient;
@@ -40,7 +40,7 @@ public class RefreshServiceTask {
         logger.info("定时刷新服务列表");
         List<String> services = discoveryClient.getServices();
         for (String serviceName : services) {
-            List<Job> jobs = getServiceInstance(serviceName);
+            List<ScheduleJob> jobs = getServiceInstance(serviceName);
             if (StringUtil.isNotEmpty(jobs)) {
                 servicesMap.put(serviceName, jobs);
             }
@@ -51,15 +51,15 @@ public class RefreshServiceTask {
     /**
      * 获取服务详细信息
      */
-    public List<Job> getServiceInstance(String serviceName) {
-        List<Job> jobs = new ArrayList<>();
+    public List<ScheduleJob> getServiceInstance(String serviceName) {
+        List<ScheduleJob> jobs = new ArrayList<>();
         ServiceInstance choose = loadBalancerClient.choose(serviceName);
         if (choose == null) {
             return jobs;
         }
         Map<String, String> metadata = choose.getMetadata();
         if (metadata.get("grpcPort") != null) {
-            Job job = new Job();
+            ScheduleJob job = new ScheduleJob();
             job.setHost(choose.getHost());
             job.setPort(Integer.valueOf(metadata.get("grpcPort")));
             jobs.add(job);

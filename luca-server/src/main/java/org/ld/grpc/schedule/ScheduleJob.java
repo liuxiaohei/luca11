@@ -60,4 +60,14 @@ public class ScheduleJob implements Serializable {
 
     private String serverName;
 
+    private String host;
+
+    private Integer port;
+
+    private String name;
+
+    private Integer deleted;
+
+    private String serviceName;
+
 }
