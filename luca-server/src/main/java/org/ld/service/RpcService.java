@@ -3,14 +3,13 @@ package org.ld.service;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
+import org.ld.grpc.client.GrpcMessage;
+import org.ld.grpc.client.LucaGrpc;
 import org.ld.pojo.Job;
 import org.ld.task.RefreshServiceTask;
 import org.ld.utils.JobUtils;
-import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.ld.utils.ZLogger;
-import org.ld.grpc.client.LucaGrpc;
-import org.ld.grpc.client.GrpcString;
 import org.quartz.Scheduler;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -41,11 +40,11 @@ public class RpcService {
                 .forAddress(job.getHost(), job.getPort())
                 .usePlaintext()
                 .build();
-        GrpcString request = new GrpcString(JsonUtil.obj2Json(job));
+        GrpcMessage request = GrpcMessage.obj(job);
         try {
-            GrpcString grpcReply = LucaGrpc.sendMessage(channel,request);
-            if ("UNKNOWN".equals(grpcReply.getValue())) {
-                log.error("任务执行失败:{}，任务id:{}", grpcReply.getValue(), job.getId());
+            GrpcMessage grpcReply = LucaGrpc.sendMessage(channel,request);
+            if ("UNKNOWN".equals(grpcReply.getStringObj())) {
+                log.error("任务执行失败:{}，任务id:{}", grpcReply.getStringObj(), job.getId());
             }
         } catch (StatusRuntimeException e) {
             List<Job> jobServices = RefreshServiceTask.servicesMap.get(job.getServiceName());

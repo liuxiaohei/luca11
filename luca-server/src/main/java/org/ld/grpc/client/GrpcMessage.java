@@ -3,29 +3,38 @@ package org.ld.grpc.client;
 import com.google.protobuf.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import org.ld.utils.JsonUtil;
 
 import java.io.IOException;
 
 /**
- * grpc通信传输String对象
+ * grpc通信传输对象
  */
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public final class GrpcString extends GeneratedMessageV3 {
+public final class GrpcMessage extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
 
     private volatile Object value;
     private byte memoizedIsInitialized = -1;
 
-    public GrpcString(String value) {
+    public static GrpcMessage stringObj(String value) {
+        return new GrpcMessage(value);
+    }
+
+    public static GrpcMessage obj(Object value) {
+        return new GrpcMessage(JsonUtil.obj2Json(value));
+    }
+
+    private GrpcMessage(String value) {
         this.value = value;
     }
 
-    public GrpcString() {
+    public GrpcMessage() {
         value = "";
     }
 
-    private GrpcString(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
+    private GrpcMessage(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
         value = "";
         var unknownFields = UnknownFieldSet.newBuilder();
         try {
@@ -63,7 +72,12 @@ public final class GrpcString extends GeneratedMessageV3 {
         return this.unknownFields;
     }
 
-    public String getValue() {
+    public <T> T getObj(Class<T> clazz) {
+        var json = getStringObj();
+        return JsonUtil.json2Obj(json,clazz);
+    }
+
+    public String getStringObj() {
         var ref = value;
         if (ref instanceof String) {
             return (String) ref;
@@ -117,15 +131,15 @@ public final class GrpcString extends GeneratedMessageV3 {
     }
 
     @Override
-    public Parser<GrpcString> getParserForType() {
+    public Parser<GrpcMessage> getParserForType() {
         return new AbstractParser<>() {
-            public GrpcString parsePartialFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
-                return new GrpcString(input, extensionRegistry);
+            public GrpcMessage parsePartialFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
+                return new GrpcMessage(input, extensionRegistry);
             }
         };
     }
 
-    public GrpcString getDefaultInstanceForType() {
+    public GrpcMessage getDefaultInstanceForType() {
         return null;
     }
 

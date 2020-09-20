@@ -1,6 +1,7 @@
 package org.ld.engine;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.ld.exception.CodeStackException;
 import org.ld.pojo.Job;
 import org.ld.service.RpcService;
@@ -15,24 +16,22 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
+@Slf4j
 public class JobRunnable extends QuartzJobBean {
-
-    private final Logger logger = ZLogger.newInstance();
 
     @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) {
         Job job = (Job) context.getMergedJobDataMap().get(JobUtils.JOB_PARAM_KEY);
         try {
-            logger.info("任务准备执行，任务ID：" + job.getId());
+            log.info("任务准备执行，任务ID：" + job.getId());
             SpringBeanFactory.getBean(RpcService.class).sendClient(job);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new CodeStackException(e);
         } catch (Exception e) {
-            logger.info("任务执行完毕，任务ID：{}", job.getId());
-            logger.error("任务执行失败，任务ID:{}", job.getId(), e);
+            log.info("任务执行完毕，任务ID：{}", job.getId());
+            log.error("任务执行失败，任务ID:{}", job.getId(), e);
         }
     }
-
 }

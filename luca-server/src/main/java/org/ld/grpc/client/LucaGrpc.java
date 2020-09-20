@@ -5,7 +5,6 @@ import io.grpc.protobuf.ProtoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.grpc.server.GrpcService;
-import org.ld.utils.JsonUtil;
 import org.ld.utils.SpringBeanFactory;
 import org.ld.utils.StringUtil;
 import org.springframework.util.ReflectionUtils;
@@ -31,8 +30,7 @@ public final class LucaGrpc implements BindableService {
                         asyncUnaryCall((req, responseObserver) -> {
                             // grpc服务端接受消息方法
                             // 通过反射调用具体需要执行方法
-                            var name = req.getValue();
-                            var scheduleJob = JsonUtil.json2Obj(name, ScheduleJob.class);
+                            var scheduleJob = req.getObj(ScheduleJob.class);
                             var message = "SUCCESS";
                             try {
                                 var target = SpringBeanFactory.getBean(scheduleJob.getBeanName());
@@ -59,7 +57,7 @@ public final class LucaGrpc implements BindableService {
                                 message = "UNKNOWN";
                                 log.error("任务执行失败:{}，任务id:{}", message, scheduleJob.getId());
                             }
-                            responseObserver.onNext(new GrpcString(message));
+                            responseObserver.onNext(GrpcMessage.stringObj(message));
                             responseObserver.onCompleted();
                         }))
                 .build();
@@ -69,14 +67,14 @@ public final class LucaGrpc implements BindableService {
      * 单例获取方法的输入输出的描述
      */
     private static class MethodDescriptorHolder {
-        private static final MethodDescriptor<GrpcString, GrpcString> methodDescriptor =
+        private static final MethodDescriptor<GrpcMessage, GrpcMessage> methodDescriptor =
                 MethodDescriptor
-                        .<GrpcString, GrpcString>newBuilder()
+                        .<GrpcMessage, GrpcMessage>newBuilder()
                         .setType(MethodDescriptor.MethodType.UNARY)
                         .setFullMethodName(SERVICE_NAME + "/sendMessage")
                         .setSampledToLocalTracing(true)
-                        .setRequestMarshaller(ProtoUtils.marshaller(new GrpcString()))
-                        .setResponseMarshaller(ProtoUtils.marshaller(new GrpcString()))
+                        .setRequestMarshaller(ProtoUtils.marshaller(new GrpcMessage()))
+                        .setResponseMarshaller(ProtoUtils.marshaller(new GrpcMessage()))
                         .build();
     }
 
@@ -94,7 +92,7 @@ public final class LucaGrpc implements BindableService {
     /**
      * 向远程发送一个请求
      */
-    public static GrpcString sendMessage(Channel channel, GrpcString request) {
+    public static GrpcMessage sendMessage(Channel channel, GrpcMessage request) {
         return blockingUnaryCall(channel, MethodDescriptorHolder.methodDescriptor, CallOptions.DEFAULT, request);
     }
 }
