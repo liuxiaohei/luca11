@@ -3,7 +3,7 @@ package org.ld.grpc.config;
 import io.grpc.Server;
 import io.grpc.services.HealthStatusManager;
 import io.netty.channel.Channel;
-import org.ld.grpc.client.LucaGrpc;
+import org.ld.grpc.client.LucaGrpcClient;
 import org.ld.grpc.server.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -58,8 +58,8 @@ public class GrpcServerAutoConfiguration {
     }
 
     @Bean
-    public LucaGrpc lucagrpc() {
-        return new LucaGrpc();
+    public LucaGrpcClient lucagrpc() {
+        return new LucaGrpcClient();
     }
 
 }

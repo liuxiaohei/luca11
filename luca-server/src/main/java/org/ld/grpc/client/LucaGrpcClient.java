@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit;
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 
-@GrpcService(LucaGrpc.class)
+@GrpcService(LucaGrpcClient.class)
 @Slf4j
-public final class LucaGrpc implements BindableService {
+public final class LucaGrpcClient implements BindableService {
 
     private static final String SERVICE_NAME = "luca";
 

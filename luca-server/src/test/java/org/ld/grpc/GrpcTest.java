@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ld.LucaApplication;
 import org.ld.beans.GrpcServer;
-import org.ld.grpc.client.LucaGrpc;
+import org.ld.grpc.client.LucaGrpcClient;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.grpc.server.GrpcServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +25,7 @@ public class GrpcTest {
 
     @Test
     public void test() {
-        LucaGrpc.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
+        LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
                 ScheduleJob
                         .builder()
                         .beanName("grpcServer")
@@ -33,7 +33,7 @@ public class GrpcTest {
                         .params("demo")
                         .id(1)
                         .build());
-        LucaGrpc.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
+        LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
                 ScheduleJob
                         .builder()
                         .beanName("grpcServer")
