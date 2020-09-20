@@ -14,11 +14,6 @@ import java.util.Date;
 @Builder
 public class ScheduleJob implements Serializable {
 
-    /**
-     * 任务调度参数key
-     */
-    public static final String JOB_PARAM_KEY = "JOB_PARAM_KEY";
-
     private static final long serialVersionUID = 1L;
 
     private Integer id;
