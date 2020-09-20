@@ -10,7 +10,7 @@ import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.ld.utils.ZLogger;
 import org.ld.grpc.client.LucaGrpc;
-import org.ld.grpc.client.GrpcObject;
+import org.ld.grpc.client.GrpcString;
 import org.quartz.Scheduler;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -41,9 +41,9 @@ public class RpcService {
                 .forAddress(job.getHost(), job.getPort())
                 .usePlaintext()
                 .build();
-        GrpcObject request = new GrpcObject(JsonUtil.obj2Json(job));
+        GrpcString request = new GrpcString(JsonUtil.obj2Json(job));
         try {
-            GrpcObject grpcReply = LucaGrpc.sendMessage(channel,request);
+            GrpcString grpcReply = LucaGrpc.sendMessage(channel,request);
             if ("UNKNOWN".equals(grpcReply.getValue())) {
                 log.error("任务执行失败:{}，任务id:{}", grpcReply.getValue(), job.getId());
             }

@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.SocketUtils;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +18,9 @@ public class GlobalServerInterceptorRegistry implements ApplicationContextAware 
 
     private final List<ServerInterceptor> serverInterceptors = Lists.newArrayList();
     private ApplicationContext applicationContext;
-    @Autowired
+    @Resource
     private GrpcServerProperties grpcProperties;
-    @Autowired
+    @Resource
     private ApplicationInfoManager instance;
 
     /**

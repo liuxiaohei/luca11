@@ -2,38 +2,36 @@ package org.ld.grpc.client;
 
 import com.google.protobuf.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 
 /**
- * grpc通信传输的对象
+ * grpc通信传输String对象
  */
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public final class GrpcObject extends GeneratedMessageV3 {
+public final class GrpcString extends GeneratedMessageV3 {
     private static final long serialVersionUID = 0L;
 
     private volatile Object value;
     private byte memoizedIsInitialized = -1;
 
-    public GrpcObject(String value) {
+    public GrpcString(String value) {
         this.value = value;
     }
 
-    public GrpcObject() {
+    public GrpcString() {
         value = "";
     }
 
-    private GrpcObject(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
+    private GrpcString(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
         value = "";
-        UnknownFieldSet.Builder unknownFields = UnknownFieldSet.newBuilder();
+        var unknownFields = UnknownFieldSet.newBuilder();
         try {
-            boolean done = false;
+            var done = false;
             while (!done) {
-                int tag = input.readTag();
+                var tag = input.readTag();
                 switch (tag) {
                     case 0:
                         done = true;
@@ -66,21 +64,21 @@ public final class GrpcObject extends GeneratedMessageV3 {
     }
 
     public String getValue() {
-        Object ref = value;
+        var ref = value;
         if (ref instanceof String) {
             return (String) ref;
         } else {
-            ByteString bs = (ByteString) ref;
-            String s = bs.toStringUtf8();
+            var bs = (ByteString) ref;
+            var s = bs.toStringUtf8();
             value = s;
             return s;
         }
     }
 
     private ByteString getMessageBytes() {
-        Object ref = value;
+        var ref = value;
         if (ref instanceof String) {
-            ByteString b = ByteString.copyFromUtf8((String) ref);
+            var b = ByteString.copyFromUtf8((String) ref);
             value = b;
             return b;
         } else {
@@ -89,7 +87,7 @@ public final class GrpcObject extends GeneratedMessageV3 {
     }
 
     public final boolean isInitialized() {
-        byte isInitialized = memoizedIsInitialized;
+        var isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
         if (isInitialized == 0) return false;
         memoizedIsInitialized = 1;
@@ -107,7 +105,7 @@ public final class GrpcObject extends GeneratedMessageV3 {
      * 不能删 会卡住
      */
     public int getSerializedSize() {
-        int size = memoizedSize;
+        var size = memoizedSize;
         if (size != -1) return size;
         size = 0;
         if (!getMessageBytes().isEmpty()) {
@@ -119,15 +117,15 @@ public final class GrpcObject extends GeneratedMessageV3 {
     }
 
     @Override
-    public Parser<GrpcObject> getParserForType() {
+    public Parser<GrpcString> getParserForType() {
         return new AbstractParser<>() {
-            public GrpcObject parsePartialFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
-                return new GrpcObject(input, extensionRegistry);
+            public GrpcString parsePartialFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry) throws InvalidProtocolBufferException {
+                return new GrpcString(input, extensionRegistry);
             }
         };
     }
 
-    public GrpcObject getDefaultInstanceForType() {
+    public GrpcString getDefaultInstanceForType() {
         return null;
     }
 

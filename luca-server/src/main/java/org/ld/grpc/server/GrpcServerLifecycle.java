@@ -49,8 +49,7 @@ public class GrpcServerLifecycle implements SmartLifecycle {
 
     @Override
     public int getPhase() {
-        int phase = Integer.MAX_VALUE;
-        return phase;
+        return Integer.MAX_VALUE;
     }
 
     @Override
@@ -68,9 +67,7 @@ public class GrpcServerLifecycle implements SmartLifecycle {
             this.server.start();
             log.debug("gRPC Server started, listening on address: " + this.factory.getAddress() + ", port: " + this.factory.getPort());
 
-            Thread awaitThread = new Thread(
-                    "container-" + (serverCounter.incrementAndGet())) {
-
+            Thread awaitThread = new Thread("container-" + (serverCounter.incrementAndGet())) {
                 @Override
                 public void run() {
                     try {

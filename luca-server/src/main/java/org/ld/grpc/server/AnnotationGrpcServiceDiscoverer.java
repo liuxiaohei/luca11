@@ -22,18 +22,15 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware 
     private ApplicationContext applicationContext;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext)
-            throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
     /**
      * 获取所有带有 @GrpcService注解的 beanName
-     *
-     * @return beanNames
      */
     public Collection<String> findGrpcServiceBeanNames() {
-        String[] beanNames = this.applicationContext.getBeanNamesForAnnotation(GrpcService.class);
+        var beanNames = this.applicationContext.getBeanNamesForAnnotation(GrpcService.class);
         return Arrays.asList(beanNames);
     }
 
@@ -41,14 +38,14 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware 
      * 获取GrpcServiceDefinition对象集合
      */
     public Collection<GrpcServiceDefinition> findGrpcServices() {
-        Collection<String> beanNames = findGrpcServiceBeanNames();
+        var beanNames = findGrpcServiceBeanNames();
         List<GrpcServiceDefinition> definitions = Lists.newArrayListWithCapacity(beanNames.size());
-        GlobalServerInterceptorRegistry globalServerInterceptorRegistry = applicationContext.getBean(GlobalServerInterceptorRegistry.class);
-        List<ServerInterceptor> globalInterceptorList = globalServerInterceptorRegistry.getServerInterceptors();
+        var globalServerInterceptorRegistry = applicationContext.getBean(GlobalServerInterceptorRegistry.class);
+        var globalInterceptorList = globalServerInterceptorRegistry.getServerInterceptors();
         for (String beanName : beanNames) {
-            BindableService bindableService = this.applicationContext.getBean(beanName, BindableService.class);
-            ServerServiceDefinition serviceDefinition = bindableService.bindService();
-            GrpcService grpcServiceAnnotation = applicationContext.findAnnotationOnBean(beanName, GrpcService.class);
+            var bindableService = this.applicationContext.getBean(beanName, BindableService.class);
+            var serviceDefinition = bindableService.bindService();
+            var grpcServiceAnnotation = applicationContext.findAnnotationOnBean(beanName, GrpcService.class);
             serviceDefinition = bindInterceptors(serviceDefinition, grpcServiceAnnotation, globalInterceptorList);
             definitions.add(new GrpcServiceDefinition(beanName, bindableService.getClass(), serviceDefinition));
         }

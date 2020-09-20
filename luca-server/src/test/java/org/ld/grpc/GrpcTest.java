@@ -9,7 +9,7 @@ import org.ld.LucaApplication;
 import org.ld.beans.GrpcBean;
 import org.ld.beans.GrpcServer;
 import org.ld.grpc.client.LucaGrpc;
-import org.ld.grpc.client.GrpcObject;
+import org.ld.grpc.client.GrpcString;
 import org.ld.grpc.server.GrpcServerProperties;
 import org.ld.utils.JsonUtil;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,9 +35,9 @@ public class GrpcTest {
         ManagedChannel channel = ManagedChannelBuilder.forAddress(grpcProperties.getAddress(), grpcProperties.getPort())
                 .usePlaintext()
                 .build();
-        GrpcObject request = new GrpcObject(JsonUtil.obj2Json(beanTest));
+        GrpcString request = new GrpcString(JsonUtil.obj2Json(beanTest));
         try {
-            GrpcObject grpcReply = LucaGrpc.sendMessage(channel, request);
+            GrpcString grpcReply = LucaGrpc.sendMessage(channel, request);
             log.info("grpc启动测试结果:{}", grpcReply.getValue());
         } catch (Exception e) {
             log.error("grpc启动异常:{}", e.getMessage());
