@@ -22,6 +22,9 @@ public final class LucaGrpc implements BindableService {
 
     private static final String SERVICE_NAME = "luca";
 
+    /**
+     * 接收端反射调用的核心逻辑
+     */
     @Override
     public final ServerServiceDefinition bindService() {
         return ServerServiceDefinition
