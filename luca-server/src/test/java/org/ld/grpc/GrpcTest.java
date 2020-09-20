@@ -25,10 +25,21 @@ public class GrpcTest {
 
     @Test
     public void test() {
-        ScheduleJob beanTest = new ScheduleJob();
-        beanTest.setBeanName("grpcServer");
-        beanTest.setMethodName("run");
-        beanTest.setId(1);
-        LucaGrpc.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(), beanTest);
+        LucaGrpc.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
+                ScheduleJob
+                        .builder()
+                        .beanName("grpcServer")
+                        .methodName("run")
+                        .params("demo")
+                        .id(1)
+                        .build());
+        LucaGrpc.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
+                ScheduleJob
+                        .builder()
+                        .beanName("grpcServer")
+                        .methodName("run")
+                        .params("ceshi")
+                        .id(2)
+                        .build());
     }
 }
