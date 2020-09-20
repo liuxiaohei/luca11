@@ -26,16 +26,14 @@ public class GrpcTest {
     @Test
     public void test() {
         LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
-                ScheduleJob
-                        .builder()
+                ScheduleJob.builder()
                         .beanName("grpcServer")
                         .methodName("run")
                         .params("demo")
                         .id(1)
                         .build());
         LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
-                ScheduleJob
-                        .builder()
+                ScheduleJob.builder()
                         .beanName("grpcServer")
                         .methodName("run")
                         .params("ceshi")
