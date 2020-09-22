@@ -17,6 +17,7 @@ public class DemoHttpServer {
 
     /**
      * 客户端
+     * https://www.cnblogs.com/secbook/archive/2012/08/24/2655189.html
      */
     @Test
     public void client() throws IOException {

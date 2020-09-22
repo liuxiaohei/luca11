@@ -1,6 +1,7 @@
 package org.ld.nio;
 
 import org.junit.jupiter.api.Test;
+import org.ld.exception.CodeStackException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class SocketTest {
                         out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));                            //4
                         out.flush();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw new CodeStackException(e);
                     }
                 }).start();
             }
