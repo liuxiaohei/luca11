@@ -19,6 +19,7 @@ import org.ld.beans.ProcessData;
 import org.ld.beans.RespBean;
 import org.ld.beans.User;
 import org.ld.beans.UserRepository;
+import org.ld.pool.IOExecutor;
 import org.ld.utils.AkkaUtil;
 import org.ld.engine.ExecutorEngine;
 import org.ld.enums.ProcessState;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -120,6 +122,20 @@ public class DemoController {
     @GetMapping("getData")
     public Mono<String> getData() {
         return Mono.fromSupplier(() -> "获取数据...");
+    }
+
+    @GetMapping("quasarDemo")
+    public Mono<String> quasarDemo() {
+        IntStream.rangeClosed(1, 100000).parallel().forEach(i -> CompletableFuture.runAsync(() -> {
+            try {
+                IOExecutor.sleep(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            log.info(i + "");
+        }, IOExecutor.getInstance()));
+        //        actorSystem.terminate(); // 这个方法终止 actor
+        return Mono.fromSupplier(() -> "success");
     }
 
     @Autowired
