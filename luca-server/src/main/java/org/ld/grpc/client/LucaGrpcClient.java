@@ -5,6 +5,7 @@ import io.grpc.protobuf.ProtoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.grpc.server.GrpcService;
+import org.ld.pool.IOExecutor;
 import org.ld.utils.SpringBeanFactory;
 import org.ld.utils.StringUtil;
 import org.springframework.util.ReflectionUtils;
@@ -58,7 +59,7 @@ public final class LucaGrpcClient implements BindableService {
                                     } catch (Exception e) {
                                         log.error("执行定时任务失败:{},任务id:{}", e, scheduleJob.getId());
                                     }
-                                });
+                                }, IOExecutor.getInstance());
                             } catch (Exception e) {
                                 message = "UNKNOWN";
                                 log.error("任务执行失败:{}，任务id:{}", message, scheduleJob.getId());

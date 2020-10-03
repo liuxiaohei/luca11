@@ -24,7 +24,7 @@ public class GrpcTest {
     private GrpcServerProperties grpcProperties;
 
     @Test
-    public void test() {
+    public void test() throws InterruptedException {
         LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
                 ScheduleJob.builder()
                         .beanName("grpcServer")
