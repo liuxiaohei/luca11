@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -126,15 +127,16 @@ public class DemoController {
 
     @GetMapping("quasarDemo")
     public Mono<String> quasarDemo() {
-        IntStream.rangeClosed(1, 100000).parallel().forEach(i -> CompletableFuture.runAsync(() -> {
+        var a = IntStream.rangeClosed(1, 100000).boxed().parallel().map(i -> CompletableFuture.supplyAsync(() -> {
             try {
                 IOExecutor.sleep(1000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             log.info(i + "");
-        }, IOExecutor.getInstance()));
-        //        actorSystem.terminate(); // 这个方法终止 actor
+            return i;
+        }, IOExecutor.getInstance())).collect(Collectors.toList());
+        var b = a.stream().map(CompletableFuture::join).collect(Collectors.toList());
         return Mono.fromSupplier(() -> "success");
     }
 
