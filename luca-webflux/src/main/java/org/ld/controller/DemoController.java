@@ -2,27 +2,16 @@ package org.ld.controller;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.routing.RandomPool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.ld.actors.ProcessChecker;
-import org.ld.actors.ProcessDispatcher;
-import org.ld.actors.ProcessExecutorAdapter;
-import org.ld.actors.ProcessStarter;
 import org.ld.annotation.NeedToken;
-import org.ld.beans.ProcessData;
 import org.ld.beans.RespBean;
-import org.ld.beans.User;
-import org.ld.beans.UserRepository;
 import org.ld.pool.IOExecutor;
 import org.ld.utils.AkkaUtil;
-import org.ld.engine.ExecutorEngine;
-import org.ld.enums.ProcessState;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,21 +44,7 @@ public class DemoController {
     private ActorSystem actorSystem;
 
     @Autowired
-    private ExecutorEngine descriptor;
-
-    @Autowired
     private ForkJoinPool forkJoinPool;
-
-    @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "demo")
-    public Mono<Map<String, Object>> demo(@RequestParam String param) {
-        Map<String, Object> a = new HashMap<>();
-        var b = new HashMap<>();
-        b.put("wer", List.of("234", "333", "eee"));
-        a.put("aaa", b);
-        descriptor.runAsync(() -> ZLogger.newInstance().info(param));
-        return Mono.fromSupplier(() -> a);
-    }
 
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "demo")
@@ -159,22 +134,6 @@ public class DemoController {
         return Mono.fromSupplier(() -> "success");
     }
 
-    @GetMapping("fsmdemo")
-    public Mono<String> getFSMDemo() {
-        var processExecutorAdapter = new ProcessExecutorAdapter();
-        var processStarter = actorSystem.actorOf(new RandomPool(10)
-                .props(Props.create(ProcessStarter.class, processExecutorAdapter)));
-        var processChecker = actorSystem.actorOf(new RandomPool(10)
-                .props(Props.create(ProcessChecker.class, processExecutorAdapter)));
-        actorSystem.actorOf(Props.create(
-                ProcessDispatcher.class,
-                ProcessState.CREATED,
-                new ProcessData().setParams("5000", ""),
-                processStarter,
-                processChecker));
-        return Mono.fromSupplier(() -> "success");
-    }
-
     @GetMapping("fjdemo")
     public Mono<String> fjDemo() {
         forkJoinPool.submit(() -> System.out.println("aaaaa"));
@@ -209,19 +168,6 @@ public class DemoController {
         });
         ZLogger.newInstance().info("get2 end.");
         return result;
-    }
-
-    @Autowired
-    UserRepository userRepository;
-
-    /**
-     * @return 返回Flux 非阻塞序列
-     */
-    @GetMapping("users")
-    public Flux<User> getAll() {
-        String threadName = Thread.currentThread().getName();
-        System.out.println("HelloWorldAsyncController[" + threadName + "]: " + "获取HTTP请求");
-        return Flux.fromStream(userRepository.getUsers().values().stream());
     }
 
     @GetMapping(value = "/3", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

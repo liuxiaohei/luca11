@@ -2,8 +2,6 @@ package org.ld;
 
 import akka.actor.typed.ActorSystem;
 import org.junit.jupiter.api.Test;
-import org.ld.actors.HelloWorldMain;
-import org.ld.beans.JobBean;
 import org.ld.utils.FileUtil;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
@@ -36,15 +34,6 @@ public class DemoTest {
     }
 
     public static void main(String... args) throws InterruptedException {
-    }
-
-    @Test
-    public void akksDemo() throws InterruptedException {
-        final ActorSystem<HelloWorldMain.SayHello> system =
-                ActorSystem.create(HelloWorldMain.create(), "hello");
-        system.tell(new HelloWorldMain.SayHello("World"));
-        system.tell(new HelloWorldMain.SayHello("Akka"));
-        Thread.sleep(10000);
     }
 
     @Test
