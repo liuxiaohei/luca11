@@ -48,6 +48,7 @@
         <module>luca-feign-client</module>
         <module>luca-fsm</module>
         <module>luca-gateway</module>
+        <module>luca-molecule</module>
     </modules>
     <dependencies>
         <!-- mysql 驱动包引入 -->

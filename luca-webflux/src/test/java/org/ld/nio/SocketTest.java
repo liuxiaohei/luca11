@@ -32,7 +32,7 @@ public class SocketTest {
                 var in = socket.getInputStream();
                 var b = new byte[1024];
                 int len;
-                while ((len = in.read(b)) != -1) {
+                while ((len = in.read(b)) != -1) { // 阻塞2
                     System.out.println(new String(b, 0, len));
                 }
             } catch (Exception e) {
@@ -44,7 +44,7 @@ public class SocketTest {
             while (true) {
                 new Thread(() -> {
                     OutputStream out;
-                    try (final var clientSocket = socket.accept()) {
+                    try (final var clientSocket = socket.accept()) { // 阻塞1
                         out = clientSocket.getOutputStream();
                         System.out.println("Accepted connection from " + clientSocket);
                         out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));                            //4

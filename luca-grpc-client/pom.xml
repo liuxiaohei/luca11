@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.ld</groupId>
-            <artifactId>luca-base</artifactId>
+            <artifactId>luca-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

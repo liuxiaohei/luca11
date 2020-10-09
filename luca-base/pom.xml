@@ -11,12 +11,6 @@
     <artifactId>luca-base</artifactId>
     <packaging>jar</packaging>
     <dependencies>
-        <!-- mysql 驱动包引入 -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.45</version>
-        </dependency>
         <dependency>
             <groupId>org.ld</groupId>
             <artifactId>luca-common</artifactId>
