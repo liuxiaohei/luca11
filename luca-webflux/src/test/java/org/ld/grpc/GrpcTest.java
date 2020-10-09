@@ -32,7 +32,7 @@ public class GrpcTest {
                         .params("demo")
                         .id(1)
                         .build());
-        LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
+        var a = LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
                 ScheduleJob.builder()
                         .beanName("grpcServer")
                         .methodName("run")

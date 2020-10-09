@@ -46,6 +46,7 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware 
             var bindableService = this.applicationContext.getBean(beanName, BindableService.class);
             var serviceDefinition = bindableService.bindService();
             var grpcServiceAnnotation = applicationContext.findAnnotationOnBean(beanName, GrpcService.class);
+            assert grpcServiceAnnotation != null;
             serviceDefinition = bindInterceptors(serviceDefinition, grpcServiceAnnotation, globalInterceptorList);
             definitions.add(new GrpcServiceDefinition(beanName, bindableService.getClass(), serviceDefinition));
         }
