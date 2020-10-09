@@ -31,11 +31,11 @@ public class JobService {
     @Resource
     private JobMapper jobMapper;
 
-    public PageData<ServiceBean> queryServices() {
-        PageData<ServiceBean> pageData = new PageData<>();
+    public PageData<JobQuery> queryServices() {
+        PageData<JobQuery> pageData = new PageData<>();
         pageData.setList(discoveryClient.getServices().stream().distinct()
                 .map(e -> {
-                    ServiceBean serviceBean = new ServiceBean();
+                    JobQuery serviceBean = new JobQuery();
                     serviceBean.serviceName = e;
                     return serviceBean;
                 }).collect(Collectors.toList()));

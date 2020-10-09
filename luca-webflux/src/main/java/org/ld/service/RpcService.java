@@ -25,8 +25,7 @@ public class RpcService {
     private final Logger log = ZLogger.newInstance();
 
     public void sendClient(ScheduleJob job) {
-        assert job != null;
-        List<ScheduleJob> jobs = refreshServiceTask.getServiceInstance(job.getServiceName());
+        var jobs = refreshServiceTask.getServiceInstance(job.getServiceName());
         if (StringUtil.isNotEmpty(jobs)) {
             job.setHost(jobs.get(0).getHost());
             job.setPort(jobs.get(0).getPort());
@@ -35,7 +34,7 @@ public class RpcService {
         try {
             LucaGrpcClient.sendMessage(job.getHost(), job.getPort(), job);
         } catch (StatusRuntimeException e) {
-            List<ScheduleJob> jobServices = RefreshServiceTask.servicesMap.get(job.getServiceName());
+            var jobServices = RefreshServiceTask.servicesMap.get(job.getServiceName());
             if (StringUtil.isNotEmpty(jobServices) && jobServices.size() > 1) {
                 jobServices.remove(0);
                 job.setHost(jobServices.get(0).getHost());
