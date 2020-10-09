@@ -1,4 +1,4 @@
-package org.ld.beans;
+package org.ld.service;
 
 public class ServiceBean  {
     public String serviceName;
