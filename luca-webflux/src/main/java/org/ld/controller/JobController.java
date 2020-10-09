@@ -4,6 +4,7 @@ import org.ld.beans.JobQuery;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.service.JobService;
 import org.ld.utils.NumberUtil;
+import org.quartz.SchedulerException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -22,13 +23,13 @@ public class JobController {
     }
 
     @RequestMapping(value = "job", method = RequestMethod.POST)
-    public Object save(@RequestBody ScheduleJob jobBean) {
+    public Object save(@RequestBody ScheduleJob jobBean) throws SchedulerException {
         jobService.validate(jobBean);
         return jobService.save(jobBean);
     }
 
     @RequestMapping(value = "job/{jobId}", method = RequestMethod.DELETE)
-    public Object delete(@PathVariable("jobId") Integer jobId) {
+    public Object delete(@PathVariable("jobId") Integer jobId) throws SchedulerException {
         Optional.ofNullable(jobId)
                 .filter(NumberUtil::isValidId)
                 .orElseThrow(() -> new RuntimeException("error_job_jobId"));
@@ -59,7 +60,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "run/{jobId}", method = RequestMethod.GET)
-    public Object runJob(@PathVariable("jobId") Integer jobId) {
+    public Object runJob(@PathVariable("jobId") Integer jobId) throws SchedulerException {
         Optional.ofNullable(jobId)
                 .filter(NumberUtil::isValidId)
                 .orElseThrow(() -> new RuntimeException("error_job_jobId"));
@@ -68,7 +69,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "pauseJob/{jobId}", method = RequestMethod.GET)
-    public Object pauseJob(@PathVariable("jobId") Integer jobId) {
+    public Object pauseJob(@PathVariable("jobId") Integer jobId) throws SchedulerException {
         Optional.ofNullable(jobId)
                 .filter(NumberUtil::isValidId)
                 .orElseThrow(() -> new RuntimeException("error_job_jobId"));
@@ -77,7 +78,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "resumeJob/{jobId}", method = RequestMethod.GET)
-    public Object resumeJob(@PathVariable("jobId") Integer jobId) {
+    public Object resumeJob(@PathVariable("jobId") Integer jobId) throws SchedulerException {
         Optional.ofNullable(jobId)
                 .filter(NumberUtil::isValidId)
                 .orElseThrow(() -> new RuntimeException("error_job_jobId"));

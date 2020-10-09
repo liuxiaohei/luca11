@@ -16,8 +16,6 @@ import javax.annotation.Resource;
 public class RpcService {
 
     @Resource
-    private Scheduler scheduler;
-    @Resource
     private RefreshServiceTask refreshServiceTask;
     @Resource
     JobService jobService;
@@ -40,14 +38,14 @@ public class RpcService {
                 job.setHost(jobServices.get(0).getHost());
                 job.setPort(jobServices.get(0).getPort());
                 RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
-                jobService.updateScheduleJob(scheduler, job);
+                jobService.update(job);
             } else {
                 jobServices = refreshServiceTask.getServiceInstance(job.getServiceName());
                 if (StringUtil.isNotEmpty(jobServices)) {
                     job.setHost(jobServices.get(0).getHost());
                     job.setPort(jobServices.get(0).getPort());
                     RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
-                    jobService.updateScheduleJob(scheduler, job);
+                    jobService.update(job);
                 }
             }
             log.info(e.getMessage());

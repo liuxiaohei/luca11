@@ -46,7 +46,7 @@ public class JobService {
     }
 
     @Transactional
-    public ScheduleJob save(ScheduleJob jobBean) {
+    public ScheduleJob save(ScheduleJob jobBean) throws SchedulerException {
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
         criteria.andNameEqualTo(jobBean.getName());
@@ -67,34 +67,26 @@ public class JobService {
         }
         int count = jobMapper.insertSelective(jobBean);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_save"));
-        try {
-            JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class).withIdentity(getJobKey(jobBean.getId())
-            ).build();
-            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(jobBean.getCronExpression())
-                    .withMisfireHandlingInstructionDoNothing();
-            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(jobBean.getId()))
-                    .withSchedule(scheduleBuilder).build();
-            jobDetail.getJobDataMap().put(JOB_PARAM_KEY, jobBean);
-            scheduler.scheduleJob(jobDetail, trigger);
-        } catch (SchedulerException e) {
-            throw new CodeStackException(e);
-        }
+        JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class).withIdentity(getJobKey(jobBean.getId())
+        ).build();
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(jobBean.getCronExpression())
+                .withMisfireHandlingInstructionDoNothing();
+        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(jobBean.getId()))
+                .withSchedule(scheduleBuilder).build();
+        jobDetail.getJobDataMap().put(JOB_PARAM_KEY, jobBean);
+        scheduler.scheduleJob(jobDetail, trigger);
         return jobBean;
     }
 
     @Transactional
-    public void delete(Integer jobId) {
+    public void delete(Integer jobId) throws SchedulerException {
         ScheduleJob job = getAndCheckJob(jobId);
         job.setDeleted(1);
         int count = jobMapper.updateByPrimaryKeySelective(job);
         Optional.of(count)
                 .filter(e -> e > 0)
                 .orElseThrow(() -> new RuntimeException("error_job_delete"));
-        try {
-            scheduler.deleteJob(getJobKey(jobId));
-        } catch (SchedulerException e) {
-            throw new CodeStackException(e);
-        }
+        scheduler.deleteJob(getJobKey(jobId));
     }
 
     @Transactional
@@ -110,7 +102,11 @@ public class JobService {
         validate(jobBean);
         int count = jobMapper.updateByPrimaryKeySelective(jobBean);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
-        updateScheduleJob(scheduler, jobBean);
+        try {
+            updateScheduleJob(scheduler, jobBean);
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
     }
 
     private void checkAndSet(ScheduleJob jobBean, ScheduleJob job) {
@@ -162,43 +158,31 @@ public class JobService {
     }
 
     private List<ScheduleJob> convertJobs(List<ScheduleJob> jobs) {
-        return jobs.stream().map(e -> JsonUtil.copyObj(e,ScheduleJob.class)).collect(Collectors.toList());
+        return jobs.stream().map(e -> JsonUtil.copyObj(e, ScheduleJob.class)).collect(Collectors.toList());
     }
 
-    public void run(Integer jobId) {
+    public void run(Integer jobId) throws SchedulerException {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
-        try {
-            JobDataMap dataMap = new JobDataMap();
-            dataMap.put(JOB_PARAM_KEY, job);
-            scheduler.triggerJob(getJobKey(job.getId()), dataMap);
-        } catch (SchedulerException e) {
-            throw new CodeStackException(e);
-        }
+        JobDataMap dataMap = new JobDataMap();
+        dataMap.put(JOB_PARAM_KEY, job);
+        scheduler.triggerJob(getJobKey(job.getId()), dataMap);
     }
 
     @Transactional
-    public void pauseJob(Integer jobId) {
+    public void pauseJob(Integer jobId) throws SchedulerException {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(STATUS);
         int count = jobMapper.updateByPrimaryKeySelective(job);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
-        try {
-            scheduler.pauseJob(getJobKey(jobId));
-        } catch (SchedulerException e) {
-            throw new CodeStackException(e);
-        }
+        scheduler.pauseJob(getJobKey(jobId));
     }
 
     @Transactional
-    public void resumeJob(Integer jobId) {
+    public void resumeJob(Integer jobId) throws SchedulerException {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(0);
         jobMapper.updateByPrimaryKeySelective(job);
-        try {
-            scheduler.resumeJob(getJobKey(jobId));
-        } catch (SchedulerException e) {
-            throw new CodeStackException(e);
-        }
+        scheduler.resumeJob(getJobKey(jobId));
     }
 
     public void validate(ScheduleJob jobBean) {
@@ -228,26 +212,22 @@ public class JobService {
         return job;
     }
 
-    public static void updateScheduleJob(Scheduler scheduler, ScheduleJob scheduleJob) {
-        try {
-            TriggerKey triggerKey = getTriggerKey(scheduleJob.getId());
-            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression())
-                    .withMisfireHandlingInstructionDoNothing();
-
-            CronTrigger trigger = getCronTrigger(scheduler, scheduleJob.getId());
-            trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
-            trigger.getJobDataMap().put(JOB_PARAM_KEY, scheduleJob);
-            scheduler.rescheduleJob(triggerKey, trigger);
-            if (scheduleJob.getStatus().equals(STATUS)) {
-                try {
-                    scheduler.pauseJob(getJobKey(scheduleJob.getId()));
-                } catch (SchedulerException e) {
-                    throw new CodeStackException(e);
-                }
+    public static void updateScheduleJob(Scheduler scheduler, ScheduleJob scheduleJob) throws SchedulerException {
+        TriggerKey triggerKey = getTriggerKey(scheduleJob.getId());
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression())
+                .withMisfireHandlingInstructionDoNothing();
+        CronTrigger trigger = getCronTrigger(scheduler, scheduleJob.getId());
+        trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+        trigger.getJobDataMap().put(JOB_PARAM_KEY, scheduleJob);
+        scheduler.rescheduleJob(triggerKey, trigger);
+        if (scheduleJob.getStatus().equals(STATUS)) {
+            try {
+                scheduler.pauseJob(getJobKey(scheduleJob.getId()));
+            } catch (SchedulerException e) {
+                throw new CodeStackException(e);
             }
-        } catch (SchedulerException e) {
-            throw new CodeStackException(e);
         }
+
     }
 
     private final static String JOB_NAME = "TASK_";
