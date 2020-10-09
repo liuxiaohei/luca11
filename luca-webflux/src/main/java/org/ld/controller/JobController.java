@@ -1,7 +1,7 @@
 package org.ld.controller;
 
-import org.ld.beans.JobBean;
 import org.ld.beans.JobQuery;
+import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.service.JobService;
 import org.ld.utils.NumberUtil;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "job", method = RequestMethod.POST)
-    public Object save(@RequestBody JobBean jobBean) {
+    public Object save(@RequestBody ScheduleJob jobBean) {
         jobService.validate(jobBean);
         return jobService.save(jobBean);
     }
@@ -37,8 +37,8 @@ public class JobController {
     }
 
     @RequestMapping(value = "job", method = RequestMethod.PUT)
-    public Object update(@RequestBody JobBean jobBean) {
-        Optional.ofNullable(jobBean.id)
+    public Object update(@RequestBody ScheduleJob jobBean) {
+        Optional.ofNullable(jobBean.getId())
                 .filter(NumberUtil::isValidId)
                 .orElseThrow(() -> new RuntimeException("error_job_jobId"));
         jobService.update(jobBean);

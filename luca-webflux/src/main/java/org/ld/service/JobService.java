@@ -1,14 +1,15 @@
 package org.ld.service;
 
-import org.ld.beans.JobBean;
 import org.ld.beans.JobQuery;
 import org.ld.beans.PageData;
+import org.ld.engine.JobRunnable;
+import org.ld.exception.CodeStackException;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.mapper.JobMapper;
 import org.ld.pojo.JobExample;
-import org.ld.utils.JobUtils;
+import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
-import org.quartz.Scheduler;
+import org.quartz.*;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class JobService {
     @Resource
     private JobMapper jobMapper;
 
+    public static final String JOB_PARAM_KEY = "JOB_PARAM_KEY";
+
     public PageData<JobQuery> queryServices() {
         PageData<JobQuery> pageData = new PageData<>();
         pageData.setList(discoveryClient.getServices().stream().distinct()
@@ -43,43 +46,40 @@ public class JobService {
     }
 
     @Transactional
-    public JobBean save(JobBean jobBean) {
+    public ScheduleJob save(ScheduleJob jobBean) {
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
-        criteria.andNameEqualTo(jobBean.name);
+        criteria.andNameEqualTo(jobBean.getName());
         criteria.andDeletedEqualTo(0);
         Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new
                 RuntimeException("error_job_name"));
-        List<ServiceInstance> instanceList = discoveryClient.getInstances(jobBean.serviceName);
+        List<ServiceInstance> instanceList = discoveryClient.getInstances(jobBean.getServiceName());
         for (ServiceInstance instance : instanceList) {
             Map<String, String> metadata = instance.getMetadata();
             if (metadata.get("grpcPort") != null) {
-                jobBean.host = instance.getHost();
-                jobBean.port = Integer.valueOf(metadata.get("grpcPort"));
+                jobBean.setHost(instance.getHost());
+                jobBean.setPort(Integer.valueOf(metadata.get("grpcPort")));
                 break;
             }
         }
-        if (jobBean.host == null || jobBean.port == null) {
+        if (jobBean.getHost() == null || jobBean.getPort() == null) {
             throw new RuntimeException("error_service_rpc_null");
         }
-        ScheduleJob job = couponJob(jobBean);
-        int count = jobMapper.insertSelective(job);
+        int count = jobMapper.insertSelective(jobBean);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_save"));
-        JobUtils.createScheduleJob(scheduler, job);
-        jobBean.id = job.getId();
+        try {
+            JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class).withIdentity(getJobKey(jobBean.getId())
+            ).build();
+            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(jobBean.getCronExpression())
+                    .withMisfireHandlingInstructionDoNothing();
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(jobBean.getId()))
+                    .withSchedule(scheduleBuilder).build();
+            jobDetail.getJobDataMap().put(JOB_PARAM_KEY, jobBean);
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
         return jobBean;
-    }
-
-    private ScheduleJob couponJob(JobBean jobBean) {
-        ScheduleJob job = new ScheduleJob();
-        job.setBeanName(jobBean.beanName);
-        job.setServiceName(jobBean.serviceName);
-        job.setName(jobBean.name);
-        job.setMethodName(jobBean.methodName);
-        job.setHost(jobBean.host);
-        job.setPort(jobBean.port);
-        job.setCronExpression(jobBean.cronExpression);
-        return job;
     }
 
     @Transactional
@@ -90,50 +90,51 @@ public class JobService {
         Optional.of(count)
                 .filter(e -> e > 0)
                 .orElseThrow(() -> new RuntimeException("error_job_delete"));
-        JobUtils.deleteScheduleJob(scheduler, jobId);
+        try {
+            scheduler.deleteJob(getJobKey(jobId));
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
     }
 
     @Transactional
-    public void update(JobBean jobBean) {
-        ScheduleJob job = getAndCheckJob(jobBean.id);
+    public void update(ScheduleJob jobBean) {
+        ScheduleJob job = getAndCheckJob(jobBean.getId());
         checkAndSet(jobBean, job);
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
-        criteria.andNameEqualTo(jobBean.name);
+        criteria.andNameEqualTo(jobBean.getName());
         criteria.andDeletedEqualTo(0);
-        criteria.andIdNotEqualTo(jobBean.id);
+        criteria.andIdNotEqualTo(jobBean.getId());
         Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new RuntimeException("error_job_name"));
         validate(jobBean);
-        ScheduleJob jobReq = couponJob(jobBean);
-        jobReq.setId(job.getId());
-        jobReq.setStatus(job.getStatus());
-        int count = jobMapper.updateByPrimaryKeySelective(jobReq);
+        int count = jobMapper.updateByPrimaryKeySelective(jobBean);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
-        JobUtils.updateScheduleJob(scheduler, jobReq);
+        updateScheduleJob(scheduler, jobBean);
     }
 
-    private void checkAndSet(JobBean jobBean, ScheduleJob job) {
-        jobBean.name = Optional.ofNullable(jobBean.name).orElse(job.getName());
-        jobBean.beanName = Optional.ofNullable(jobBean.beanName).orElse(job.getBeanName());
-        jobBean.methodName = Optional.ofNullable(jobBean.methodName).orElse(job.getMethodName());
-        jobBean.cronExpression = Optional.ofNullable(jobBean.cronExpression).orElse(job.getCronExpression());
-        jobBean.params = Optional.ofNullable(jobBean.params).orElse(job.getParams());
-        jobBean.status = job.getStatus();
-        jobBean.host = job.getHost();
-        jobBean.port = job.getPort();
+    private void checkAndSet(ScheduleJob jobBean, ScheduleJob job) {
+        jobBean.setName(Optional.ofNullable(jobBean.getName()).orElse(job.getName()));
+        jobBean.setBeanName(Optional.ofNullable(jobBean.getBeanName()).orElse(job.getBeanName()));
+        jobBean.setMethodName(Optional.ofNullable(jobBean.getMethodName()).orElse(job.getMethodName()));
+        jobBean.setCronExpression(Optional.ofNullable(jobBean.getCronExpression()).orElse(job.getCronExpression()));
+        jobBean.setParams(Optional.ofNullable(jobBean.getParams()).orElse(job.getParams()));
+        jobBean.setStatus(job.getStatus());
+        jobBean.setHost(job.getHost());
+        jobBean.setPort(job.getPort());
     }
 
-    public JobBean queryJob(Integer jobId) {
+    public ScheduleJob queryJob(Integer jobId) {
         JobQuery query = new JobQuery();
         query.jobId = jobId;
-        PageData<JobBean> data = queryJobList(query);
+        PageData<ScheduleJob> data = queryJobList(query);
         if (StringUtil.isEmpty(data.getList())) {
             throw new RuntimeException();
         }
         return data.getList().get(0);
     }
 
-    public PageData<JobBean> queryJobList(JobQuery query) {
+    public PageData<ScheduleJob> queryJobList(JobQuery query) {
         JobExample jobExample = new JobExample();
         JobExample.Criteria criteria = jobExample.createCriteria();
         criteria.andDeletedEqualTo(0);
@@ -146,7 +147,7 @@ public class JobService {
         if (StringUtil.isNotBlank(query.serviceName)) {
             criteria.andServiceNameEqualTo(query.serviceName);
         }
-        PageData<JobBean> pageData = new PageData<>();
+        PageData<ScheduleJob> pageData = new PageData<>();
         pageData.setCount(jobMapper.countByExample(jobExample));
         //query.setAll(Boolean.FALSE);
         jobExample.setOffset(query.getOffSet());
@@ -160,35 +161,32 @@ public class JobService {
         return pageData;
     }
 
-    private List<JobBean> convertJobs(List<ScheduleJob> jobs) {
-        return jobs.stream().map(e -> {
-            JobBean jobBean = new JobBean();
-            jobBean.id = e.getId();
-            jobBean.port = e.getPort();
-            jobBean.host = e.getHost();
-            jobBean.beanName = e.getBeanName();
-            jobBean.methodName = e.getMethodName();
-            jobBean.serviceName = e.getServiceName();
-            jobBean.cronExpression = e.getCronExpression();
-            jobBean.params = e.getParams();
-            jobBean.createTime = e.getCreateTime();
-            jobBean.status = e.getStatus();
-            return jobBean;
-        }).collect(Collectors.toList());
+    private List<ScheduleJob> convertJobs(List<ScheduleJob> jobs) {
+        return jobs.stream().map(e -> JsonUtil.copyObj(e,ScheduleJob.class)).collect(Collectors.toList());
     }
 
     public void run(Integer jobId) {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
-        JobUtils.run(scheduler, job);
+        try {
+            JobDataMap dataMap = new JobDataMap();
+            dataMap.put(JOB_PARAM_KEY, job);
+            scheduler.triggerJob(getJobKey(job.getId()), dataMap);
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
     }
 
     @Transactional
     public void pauseJob(Integer jobId) {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
-        job.setStatus(JobUtils.STATUS);
+        job.setStatus(STATUS);
         int count = jobMapper.updateByPrimaryKeySelective(job);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
-        JobUtils.pauseJob(scheduler, jobId);
+        try {
+            scheduler.pauseJob(getJobKey(jobId));
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
     }
 
     @Transactional
@@ -196,23 +194,27 @@ public class JobService {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(0);
         jobMapper.updateByPrimaryKeySelective(job);
-        JobUtils.resumeJob(scheduler, jobId);
+        try {
+            scheduler.resumeJob(getJobKey(jobId));
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
     }
 
-    public void validate(JobBean jobBean) {
-        Optional.ofNullable(jobBean.name)
+    public void validate(ScheduleJob jobBean) {
+        Optional.ofNullable(jobBean.getBeanName())
                 .filter(StringUtil::isNotBlank)
                 .orElseThrow(() -> new RuntimeException("error_job_name_null"));
-        Optional.ofNullable(jobBean.serviceName)
+        Optional.ofNullable(jobBean.getServiceName())
                 .filter(StringUtil::isNotBlank)
                 .orElseThrow(() -> new RuntimeException("error_service_name_null"));
-        Optional.ofNullable(jobBean.beanName)
+        Optional.ofNullable(jobBean.getBeanName())
                 .filter(StringUtil::isNotBlank)
                 .orElseThrow(() -> new RuntimeException("error_bean_name_null"));
-        Optional.ofNullable(jobBean.methodName)
+        Optional.ofNullable(jobBean.getMethodName())
                 .filter(StringUtil::isNotBlank)
                 .orElseThrow(() -> new RuntimeException("error_method_name_null"));
-        Optional.ofNullable(jobBean.cronExpression)
+        Optional.ofNullable(jobBean.getCronExpression())
                 .filter(StringUtil::isNotBlank)
                 .orElseThrow(() -> new RuntimeException("error_cron_expression_null"));
 
@@ -224,5 +226,47 @@ public class JobService {
                 .filter(e -> job.getDeleted().equals(0))
                 .orElseThrow(() -> new RuntimeException("error_job_delete_status"));
         return job;
+    }
+
+    public static void updateScheduleJob(Scheduler scheduler, ScheduleJob scheduleJob) {
+        try {
+            TriggerKey triggerKey = getTriggerKey(scheduleJob.getId());
+            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression())
+                    .withMisfireHandlingInstructionDoNothing();
+
+            CronTrigger trigger = getCronTrigger(scheduler, scheduleJob.getId());
+            trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+            trigger.getJobDataMap().put(JOB_PARAM_KEY, scheduleJob);
+            scheduler.rescheduleJob(triggerKey, trigger);
+            if (scheduleJob.getStatus().equals(STATUS)) {
+                try {
+                    scheduler.pauseJob(getJobKey(scheduleJob.getId()));
+                } catch (SchedulerException e) {
+                    throw new CodeStackException(e);
+                }
+            }
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
+    }
+
+    private final static String JOB_NAME = "TASK_";
+
+    public final static Integer STATUS = 1;
+
+    public static TriggerKey getTriggerKey(Integer jobId) {
+        return TriggerKey.triggerKey(JOB_NAME + jobId);
+    }
+
+    public static JobKey getJobKey(Integer jobId) {
+        return JobKey.jobKey(JOB_NAME + jobId);
+    }
+
+    public static CronTrigger getCronTrigger(Scheduler scheduler, Integer jobId) {
+        try {
+            return (CronTrigger) scheduler.getTrigger(getTriggerKey(jobId));
+        } catch (SchedulerException e) {
+            throw new CodeStackException(e);
+        }
     }
 }

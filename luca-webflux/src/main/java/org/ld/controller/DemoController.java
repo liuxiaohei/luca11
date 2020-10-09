@@ -122,7 +122,7 @@ public class DemoController {
     public Mono<String> getAkkaDemo() throws Exception {
         var ref = akkaUtil.getActorRef("counter", "testActor");
         IntStream.rangeClosed(1, 100000).parallel().forEach(i -> ref.tell("hello", ActorRef.noSender()));
-        //        actorSystem.terminate(); // 这个方法终止 actor
+//                actorSystem.terminate(); // 这个方法终止 actor
         return Mono.fromSupplier(() -> "success");
     }
 
@@ -130,7 +130,7 @@ public class DemoController {
     public Mono<String> getAkkaDemo1() throws Exception {
         var ref = akkaUtil.getActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
-        //        actorSystem.terminate(); // 这个方法终止 actor
+//                actorSystem.terminate(); // 这个方法终止 actor
         return Mono.fromSupplier(() -> "success");
     }
 

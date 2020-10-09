@@ -242,7 +242,7 @@ public class LucaConfig {
 
     @Bean
     public ActorSystem actorSystem() {
-        return ActorSystem.create("lucaSystem");
+        return ActorSystemHolder.ACTORSYSTEM;
     }
 
     @PostConstruct
@@ -283,6 +283,10 @@ public class LucaConfig {
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static class ActorSystemHolder {
+        public static final ActorSystem ACTORSYSTEM = ActorSystem.create("lucaSystem");
+    }
 
     public static class MethodParameterHolder {
 

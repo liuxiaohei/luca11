@@ -4,7 +4,6 @@ import io.grpc.StatusRuntimeException;
 import org.ld.grpc.grpc.LucaGrpcClient;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.task.RefreshServiceTask;
-import org.ld.utils.JobUtils;
 import org.ld.utils.StringUtil;
 import org.ld.utils.ZLogger;
 import org.quartz.Scheduler;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @Service
 public class RpcService {
@@ -21,6 +19,8 @@ public class RpcService {
     private Scheduler scheduler;
     @Resource
     private RefreshServiceTask refreshServiceTask;
+    @Resource
+    JobService jobService;
 
     private final Logger log = ZLogger.newInstance();
 
@@ -40,14 +40,14 @@ public class RpcService {
                 job.setHost(jobServices.get(0).getHost());
                 job.setPort(jobServices.get(0).getPort());
                 RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
-                JobUtils.updateScheduleJob(scheduler, job);
+                jobService.updateScheduleJob(scheduler, job);
             } else {
                 jobServices = refreshServiceTask.getServiceInstance(job.getServiceName());
                 if (StringUtil.isNotEmpty(jobServices)) {
                     job.setHost(jobServices.get(0).getHost());
                     job.setPort(jobServices.get(0).getPort());
                     RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
-                    JobUtils.updateScheduleJob(scheduler, job);
+                    jobService.updateScheduleJob(scheduler, job);
                 }
             }
             log.info(e.getMessage());
