@@ -1,4 +1,4 @@
-package org.ld.grpc.client;
+package org.ld.grpc.grpc;
 
 import com.google.protobuf.*;
 import lombok.AllArgsConstructor;

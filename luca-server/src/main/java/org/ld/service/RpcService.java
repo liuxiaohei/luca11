@@ -1,7 +1,7 @@
 package org.ld.service;
 
 import io.grpc.StatusRuntimeException;
-import org.ld.grpc.client.LucaGrpcClient;
+import org.ld.grpc.grpc.LucaGrpcClient;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.task.RefreshServiceTask;
 import org.ld.utils.JobUtils;

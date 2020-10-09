@@ -6,6 +6,8 @@ import io.grpc.Server;
 import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.services.HealthStatusManager;
+import org.ld.grpc.server.GrpcServiceDefinition;
+import org.ld.grpc.server.GrpcServerProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +21,7 @@ public class NettyGrpcServerFactory {
     private final GrpcServerProperties properties;
 
     private final List<GrpcServiceDefinition> services = Lists.newLinkedList();
+    
     @Autowired
     private HealthStatusManager healthStatusManager;
 
