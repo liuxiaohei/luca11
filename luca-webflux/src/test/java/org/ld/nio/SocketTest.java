@@ -20,10 +20,10 @@ import java.util.concurrent.Executors;
 public class SocketTest {
 
     /**
-     * Biotesk
+     * Bio Test
      */
     @Test
-    public void BSocket() {
+    public void BSocket() throws IOException, InterruptedException {
         var port = 8987;
         new Thread(() -> {
             try {
@@ -39,31 +39,23 @@ public class SocketTest {
                 e.printStackTrace();
             }
         }).start();
-        try {
-            final var socket = new ServerSocket(port);
-            while (true) {
-                new Thread(() -> {
-                    OutputStream out;
-                    try (final var clientSocket = socket.accept()) { // 阻塞1
-                        out = clientSocket.getOutputStream();
-                        System.out.println("Accepted connection from " + clientSocket);
-                        out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));                            //4
-                        out.flush();
-                    } catch (IOException e) {
-                        throw new CodeStackException(e);
-                    }
-                }).start();
-            }
+        final var socket = new ServerSocket(port);
+        try (final var clientSocket = socket.accept()) { // 阻塞1
+            OutputStream out = clientSocket.getOutputStream();
+            System.out.println("Accepted connection from " + clientSocket);
+            out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));
+            out.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CodeStackException(e);
         }
+        Thread.sleep(1000);
     }
 
     /**
      * NioTest
      */
     @Test
-    public void NSocket() throws IOException {
+    public void NSocket() throws IOException, InterruptedException {
         var port = 8988;
         new Thread(() -> {
             try {
@@ -77,7 +69,6 @@ public class SocketTest {
                 e.printStackTrace();
             }
         }).start();
-
         var serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
         var ss = serverChannel.socket();
@@ -86,45 +77,48 @@ public class SocketTest {
         var selector = Selector.open();
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
         final var msg = ByteBuffer.wrap("Hi!\r\n".getBytes());
-        while (true) {
-            try {
-                selector.select();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                break;
-            }
-            var readyKeys = selector.selectedKeys();
-            var iterator = readyKeys.iterator();
-            while (iterator.hasNext()) {
-                SelectionKey key = iterator.next();
-                iterator.remove();
+        new Thread(() -> {
+            while (true) {
                 try {
-                    if (key.isAcceptable()) {
-                        var server = (ServerSocketChannel) key.channel();
-                        var client = server.accept();
-                        client.configureBlocking(false);
-                        client.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ, msg.duplicate());    //7
-                        System.out.println("Accepted connection from " + client);
-                    }
-                    if (key.isWritable()) {
-                        try (var client = (SocketChannel) key.channel()) {
-                            var buffer = (ByteBuffer) key.attachment();
-                            while (buffer.hasRemaining()) {
-                                if (client.write(buffer) == 0) {
-                                    break;
+                    selector.select();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    break;
+                }
+                var readyKeys = selector.selectedKeys();
+                var iterator = readyKeys.iterator();
+                while (iterator.hasNext()) {
+                    SelectionKey key = iterator.next();
+                    iterator.remove();
+                    try {
+                        if (key.isAcceptable()) {
+                            var server = (ServerSocketChannel) key.channel();
+                            var client = server.accept();
+                            client.configureBlocking(false); // 触发内核启动非阻塞
+                            client.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ, msg.duplicate());    //7
+                            System.out.println("Accepted connection from " + client);
+                        }
+                        if (key.isWritable()) {
+                            try (var client = (SocketChannel) key.channel()) {
+                                var buffer = (ByteBuffer) key.attachment();
+                                while (buffer.hasRemaining()) {
+                                    if (client.write(buffer) == 0) {
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                } catch (IOException ex) {
-                    key.cancel();
-                    try {
-                        key.channel().close();
-                    } catch (IOException ignored) {
+                    } catch (IOException ex) {
+                        key.cancel();
+                        try {
+                            key.channel().close();
+                        } catch (IOException ignored) {
+                        }
                     }
                 }
             }
-        }
+        }).start();
+        Thread.sleep(4000);
     }
 
     /**
