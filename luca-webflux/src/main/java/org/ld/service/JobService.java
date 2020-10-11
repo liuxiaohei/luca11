@@ -51,8 +51,7 @@ public class JobService {
         JobExample.Criteria criteria = jobExample.createCriteria();
         criteria.andNameEqualTo(jobBean.getName());
         criteria.andDeletedEqualTo(0);
-        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new
-                RuntimeException("error_job_name"));
+        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new RuntimeException("error_job_name"));
         List<ServiceInstance> instanceList = discoveryClient.getInstances(jobBean.getServiceName());
         for (ServiceInstance instance : instanceList) {
             Map<String, String> metadata = instance.getMetadata();
@@ -67,9 +66,10 @@ public class JobService {
         }
         int count = jobMapper.insertSelective(jobBean);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_save"));
-        JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class).withIdentity(getJobKey(jobBean.getId())
-        ).build();
-        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(jobBean.getCronExpression())
+        JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class)
+                .withIdentity(getJobKey(jobBean.getId())).build();
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder
+                .cronSchedule(jobBean.getCronExpression())
                 .withMisfireHandlingInstructionDoNothing();
         CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(jobBean.getId()))
                 .withSchedule(scheduleBuilder).build();
@@ -83,9 +83,7 @@ public class JobService {
         ScheduleJob job = getAndCheckJob(jobId);
         job.setDeleted(1);
         int count = jobMapper.updateByPrimaryKeySelective(job);
-        Optional.of(count)
-                .filter(e -> e > 0)
-                .orElseThrow(() -> new RuntimeException("error_job_delete"));
+        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_delete"));
         scheduler.deleteJob(getJobKey(jobId));
     }
 
@@ -145,7 +143,6 @@ public class JobService {
         }
         PageData<ScheduleJob> pageData = new PageData<>();
         pageData.setCount(jobMapper.countByExample(jobExample));
-        //query.setAll(Boolean.FALSE);
         jobExample.setOffset(query.getOffSet());
         jobExample.setLimit(query.getLimit());
         List<ScheduleJob> jobs = jobMapper.selectByExample(jobExample);
