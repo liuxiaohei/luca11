@@ -1,8 +1,8 @@
 package org.ld;
 
-import akka.actor.typed.ActorSystem;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.ld.utils.FileUtil;
+import org.ld.pool.IOExecutor;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
@@ -10,12 +10,14 @@ import org.ld.utils.ZLogger;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+@Slf4j
 public class DemoTest {
 
     /**
@@ -55,8 +57,8 @@ public class DemoTest {
     @Test
     public void dabao() throws IOException {
         var tag = "studio-2.0.0-final";
-        var list = Arrays.asList("tdt","syncher-server","syncher-client");
-        var digestMap = new HashMap<String,String>();
+        var list = Arrays.asList("tdt", "syncher-server", "syncher-client");
+        var digestMap = new HashMap<String, String>();
         list.forEach(s -> {
             Process process;
             try {
@@ -66,10 +68,10 @@ public class DemoTest {
                 throw new RuntimeException(e);
             }
             var result = convertStreamToStr(process.getInputStream());
-            if(result.size() < 2) {
+            if (result.size() < 2) {
                 throw new RuntimeException("拉取镜像失败");
             }
-            digestMap.put(s,result.get(1));
+            digestMap.put(s, result.get(1));
         });
         var process = Runtime.getRuntime().exec("docker images");
         var result = convertStreamToStr(process.getInputStream());
@@ -82,7 +84,7 @@ public class DemoTest {
                                         .filter(h -> h.length() > 0).skip(2)
                                         .findFirst().orElse(""))
                                 .orElse("")));
-        imageIdMap.forEach((name,imageId) -> {
+        imageIdMap.forEach((name, imageId) -> {
             try {
                 final var fullTag = "172.16.1.99/transwarp/" + name + ":" + tag;
                 System.out.println("docker tag " + imageId + " " + fullTag);
@@ -108,8 +110,8 @@ public class DemoTest {
     @Test
     public void tdt1_Xdabao() throws IOException {
         var tag = "studio-1.5.0-rc1";
-        var list = Arrays.asList("tdt","canal-server","canal-client");
-        var digestMap = new HashMap<String,String>();
+        var list = Arrays.asList("tdt", "canal-server", "canal-client");
+        var digestMap = new HashMap<String, String>();
         list.forEach(s -> {
             Process process;
             try {
@@ -119,10 +121,10 @@ public class DemoTest {
                 throw new RuntimeException(e);
             }
             var result = convertStreamToStr(process.getInputStream());
-            if(result.size() < 2) {
+            if (result.size() < 2) {
                 throw new RuntimeException("拉取镜像失败");
             }
-            digestMap.put(s,result.get(1));
+            digestMap.put(s, result.get(1));
         });
         var process = Runtime.getRuntime().exec("docker images");
         var result = convertStreamToStr(process.getInputStream());
@@ -135,7 +137,7 @@ public class DemoTest {
                                         .filter(h -> h.length() > 0).skip(2)
                                         .findFirst().orElse(""))
                                 .orElse("")));
-        imageIdMap.forEach((name,imageId) -> {
+        imageIdMap.forEach((name, imageId) -> {
             try {
                 final var fullTag = "172.16.1.99/transwarp/" + name + ":" + tag;
                 System.out.println("docker tag " + imageId + " " + fullTag);
@@ -191,22 +193,19 @@ public class DemoTest {
     }
 
     @Test
-    public void ab() throws InterruptedException {
+    public void ab() {
         var atomicInteger = new AtomicInteger(0);// 0 t1 可写 1 t1 正在写 2 t2 可写 3 t2 正在写
-        var t1 = new Thread(() -> IntStream.range(1,10).forEach(i -> {
-            while (!atomicInteger.compareAndSet(0,1)) {}
-            System.out.print(i + " ");
+        var t1 = CompletableFuture.runAsync(() -> IntStream.range(1, 10).forEach(i -> {
+            while (!atomicInteger.compareAndSet(0, 1)) {}
+            log.info(i + " ");
             atomicInteger.set(2);
-        }));
-        var t2 = new Thread(() -> Arrays.asList("a","b","c","d","e","f","g","h","i").forEach(i -> {
-            while (!atomicInteger.compareAndSet(2,3)) {}
-            System.out.print(i + " ");
+        }), IOExecutor.getInstance());
+        var t2 = CompletableFuture.runAsync(() -> Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i").forEach(i -> {
+            while (!atomicInteger.compareAndSet(2, 3)) {}
+            log.info(i + " ");
             atomicInteger.set(0);
-        }));
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
+        }), IOExecutor.getInstance());
+        CompletableFuture.allOf(t1, t2).join();
     }
 
 }

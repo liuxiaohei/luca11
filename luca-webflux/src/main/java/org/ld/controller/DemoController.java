@@ -103,11 +103,6 @@ public class DemoController {
     @GetMapping("quasarDemo")
     public Mono<String> quasarDemo() {
         var a = IntStream.rangeClosed(1, 100000).boxed().parallel().map(i -> CompletableFuture.supplyAsync(() -> {
-            try {
-                IOExecutor.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             log.info(i + "");
             return i;
         }, IOExecutor.getInstance())).collect(Collectors.toList());
