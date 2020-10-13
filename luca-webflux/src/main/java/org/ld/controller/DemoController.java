@@ -21,6 +21,13 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +110,20 @@ public class DemoController {
     @GetMapping("quasarDemo")
     public Mono<String> quasarDemo() {
         var a = IntStream.rangeClosed(1, 100000).boxed().parallel().map(i -> CompletableFuture.supplyAsync(() -> {
+            var client = HttpClient.newHttpClient();
+            HttpRequest request = null;
+            try {
+                request = HttpRequest.newBuilder()
+                        .uri(new URI("https://labs.consol.de/"))
+                        .GET()
+                        .build();
+                var tempFile = Files.createTempFile("consol-labs-home", ".html");
+                var response = client.send(request, HttpResponse.BodyHandlers.ofFile(tempFile));
+                log.info(response.statusCode());
+                log.info(response.body());
+            } catch (URISyntaxException | IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
             log.info(i + "");
             return i;
         }, IOExecutor.getInstance())).collect(Collectors.toList());
