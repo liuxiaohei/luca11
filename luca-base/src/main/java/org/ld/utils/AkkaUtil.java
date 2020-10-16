@@ -39,7 +39,8 @@ public class AkkaUtil {
     public ActorRef getActorRef(String beanName, String actorId) throws Exception {
         final var sel = actorSystem.actorSelection("/user/" + actorId);
         final var fut = new AskableActorSelection(sel).ask(new Identify(1), t);
-        final var indent = (ActorIdentity) Await.result(fut, t.duration());
+        var cFucture =  new AkkaFutureAdapter(fut);
+        final var indent = (ActorIdentity) cFucture.join();
         return indent.getActorRef()
                 .orElseGet(() -> actorSystem.actorOf(createPropsByName(beanName), actorId));
     }
