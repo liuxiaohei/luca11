@@ -136,17 +136,23 @@ public class DemoController {
 
     @GetMapping("akkademo")
     public Mono<String> getAkkaDemo() throws Exception {
-        var ref = akkaUtil.getActorRef("counter", "testActor");
+        var ref = AkkaUtil.getActorRef("counter", "testActor");
         IntStream.rangeClosed(1, 100000).parallel().forEach(i -> ref.tell("hello", ActorRef.noSender()));
 //                actorSystem.terminate(); // 这个方法终止 actor
         return Mono.fromSupplier(() -> "success");
     }
 
     @GetMapping("akkademo1")
-    public Mono<String> getAkkaDemo1() throws Exception {
-        var ref = akkaUtil.getActorRef("counter", "testActor1");
+    public Mono<String> getAkkaDemo1() {
+        var ref = AkkaUtil.getActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
 //                actorSystem.terminate(); // 这个方法终止 actor
+        return Mono.fromSupplier(() -> "success");
+    }
+
+    @GetMapping("stopdemo1")
+    public Mono<String> stopAkkaDemo1() {
+        AkkaUtil.stopActorRef("counter", "testActor1");
         return Mono.fromSupplier(() -> "success");
     }
 

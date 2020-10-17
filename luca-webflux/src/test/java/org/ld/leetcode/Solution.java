@@ -2,22 +2,7 @@ package org.ld.leetcode;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 public class Solution {
-
-    @Test
-    public void demo() {
-        int[] nums = {3, 2, 3};
-        var target = 6;
-        var a = twoSum(nums, target);
-        Object b = null;
-    }
-
 
     /**
      * 给定一个整数数组 nums 和一个目标值 target，请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
@@ -36,5 +21,20 @@ public class Solution {
         }
         return result;
     }
+
+    public int reverse(int x) {
+        long result = (x >= 0 ? Long.parseLong(new StringBuilder(x + "").reverse().toString())
+                : (0 - Long.parseLong(new StringBuilder((0 - x) + "").reverse().toString())));
+        if (result > Integer.MAX_VALUE || result < Integer.MIN_VALUE) {
+            return 0;
+        }
+        return (int)result;
+    }
+
+//    @Test
+//    public void demo() {
+//        var a = isPalindrome(12);
+//        Object b = null;
+//    }
 
 }

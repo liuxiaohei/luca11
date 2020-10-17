@@ -1,5 +1,6 @@
 package org.ld.utils;
 
+import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import org.ld.config.LucaConfig;
 import scala.concurrent.Future;
@@ -13,8 +14,19 @@ import java.util.concurrent.CompletableFuture;
  */
 public class AkkaFutureAdapter<T> extends CompletableFuture<T> {
 
+    /**
+     * 将Scala的Fucture 转换成java8 的 CompletableFuture
+     */
+    public static <T> CompletableFuture<T> of(Future<T> future) {
+        return new AkkaFutureAdapter<>(future);
+    }
+
+    public static <T> CompletableFuture<T> of(Future<T> future, ActorSystem actorSystem) {
+        return new AkkaFutureAdapter<>(future, actorSystem);
+    }
+
     @SuppressWarnings("unchecked")
-    public AkkaFutureAdapter(Future<T> akkaFuture) {
+    private AkkaFutureAdapter(Future<T> akkaFuture) {
         akkaFuture.onComplete(new OnComplete<>() {
                                   @Override
                                   public void onComplete(Throwable throwable, Object o) {
@@ -26,6 +38,21 @@ public class AkkaFutureAdapter<T> extends CompletableFuture<T> {
                                   }
                               }
                 , LucaConfig.ActorSystemHolder.ACTORSYSTEM.dispatcher());
+    }
+
+    @SuppressWarnings("unchecked")
+    public AkkaFutureAdapter(Future<T> akkaFuture,ActorSystem actorSystem) {
+        akkaFuture.onComplete(new OnComplete<>() {
+                                  @Override
+                                  public void onComplete(Throwable throwable, Object o) {
+                                      try {
+                                          complete((T) o);
+                                      } catch (Throwable exception) {
+                                          completeExceptionally(exception);
+                                      }
+                                  }
+                              }
+                , actorSystem.dispatcher());
     }
 
     /**
