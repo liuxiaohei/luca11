@@ -1,9 +1,12 @@
 package org.ld.beans;
 
-public final class ProcessStarted {
-    public final String id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    public ProcessStarted(String id) {
-        this.id = id;
-    }
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public final class ProcessStarted {
+    public String id;
 }

@@ -19,7 +19,9 @@ public class ProcessDispatcher extends AbstractFSM<ProcessState, ProcessData> {
         startWith(ProcessState.CREATED, initData);
 
         when(ProcessState.CREATED, Duration.ofSeconds(0), matchEvent(
-                Collections.singletonList(StateTimeout()), ProcessData.class, (message, data) -> goTo(ProcessState.STARTING)));
+                Collections.singletonList(StateTimeout()),
+                ProcessData.class,
+                (message, data) -> goTo(ProcessState.STARTING)));
 
         when(ProcessState.STARTING, matchEvent(
                 ProcessStarted.class,
@@ -33,7 +35,9 @@ public class ProcessDispatcher extends AbstractFSM<ProcessState, ProcessData> {
                 (message, data) -> goTo(ProcessState.STARTING_FAILURE)));
 
         when(ProcessState.STARTING_FAILURE, Duration.ofSeconds(5), matchEvent(
-                Collections.singletonList(StateTimeout()), ProcessData.class, (message, data) -> goTo(ProcessState.STARTING)));
+                Collections.singletonList(StateTimeout()),
+                ProcessData.class,
+                (message, data) -> goTo(ProcessState.STARTING)));
 
         when(ProcessState.CHECKING_STATE, matchEvent(
                 ProcessFinished.class,

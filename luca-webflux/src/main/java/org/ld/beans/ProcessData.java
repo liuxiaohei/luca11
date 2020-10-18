@@ -1,25 +1,20 @@
 package org.ld.beans;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProcessData {
-    public final String id;
-    public final String processParam;
-    public final String executorParam;
 
-    private ProcessData(String id, String processParam, String executorParam) {
-        this.id = id;
-        this.processParam = processParam;
-        this.executorParam = executorParam;
-    }
-
-    public ProcessData() {
-        this(null, null, null);
-    }
+    public String id;
+    public String processParam;
+    public String executorParam;
 
     public ProcessData setId(String id) {
         return new ProcessData(id, processParam, executorParam);
     }
 
-    public ProcessData setParams(String processParam, String executorParam) {
-        return new ProcessData(id, processParam, executorParam);
-    }
 }

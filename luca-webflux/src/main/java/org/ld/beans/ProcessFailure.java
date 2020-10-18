@@ -1,9 +1,12 @@
 package org.ld.beans;
 
-public final class ProcessFailure implements ProcessStatus {
-    public final Throwable error;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    public ProcessFailure(Throwable error) {
-        this.error = error;
-    }
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public final class ProcessFailure implements ProcessStatus {
+    public Throwable error;
 }
