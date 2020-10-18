@@ -210,9 +210,9 @@ public class LucaConfig {
     static class GlobalExceptionHandler {
         @ExceptionHandler(Exception.class)
         @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-        public RespBean exceptionHandler(Throwable e) {
+        public RespBean<Object> exceptionHandler(Throwable e) {
             log.error(AroundController.UUIDS.get(), e);
-            return new RespBean(e);
+            return new RespBean<>(e);
         }
     }
 

@@ -30,6 +30,7 @@ public class AkkaUtil {
 
     /**
      * 可通过bean的名称和ActorId 创建Actor对象
+     * actorSystem.terminate();这个方法终止 actor
      */
     public static ActorRef getActorRef(String beanName, String actorId) {
         final var sel = LucaConfig.ActorSystemHolder.ACTORSYSTEM.actorSelection("/user/" + actorId);

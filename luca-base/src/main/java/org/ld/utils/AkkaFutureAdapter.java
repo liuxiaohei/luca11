@@ -25,23 +25,12 @@ public class AkkaFutureAdapter<T> extends CompletableFuture<T> {
         return new AkkaFutureAdapter<>(future, actorSystem);
     }
 
-    @SuppressWarnings("unchecked")
     private AkkaFutureAdapter(Future<T> akkaFuture) {
-        akkaFuture.onComplete(new OnComplete<>() {
-                                  @Override
-                                  public void onComplete(Throwable throwable, Object o) {
-                                      try {
-                                          complete((T) o);
-                                      } catch (Throwable exception) {
-                                          completeExceptionally(exception);
-                                      }
-                                  }
-                              }
-                , LucaConfig.ActorSystemHolder.ACTORSYSTEM.dispatcher());
+        this(akkaFuture, LucaConfig.ActorSystemHolder.ACTORSYSTEM);
     }
 
     @SuppressWarnings("unchecked")
-    public AkkaFutureAdapter(Future<T> akkaFuture,ActorSystem actorSystem) {
+    public AkkaFutureAdapter(Future<T> akkaFuture, ActorSystem actorSystem) {
         akkaFuture.onComplete(new OnComplete<>() {
                                   @Override
                                   public void onComplete(Throwable throwable, Object o) {
