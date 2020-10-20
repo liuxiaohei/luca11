@@ -9,7 +9,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.ld.annotation.NeedToken;
+import org.ld.beans.Flush;
+import org.ld.beans.Queue;
 import org.ld.beans.RespBean;
+import org.ld.beans.SetTarget;
 import org.ld.pool.IOExecutor;
 import org.ld.utils.AkkaUtil;
 import org.ld.utils.JwtUtils;
@@ -28,10 +31,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
@@ -142,6 +142,26 @@ public class DemoController {
     public Mono<String> getAkkaDemo1() {
         var ref = AkkaUtil.getActorRef("counter", "testActor1");
         ref.tell("hello", ActorRef.noSender());
+        return Mono.fromSupplier(() -> "success");
+    }
+
+    @GetMapping("akkafsmdemo1")
+    public Mono<String> getAkkafsmDemo1() {
+        var buncher = AkkaUtil.getActorRef("buncher", "testActor2");
+        final ActorRef probe = ActorRef.noSender();
+        buncher.tell(new SetTarget(probe), probe);
+        buncher.tell(new org.ld.beans.Queue(42), probe);
+        buncher.tell(new org.ld.beans.Queue(43), probe);
+        LinkedList<Object> list1 = new LinkedList<>();
+        list1.add(42);
+        list1.add(43);
+        buncher.tell(new org.ld.beans.Queue(44), probe);
+        buncher.tell(Flush.Flush, probe);
+        buncher.tell(new Queue(45), probe);
+        LinkedList<Object> list2 = new LinkedList<>();
+        list2.add(44);
+        LinkedList<Object> list3 = new LinkedList<>();
+        list3.add(45);
         return Mono.fromSupplier(() -> "success");
     }
 

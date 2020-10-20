@@ -6,6 +6,5 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public final class ProcessInProgress implements ProcessStatus {
 }

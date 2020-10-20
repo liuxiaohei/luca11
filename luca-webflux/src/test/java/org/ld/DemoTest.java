@@ -1,7 +1,15 @@
 package org.ld;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.ld.actors.Buncher;
+import org.ld.beans.Flush;
+import org.ld.beans.Queue;
+import org.ld.beans.SetTarget;
+import org.ld.config.LucaConfig;
 import org.ld.pool.IOExecutor;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
@@ -196,16 +204,42 @@ public class DemoTest {
     public void ab() {
         var atomicInteger = new AtomicInteger(0);// 0 t1 可写 1 t1 正在写 2 t2 可写 3 t2 正在写
         var t1 = CompletableFuture.runAsync(() -> IntStream.range(1, 10).forEach(i -> {
-            while (!atomicInteger.compareAndSet(0, 1)) {}
+            while (!atomicInteger.compareAndSet(0, 1)) {
+            }
             log.info(i + " ");
             atomicInteger.set(2);
         }), IOExecutor.getInstance());
         var t2 = CompletableFuture.runAsync(() -> Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i").forEach(i -> {
-            while (!atomicInteger.compareAndSet(2, 3)) {}
+            while (!atomicInteger.compareAndSet(2, 3)) {
+            }
             log.info(i + " ");
             atomicInteger.set(0);
         }), IOExecutor.getInstance());
         CompletableFuture.allOf(t1, t2).join();
     }
+
+    @Test
+    public void testBuncherActorBatchesCorrectly() throws InterruptedException {
+
+        ActorSystem system = LucaConfig.ActorSystemHolder.ACTORSYSTEM;
+        final ActorRef buncher = system.actorOf(Props.create(Buncher.class));
+        final ActorRef probe = ActorRef.noSender();
+        buncher.tell(new SetTarget(probe), probe);
+        buncher.tell(new org.ld.beans.Queue(42), probe);
+        buncher.tell(new org.ld.beans.Queue(43), probe);
+        LinkedList<Object> list1 = new LinkedList<>();
+        list1.add(42);
+        list1.add(43);
+        buncher.tell(new org.ld.beans.Queue(44), probe);
+        buncher.tell(Flush.Flush, probe);
+        buncher.tell(new Queue(45), probe);
+        LinkedList<Object> list2 = new LinkedList<>();
+        list2.add(44);
+        LinkedList<Object> list3 = new LinkedList<>();
+        list3.add(45);
+        Thread.sleep(1000);
+        system.stop(buncher);
+    }
+
 
 }
