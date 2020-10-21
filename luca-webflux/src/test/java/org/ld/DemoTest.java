@@ -206,12 +206,12 @@ public class DemoTest {
         var t1 = CompletableFuture.runAsync(() -> IntStream.range(1, 10).forEach(i -> {
             while (!atomicInteger.compareAndSet(0, 1)) ;
             log.info(i + "");
-            atomicInteger.set(2);
+            atomicInteger.set(2); //至成 2 相当于给线程2 发出一个可执行信号 1 3 只允许内部修改
         }));
         var t2 = CompletableFuture.runAsync(() -> Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i").forEach(i -> {
             while (!atomicInteger.compareAndSet(2, 3)) ;
             log.info(i);
-            atomicInteger.set(0);
+            atomicInteger.set(0); // 至成 0 相当于给线程1 发出一个可执行信号 1 3 只允许内部修改
         }));
         CompletableFuture.allOf(t1, t2).join();
     }
