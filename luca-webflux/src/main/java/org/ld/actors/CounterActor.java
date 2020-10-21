@@ -26,15 +26,6 @@ public class CounterActor extends AbstractLoggingActor {
         return receiveBuilder()
                 .match(String.class, e -> {
                     counter++;
-//                    var client = HttpClient.newHttpClient();
-//                    HttpRequest request = null;
-//                    request = HttpRequest.newBuilder()
-//                            .uri(new URI("https://www.baidu.com/"))
-//                            .GET()
-//                            .build();
-//                    var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-//                    log.info(response.statusCode() + "");
-//                    log.info(response.body() + "");
                     log().info("Increased counter " + counter);
                 })
                 .matchAny(e -> log().info("接收到消息:{}", e))

@@ -204,17 +204,15 @@ public class DemoTest {
     public void ab() {
         var atomicInteger = new AtomicInteger(0);// 0 t1 可写 1 t1 正在写 2 t2 可写 3 t2 正在写
         var t1 = CompletableFuture.runAsync(() -> IntStream.range(1, 10).forEach(i -> {
-            while (!atomicInteger.compareAndSet(0, 1)) {
-            }
-            log.info(i + " ");
+            while (!atomicInteger.compareAndSet(0, 1)) ;
+            log.info(i + "");
             atomicInteger.set(2);
-        }), IOExecutor.getInstance());
+        }));
         var t2 = CompletableFuture.runAsync(() -> Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i").forEach(i -> {
-            while (!atomicInteger.compareAndSet(2, 3)) {
-            }
-            log.info(i + " ");
+            while (!atomicInteger.compareAndSet(2, 3)) ;
+            log.info(i);
             atomicInteger.set(0);
-        }), IOExecutor.getInstance());
+        }));
         CompletableFuture.allOf(t1, t2).join();
     }
 
