@@ -1,20 +1,13 @@
 package org.ld.beans;
 
 import akka.actor.ActorRef;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public final class SetTarget {
-    private final ActorRef ref;
-
-    public SetTarget(ActorRef ref) {
-        this.ref = ref;
-    }
-
-    public ActorRef getRef() {
-        return ref;
-    }
-
-    @Override
-    public String toString() {
-        return "SetTarget{" + "ref=" + ref + '}';
-    }
+    private ActorRef ref;
 }
