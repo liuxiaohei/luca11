@@ -117,7 +117,7 @@ public class DemoTest {
 
     @Test
     public void tdt1_Xdabao() throws IOException {
-        var tag = "studio-1.5.0-rc1";
+        var tag = "studio-1.5.0-rc2";
         var list = Arrays.asList("tdt", "canal-server", "canal-client");
         var digestMap = new HashMap<String, String>();
         list.forEach(s -> {
@@ -136,7 +136,7 @@ public class DemoTest {
         });
         var process = Runtime.getRuntime().exec("docker images");
         var result = convertStreamToStr(process.getInputStream());
-        var s1 = result.stream().skip(1).filter(s -> s.startsWith("172.16.1.99/postcommit/")).collect(Collectors.toList());
+        var s1 = result.stream().skip(1).filter(s -> s.startsWith("172.16.1.99/gold/")).collect(Collectors.toList());
         var imageIdMap = list.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
