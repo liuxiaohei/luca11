@@ -4,7 +4,6 @@ import akka.actor.*;
 import akka.pattern.AskableActorSelection;
 import akka.util.Timeout;
 import org.ld.config.LucaConfig;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +34,7 @@ public class AkkaUtil {
     public static ActorRef getActorRef(String beanName, String actorId) {
         final var sel = LucaConfig.ActorSystemHolder.ACTORSYSTEM.actorSelection("/user/" + actorId);
         final var fut = new AskableActorSelection(sel).ask(new Identify(1), t);
-        final var indent = (ActorIdentity) AkkaFutureAdapter.of(fut).join();
+        final var indent = (ActorIdentity) SaFutureAdapter.of(fut).join();
         return indent.getActorRef().orElseGet(() -> LucaConfig.ActorSystemHolder.ACTORSYSTEM.actorOf(createPropsByName(beanName), actorId));
     }
 

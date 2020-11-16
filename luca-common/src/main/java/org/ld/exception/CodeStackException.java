@@ -10,6 +10,11 @@ public class CodeStackException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
+    public CodeStackException(String msg) {
+        super(msg);
+        this.errorCode = new ErrorCode(SystemErrorCodeEnum.UNKNOWN);
+    }
+
     public CodeStackException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;

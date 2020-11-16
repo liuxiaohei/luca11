@@ -117,7 +117,7 @@ public class DemoTest {
 
     @Test
     public void tdt1_Xdabao() throws IOException {
-        var tag = "studio-1.5.0-rc2";
+        var tag = "studio-1.5.0-final";
         var list = Arrays.asList("tdt", "canal-server", "canal-client");
         var digestMap = new HashMap<String, String>();
         list.forEach(s -> {

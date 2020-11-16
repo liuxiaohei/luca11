@@ -8,13 +8,20 @@ import org.ld.beans.RespBean;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
+import org.ld.redis.BooleanRedisTemplate;
+import org.ld.redis.NumberRedisTemplate;
+import org.ld.redis.RedisService;
+import org.ld.redis.StringRedisTemplate;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.JwtUtils;
 import org.ld.utils.ServiceExecutor;
 import org.ld.utils.SnowflakeId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.MethodParameter;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -280,6 +287,39 @@ public class LucaConfig {
             log.error("", e);
             throw new CodeStackException(e);
         }
+    }
+
+//    @Bean
+//    @Autowired
+//    @Primary
+//    public ObjectRedisTemplate<Object> objectTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        return new ObjectRedisTemplate<Object>(redisConnectionFactory) {
+//        };
+//    }
+
+    @Bean
+    @Autowired
+    public StringRedisTemplate stringTemplate(RedisConnectionFactory redisConnectionFactory) {
+        return new StringRedisTemplate(redisConnectionFactory);
+    }
+
+    @Bean
+    @Autowired
+    public NumberRedisTemplate numberTemplate(RedisConnectionFactory redisConnectionFactory) {
+        return new NumberRedisTemplate(redisConnectionFactory);
+    }
+
+    @Bean
+    @Autowired
+    public BooleanRedisTemplate booleanTemplate(RedisConnectionFactory redisConnectionFactory) {
+        return new BooleanRedisTemplate(redisConnectionFactory);
+    }
+
+
+    @Bean
+    @Autowired
+    public RedisService redisService(RedisConnectionFactory redisConnectionFactory) {
+        return new RedisService(stringTemplate(redisConnectionFactory), numberTemplate(redisConnectionFactory));
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

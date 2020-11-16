@@ -12,25 +12,25 @@ import java.util.concurrent.CompletableFuture;
  * https://github.com/Comcast/sirius/pull/133/files
  * https://stackoverflow.com/questions/47868480/akka-java-future-oncomplete-oncomplete-is-not-called
  */
-public class AkkaFutureAdapter<T> extends CompletableFuture<T> {
+public class SaFutureAdapter<T> extends CompletableFuture<T> {
 
     /**
      * 将Scala的Fucture 转换成java8 的 CompletableFuture
      */
     public static <T> CompletableFuture<T> of(Future<T> future) {
-        return new AkkaFutureAdapter<>(future);
+        return new SaFutureAdapter<>(future);
     }
 
     public static <T> CompletableFuture<T> of(Future<T> future, ActorSystem actorSystem) {
-        return new AkkaFutureAdapter<>(future, actorSystem);
+        return new SaFutureAdapter<>(future, actorSystem);
     }
 
-    private AkkaFutureAdapter(Future<T> akkaFuture) {
+    private SaFutureAdapter(Future<T> akkaFuture) {
         this(akkaFuture, LucaConfig.ActorSystemHolder.ACTORSYSTEM);
     }
 
     @SuppressWarnings("unchecked")
-    public AkkaFutureAdapter(Future<T> akkaFuture, ActorSystem actorSystem) {
+    public SaFutureAdapter(Future<T> akkaFuture, ActorSystem actorSystem) {
         akkaFuture.onComplete(new OnComplete<>() {
                                   @Override
                                   public void onComplete(Throwable throwable, Object o) {
