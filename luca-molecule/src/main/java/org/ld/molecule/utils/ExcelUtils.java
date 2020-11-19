@@ -21,7 +21,7 @@ public class ExcelUtils {
 
     public static <T> AnalysisEventListener<T> getListener(Consumer<List<T>> consumer, int threshold) {
 
-        return new AnalysisEventListener<T>() {
+        return new AnalysisEventListener<>() {
             private final LinkedList<T> linkedList = new LinkedList<>();
 
             @Override

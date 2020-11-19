@@ -10,5 +10,4 @@ public class LucaApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LucaApplication.class, args);
 	}
-
 }
