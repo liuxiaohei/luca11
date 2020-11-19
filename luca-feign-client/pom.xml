@@ -16,11 +16,9 @@
             <artifactId>luca-base</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--feign-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <version>${spring-cloud-version}</version>
         </dependency>
     </dependencies>
     <properties>

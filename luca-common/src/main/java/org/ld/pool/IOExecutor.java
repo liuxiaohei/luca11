@@ -1,11 +1,7 @@
 package org.ld.pool;
 
-import co.paralleluniverse.fibers.Fiber;
-import co.paralleluniverse.fibers.SuspendExecution;
-import org.ld.exception.CodeStackException;
-
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 /**
  * 针对IO密集型会频繁被阻塞操作的执行器
@@ -15,28 +11,7 @@ import java.util.function.Consumer;
 public class IOExecutor {
 
     private static class ServiceExecutorHolder {
-        private static final Executor Executor = runnable ->
-                new Fiber<Void>() {
-                    @Override
-                    protected Void run() {
-                        runnable.run();
-                        return null;
-                    }
-                }.start();
-    }
-
-    public static void sleep(long millis) throws InterruptedException {
-        sleep(millis, e -> {
-            throw new CodeStackException(e);
-        });
-    }
-
-    public static void sleep(long millis, Consumer<Throwable> whenSuspend) throws InterruptedException {
-        try {
-            Fiber.sleep(millis);
-        } catch (SuspendExecution suspendExecution) {
-            whenSuspend.accept(suspendExecution);
-        }
+        private static final Executor Executor = CompletableFuture::runAsync;
     }
 
     public static Executor getInstance() {

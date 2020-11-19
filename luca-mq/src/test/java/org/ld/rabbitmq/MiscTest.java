@@ -1,8 +1,8 @@
 package org.ld.rabbitmq;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
+//import org.junit.Test;
+//import org.junit.runner.RunWith;
+//import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -14,18 +14,18 @@ import java.util.Map;
 /**
  * @author ld
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {org.ld.rabbitmq.TestServer.class})
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes = {org.ld.rabbitmq.TestServer.class})
 public class MiscTest {
 
-    @Test
+//    @Test
     public void demo() {
     }
 
     @Resource
     private MqClient mqClient;
 
-    @Test
+//    @Test
     public void sendTopicMessage() {
         String messageId = "aaa";
         String messageData = "message: M A N ";

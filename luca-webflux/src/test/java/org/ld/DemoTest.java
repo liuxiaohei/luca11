@@ -117,7 +117,7 @@ public class DemoTest {
 
     @Test
     public void tdt1_Xdabao() throws IOException {
-        var tag = "studio-1.5.0-final";
+        var tag = "studio-1.5.0-rc3";
         var list = Arrays.asList("tdt", "canal-server", "canal-client");
         var digestMap = new HashMap<String, String>();
         list.forEach(s -> {
@@ -216,9 +216,79 @@ public class DemoTest {
         CompletableFuture.allOf(t1, t2).join();
     }
 
+
+    /**
+     * 使用递归的二分查找
+     * title:recursionBinarySearch
+     *
+     * @param arr 有序数组
+     * @param key 待查找关键字
+     * @return 找到的位置
+     */
+    public static int recursionBinarySearch(int[] arr, int key, int low, int high) {
+        if (key < arr[low] || key > arr[high] || low > high) {
+            return -1;
+        }
+        int middle = (low + high) / 2;            //初始中间位置
+        if (arr[middle] > key) {
+            return recursionBinarySearch(arr, key, low, middle - 1);
+        } else if (arr[middle] < key) {
+            return recursionBinarySearch(arr, key, middle + 1, high);
+        } else {
+            return middle;
+        }
+    }
+
+    /**
+     * 不使用递归的二分查找
+     * title:commonBinarySearch
+     *
+     * @param arr
+     * @param key
+     * @return 关键字位置
+     */
+    public static int commonBinarySearch(int[] arr, int key) {
+        int low = 0;
+        int high = arr.length - 1;
+        int middle;
+        if (key < arr[low] || key > arr[high]) {
+            return -1;
+        }
+        while (low <= high) {
+            middle = (low + high) / 2;
+            if (arr[middle] > key) {
+                high = middle - 1;
+            } else if (arr[middle] < key) {
+                low = middle + 1;
+            } else {
+                return middle;
+            }
+        }
+        return -1;        //最后仍然没有找到，则返回-1
+    }
+
+    @Test
+    public void aaa() {
+        int[] arr = {1, 3, 5, 7, 9, 11};
+        int key = 5;
+        int positionx = recursionBinarySearch(arr,key,0,arr.length - 1);
+        int position = commonBinarySearch(arr, key);
+        if (positionx == -1) {
+            System.out.println("查找的是" + key + ",序列中没有该数！");
+        } else {
+            System.out.println("查找的是" + key + ",找到位置为：" + positionx);
+        }
+        if (position == -1) {
+            System.out.println("查找的是" + key + ",序列中没有该数！");
+        } else {
+            System.out.println("查找的是" + key + ",找到位置为：" + position);
+        }
+
+    }
+
+
     @Test
     public void testBuncherActorBatchesCorrectly() throws InterruptedException {
-
         ActorSystem system = LucaConfig.ActorSystemHolder.ACTORSYSTEM;
         final ActorRef buncher = system.actorOf(Props.create(Buncher.class));
         final ActorRef probe = ActorRef.noSender();

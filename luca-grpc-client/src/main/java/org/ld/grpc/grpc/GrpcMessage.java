@@ -13,6 +13,7 @@ import java.io.IOException;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 public final class GrpcMessage extends GeneratedMessageV3 {
+
     private static final long serialVersionUID = 0L;
 
     private volatile Object value;
@@ -74,7 +75,7 @@ public final class GrpcMessage extends GeneratedMessageV3 {
 
     public <T> T getObj(Class<T> clazz) {
         var json = getStringObj();
-        return JsonUtil.json2Obj(json,clazz);
+        return JsonUtil.json2Obj(json, clazz);
     }
 
     public String getStringObj() {
@@ -110,20 +111,20 @@ public final class GrpcMessage extends GeneratedMessageV3 {
 
     public void writeTo(CodedOutputStream output) throws IOException {
         if (!getMessageBytes().isEmpty()) {
-            GeneratedMessageV3.writeString(output, 1, value);
+            writeString(output, 1, value);
         }
         unknownFields.writeTo(output);
     }
 
     /**
-     * 不能删 会卡住
+     * 协议必须 不能删 否则会卡住
      */
     public int getSerializedSize() {
         var size = memoizedSize;
         if (size != -1) return size;
         size = 0;
         if (!getMessageBytes().isEmpty()) {
-            size += GeneratedMessageV3.computeStringSize(1, value);
+            size += computeStringSize(1, value);
         }
         size += unknownFields.getSerializedSize();
         memoizedSize = size;
@@ -139,22 +140,23 @@ public final class GrpcMessage extends GeneratedMessageV3 {
         };
     }
 
+    // ↓↓ 非必须的部分 但是抽象方法必须要继承
     public GrpcMessage getDefaultInstanceForType() {
         return null;
     }
 
     @Deprecated
-    public Builder newBuilderForType() {
+    public Builder<? extends Message.Builder> newBuilderForType() {
         return null;
     }
 
     @Deprecated
-    public Builder toBuilder() {
+    public Builder<? extends Message.Builder> toBuilder() {
         return null;
     }
 
     @Deprecated
-    protected Builder newBuilderForType(BuilderParent parent) {
+    protected Builder<? extends Message.Builder> newBuilderForType(BuilderParent parent) {
         return null;
     }
 
