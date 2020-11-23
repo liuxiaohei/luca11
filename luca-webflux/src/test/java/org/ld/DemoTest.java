@@ -10,7 +10,6 @@ import org.ld.beans.Flush;
 import org.ld.beans.Queue;
 import org.ld.beans.SetTarget;
 import org.ld.config.LucaConfig;
-import org.ld.pool.IOExecutor;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
@@ -203,16 +202,18 @@ public class DemoTest {
     @Test
     public void ab() {
         var atomicInteger = new AtomicInteger(0);// 0 t1 可写 1 t1 正在写 2 t2 可写 3 t2 正在写
-        var t1 = CompletableFuture.runAsync(() -> IntStream.range(1, 10).forEach(i -> {
-            while (!atomicInteger.compareAndSet(0, 1)) ;
-            log.info(i + "");
-            atomicInteger.set(2); //至成 2 相当于给线程2 发出一个可执行信号 1 3 只允许内部修改
-        }));
-        var t2 = CompletableFuture.runAsync(() -> Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i").forEach(i -> {
-            while (!atomicInteger.compareAndSet(2, 3)) ;
-            log.info(i);
-            atomicInteger.set(0); // 至成 0 相当于给线程1 发出一个可执行信号 1 3 只允许内部修改
-        }));
+        var t1 = CompletableFuture.runAsync(() -> IntStream.range(1, 10)
+                .forEach(i -> {
+                    while (!atomicInteger.compareAndSet(0, 1)) ;
+                    log.info(i + "");
+                    atomicInteger.set(2); //至成 2 相当于给线程2 发出一个可执行信号 1 3 只允许内部修改
+                }));
+        var t2 = CompletableFuture.runAsync(() -> Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i")
+                .forEach(i -> {
+                    while (!atomicInteger.compareAndSet(2, 3)) ;
+                    log.info(i);
+                    atomicInteger.set(0); // 至成 0 相当于给线程1 发出一个可执行信号 1 3 只允许内部修改
+                }));
         CompletableFuture.allOf(t1, t2).join();
     }
 
@@ -271,7 +272,7 @@ public class DemoTest {
     public void aaa() {
         int[] arr = {1, 3, 5, 7, 9, 11};
         int key = 5;
-        int positionx = recursionBinarySearch(arr,key,0,arr.length - 1);
+        int positionx = recursionBinarySearch(arr, key, 0, arr.length - 1);
         int position = commonBinarySearch(arr, key);
         if (positionx == -1) {
             System.out.println("查找的是" + key + ",序列中没有该数！");
@@ -307,6 +308,30 @@ public class DemoTest {
         list3.add(45);
         Thread.sleep(1000);
         system.stop(buncher);
+    }
+
+    int searchDisorderedArray(int[] a, int key, int begin, int end) {
+        if (begin == end && a[begin] != key)
+            return -1;
+        int mid = (begin + end) / 2;
+        if (a[mid] == key)
+            return mid;
+        if (a[mid] > a[end]) { // mid 之前是有序数组
+            if (key >= a[begin] && key <= a[mid]) // 如果key 的大小在前半段的范围 就只能从前半段查找 否则只能从后半段查找
+                return searchDisorderedArray(a, key, begin, mid - 1);
+            else
+                return searchDisorderedArray(a, key, mid + 1, end);
+        } else {               // mid 之后是有序数组
+            if (key >= a[mid] && key <= a[end])  // 如果key 的大小在前后段的范围 就只能从后半段查找 否则只能从前半段查找
+                return searchDisorderedArray(a, key, mid + 1, end);
+            else
+                return searchDisorderedArray(a, key, begin, mid - 1);
+        }
+    }
+
+    @Test
+    public void searchDisorderedArrayTest() {
+        System.out.println(searchDisorderedArray(new int[]{7, 8, 9, 1, 2, 3, 4, 5, 6},1,0,8));
     }
 
 

@@ -15,14 +15,12 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public class FunctionUtil {
 
-    public static <T, R> Function<T, R> runWithUC(UCFunction<T, R> function) {
-        return t -> {
-            try {
-                return function.apply(t);
-            } catch (Throwable throwable) {
-                throw new CodeStackException(throwable);
-            }
-        };
+    public static <T, R> R applyWithUC(UCFunction<T, R> function, T t) {
+        try {
+            return function.apply(t);
+        } catch (Throwable throwable) {
+            throw new CodeStackException(throwable);
+        }
     }
 
     public static void runWithUC(UCRunnable runnable) {
