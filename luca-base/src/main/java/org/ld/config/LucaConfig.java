@@ -60,7 +60,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.sql.DriverManager;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
@@ -151,16 +150,15 @@ public class LucaConfig {
                 requestedContentTypeResolver
         ) {
             @Override
-            public boolean supports(@NotNull HandlerResult result) {
+            public boolean supports(HandlerResult result) {
                 var isMono = result.getReturnType().resolve() == Mono.class;
                 var isAlreadyResponse = result.getReturnType().resolveGeneric(0) == ServerResponse.class;
                 return isMono && !isAlreadyResponse;
             }
 
-            @NotNull
             @Override
             @SuppressWarnings("unchecked")
-            public Mono<Void> handleResult(@NotNull ServerWebExchange exchange, @NotNull HandlerResult result) {
+            public Mono<Void> handleResult(ServerWebExchange exchange, HandlerResult result) {
                 Objects.requireNonNull(result.getReturnValue(), "response is null!");
                 var body = ((Mono<Object>) result.getReturnValue())
                         .map(o -> {
@@ -192,13 +190,12 @@ public class LucaConfig {
     AbstractMessageReaderArgumentResolver requestBodyHandler() {
         return new AbstractMessageReaderArgumentResolver(serverCodecConfigurer.getReaders()) {
             @Override
-            public boolean supportsParameter(@NotNull MethodParameter methodParameter) {
+            public boolean supportsParameter(MethodParameter methodParameter) {
                 return true;
             }
 
-            @NotNull
             @Override
-            public Mono<Object> resolveArgument(@NotNull MethodParameter param, @NotNull BindingContext bindingContext, @NotNull ServerWebExchange exchange) {
+            public Mono<Object> resolveArgument(MethodParameter param, BindingContext bindingContext, ServerWebExchange exchange) {
                 var ann = param.getParameterAnnotation(RequestBody.class);
                 final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
                 log.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));

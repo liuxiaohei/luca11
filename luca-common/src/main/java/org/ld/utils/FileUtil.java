@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -56,12 +55,12 @@ public class FileUtil {
                     }
 
                     @Override
-                    public int read(@NotNull byte[] b) throws IOException {
+                    public int read(byte[] b) throws IOException {
                         return in.read(b);
                     }
 
                     @Override
-                    public int read(@NotNull byte[] b, int off, int len) throws IOException {
+                    public int read(byte[] b, int off, int len) throws IOException {
                         return in.read(b, off, len);
                     }
 

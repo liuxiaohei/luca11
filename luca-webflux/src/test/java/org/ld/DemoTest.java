@@ -331,7 +331,7 @@ public class DemoTest {
 
     @Test
     public void searchDisorderedArrayTest() {
-        System.out.println(searchDisorderedArray(new int[]{7, 8, 9, 1, 2, 3, 4, 5, 6},1,0,8));
+        System.out.println(searchDisorderedArray(new int[]{4,5,6,7,1,2,3},1,0,6));
     }
 
 
