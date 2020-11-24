@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <properties resource="db.properties"/>
+    <!--数据库驱动包路径 -->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <plugin type="com.luca.mybatis.generator.plugins.AddMapperAnnotationPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.BatchInsertPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.AddCriteriaActionsPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.AnyCriteriaPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.CommonTablePropertiesPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.ExampleMethodsChainPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.JoinPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.MinMaxPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.NullableInCriteriaPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.OptimisticLockAutoIncreasePlugin"/>
+<!--        <plugin type="com.luca.mybatis.generator.plugins.SelectiveWithNullPlugin"/>-->
+        <plugin type="com.luca.mybatis.generator.plugins.ServicePlugin">
+            <property name="targetProject" value="src/main/java"/>
+            <property name="targetPackage" value="org.ld.service"/>
+        </plugin>
+        <plugin type="com.luca.mybatis.generator.plugins.ControllerPlugin">
+            <property name="targetProject" value="src/main/java"/>
+            <property name="targetPackage" value="org.ld.controller"/>
+        </plugin>
+        <plugin type="com.luca.mybatis.generator.plugins.SimpleOrCriteriaPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.SumSelectivePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.UpdateSqlTextOfUpdateSelectivePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.WhereSqlTextPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.OverIsMergeablePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.SelectOneByExamplePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.LimitPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.ExampleEnhancedPlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.ExampleTargetPlugin">
+            <property name="targetPackage" value="org.ld.pojo.example"/>
+        </plugin>
+        <plugin type="com.luca.mybatis.generator.plugins.UpsertPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="com.luca.mybatis.generator.plugins.CommentPlugin">
+            <property name="suppressTypeWarnings" value="true"/>
+            <property name="suppressAllComments" value="false"/>
+            <property name="suppressDate" value="true"/>
+        </plugin>
+        <plugin type="com.luca.mybatis.generator.plugins.LombokPlugin">
+            <property name="hasLombok" value="true"/>
+        </plugin>
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <jdbcConnection driverClass="${db.driver}"
+                        connectionURL="${db.url}"
+                        userId="${db.username}"
+                        password="${db.password}"/>
+        <!-- false：JDBC DECIMAL、NUMERIC類型解析為Integer，默認方式 -->
+        <!-- true：JDBC DECIMAL、NUMERIC類型解析為java.math.BigDecimal -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+        <!--生成的model 包路径 -->
+        <javaModelGenerator targetPackage="org.ld.pojo" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <javaClientGenerator type="XMLMAPPER" targetPackage="org.ld.mapper" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <table tableName="flyway_schema_history"
+               domainObjectName="flywaySchemaHistory"
+               enableUpdateByPrimaryKey="true"
+               enableDeleteByPrimaryKey="true"
+               enableInsert="true"
+               enableSelectByPrimaryKey="true"
+               selectByPrimaryKeyQueryId="true"
+               enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <!-- ibatis id 在返回值里   mybatis id 在对象中获取-->
+            <generatedKey column="id" sqlStatement="JDBC"/>
+            <!-- 忽略时间字段 -->
+            <!-- <ignoreColumn column="modify_time"/>-->
+        </table>
+    </context>
+</generatorConfiguration>
