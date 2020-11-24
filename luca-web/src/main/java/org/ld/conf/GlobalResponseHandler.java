@@ -41,7 +41,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                 || o instanceof FileSystemResource // 不包装文件流
                 || path.contains("swagger")        // 不包装swagger相关的接口
                 || path.equals("/error")
-                || path.equals("/v2/api-docs")
+                || path.equals("/v3/api-docs")
         ) {
             return o; // 防止多余的封装 防止swagger 也被封装 影响swagger界面显示
         }

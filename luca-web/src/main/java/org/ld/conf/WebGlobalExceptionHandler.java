@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * 异常处理策略
  */
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class WebGlobalExceptionHandler {
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
