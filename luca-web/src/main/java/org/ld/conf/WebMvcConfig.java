@@ -15,6 +15,8 @@ import java.util.List;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    // todo jwt https://www.cnblogs.com/jichuang/p/12205918.html
+
     @Value("${localdate.date-format:yyyy-MM-dd HH:mm:ss}")
     private String pattern; // 全局配置 LocalDateTime 的转换方式
 
