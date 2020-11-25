@@ -33,8 +33,6 @@ public class JwtUtils {
 
     /**
      * 校验token是否正确
-     *
-     * @param token 令牌
      */
     public static void verify(String token) {
         try {
