@@ -2,7 +2,6 @@ package org.ld.utils;
 
 import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
-import org.ld.config.LucaConfig;
 import scala.concurrent.Future;
 
 import java.util.concurrent.CompletableFuture;
@@ -26,7 +25,7 @@ public class SaFutureAdapter<T> extends CompletableFuture<T> {
     }
 
     private SaFutureAdapter(Future<T> akkaFuture) {
-        this(akkaFuture, LucaConfig.ActorSystemHolder.ACTORSYSTEM);
+        this(akkaFuture, ActorSystemHolder.ACTORSYSTEM);
     }
 
     @SuppressWarnings("unchecked")

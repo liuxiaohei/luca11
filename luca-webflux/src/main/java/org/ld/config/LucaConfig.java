@@ -5,6 +5,8 @@ import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.Flyway;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
+import org.ld.config.AroundController;
+import org.ld.config.DataSourceConfig;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
@@ -12,14 +14,10 @@ import org.ld.redis.BooleanRedisTemplate;
 import org.ld.redis.NumberRedisTemplate;
 import org.ld.redis.RedisService;
 import org.ld.redis.StringRedisTemplate;
-import org.ld.utils.JsonUtil;
-import org.ld.utils.JwtUtils;
-import org.ld.utils.ServiceExecutor;
-import org.ld.utils.SnowflakeId;
+import org.ld.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpHeaders;
@@ -33,15 +31,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.BindingContext;
-import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
-import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -61,7 +56,10 @@ import springfox.documentation.spring.web.plugins.Docket;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.sql.DriverManager;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 /**
@@ -320,10 +318,6 @@ public class LucaConfig {
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public static class ActorSystemHolder {
-        public static final ActorSystem ACTORSYSTEM = ActorSystem.create("lucaSystem");
-    }
 
     public static class MethodParameterHolder {
 

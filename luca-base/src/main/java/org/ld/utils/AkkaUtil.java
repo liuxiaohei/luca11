@@ -3,7 +3,6 @@ package org.ld.utils;
 import akka.actor.*;
 import akka.pattern.AskableActorSelection;
 import akka.util.Timeout;
-import org.ld.config.LucaConfig;
 
 import java.util.concurrent.TimeUnit;
 
@@ -32,10 +31,10 @@ public class AkkaUtil {
      * actorSystem.terminate();这个方法终止 actor
      */
     public static ActorRef getActorRef(String beanName, String actorId) {
-        final var sel = LucaConfig.ActorSystemHolder.ACTORSYSTEM.actorSelection("/user/" + actorId);
+        final var sel = ActorSystemHolder.ACTORSYSTEM.actorSelection("/user/" + actorId);
         final var fut = new AskableActorSelection(sel).ask(new Identify(1), t);
         final var indent = (ActorIdentity) SaFutureAdapter.of(fut).join();
-        return indent.getActorRef().orElseGet(() -> LucaConfig.ActorSystemHolder.ACTORSYSTEM.actorOf(createPropsByName(beanName), actorId));
+        return indent.getActorRef().orElseGet(() -> ActorSystemHolder.ACTORSYSTEM.actorOf(createPropsByName(beanName), actorId));
     }
 
     /**
@@ -43,6 +42,6 @@ public class AkkaUtil {
      */
     public static void stopActorRef(String beanName, String actorId) {
         var actorRef = getActorRef(beanName,actorId);
-        LucaConfig.ActorSystemHolder.ACTORSYSTEM.stop(actorRef);
+        ActorSystemHolder.ACTORSYSTEM.stop(actorRef);
     }
 }

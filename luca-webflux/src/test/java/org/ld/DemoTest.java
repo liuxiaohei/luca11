@@ -9,7 +9,7 @@ import org.ld.actors.Buncher;
 import org.ld.beans.Flush;
 import org.ld.beans.Queue;
 import org.ld.beans.SetTarget;
-import org.ld.config.LucaConfig;
+import org.ld.utils.ActorSystemHolder;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SnowflakeId;
 import org.ld.utils.ZLogger;
@@ -290,7 +290,7 @@ public class DemoTest {
 
     @Test
     public void testBuncherActorBatchesCorrectly() throws InterruptedException {
-        ActorSystem system = LucaConfig.ActorSystemHolder.ACTORSYSTEM;
+        ActorSystem system = ActorSystemHolder.ACTORSYSTEM;
         final ActorRef buncher = system.actorOf(Props.create(Buncher.class));
         final ActorRef probe = ActorRef.noSender();
         buncher.tell(new SetTarget(probe), probe);
