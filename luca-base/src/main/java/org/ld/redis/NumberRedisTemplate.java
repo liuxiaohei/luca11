@@ -1,13 +1,16 @@
 package org.ld.redis;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.DefaultStringRedisConnection;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.stereotype.Component;
 
 /**
  */
+@Component
 public class NumberRedisTemplate extends BaseRedisTemplate<String, Number> {
 
     private NumberRedisTemplate() {
@@ -24,6 +27,7 @@ public class NumberRedisTemplate extends BaseRedisTemplate<String, Number> {
      *
      * @param connectionFactory connection factory for creating new connections
      */
+    @Autowired
     public NumberRedisTemplate(RedisConnectionFactory connectionFactory) {
         this();
         setConnectionFactory(connectionFactory);
