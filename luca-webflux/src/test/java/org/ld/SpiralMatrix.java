@@ -16,16 +16,19 @@ public class SpiralMatrix {
         int colBegin = 0;
         int colEnd = n - 1;
         while (num <= total) {
-            for (int y = colBegin; y <= colEnd && num <= total; y++)
+            for (int y = colBegin; y <= colEnd; y++)
                 res[rowBegin][y] = num++;
+            if (num > total) break;
             rowBegin++;
-            for (int x = rowBegin; x <= rowEnd && num <= total; x++)
+            for (int x = rowBegin; x <= rowEnd; x++)
                 res[x][colEnd] = num++;
+            if (num > total) break;
             colEnd--;
-            for (int y = colEnd; y >= colBegin && num <= total; y--)
+            for (int y = colEnd; y >= colBegin; y--)
                 res[rowEnd][y] = num++;
+            if (num > total) break;
             rowEnd--;
-            for (int x = rowEnd; x >= rowBegin && num <= total; x--)
+            for (int x = rowEnd; x >= rowBegin; x--)
                 res[x][colBegin] = num++;
             colBegin++;
         }
