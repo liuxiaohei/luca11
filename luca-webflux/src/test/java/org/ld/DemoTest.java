@@ -116,7 +116,7 @@ public class DemoTest {
 
     @Test
     public void tdt1_Xdabao() throws IOException {
-        var tag = "studio-1.5.0-rc3";
+        var tag = "studio-1.5.0-rc4";
         var list = Arrays.asList("tdt", "canal-server", "canal-client");
         var digestMap = new HashMap<String, String>();
         list.forEach(s -> {
@@ -331,8 +331,23 @@ public class DemoTest {
 
     @Test
     public void searchDisorderedArrayTest() {
-        System.out.println(searchDisorderedArray(new int[]{4,5,6,7,1,2,3},1,0,6));
+        System.out.println(searchDisorderedArray(new int[]{4, 5, 6, 7, 1, 2, 3}, 1, 0, 6));
     }
 
 
+    Function<Integer, Integer> adder() {
+        final AtomicInteger sum = new AtomicInteger(0);
+        return (Integer value) -> {
+            sum.addAndGet(value);
+            return sum.get();
+        };
+    }
+
+    @Test
+    public void demo111() {
+        Function<Integer, Integer> function = adder();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(function.apply(i));
+        }
+    }
 }

@@ -1,0 +1,26 @@
+# mybatis xml 地址
+mybatis:
+  mapperLocations: classpath:/mapper/*.xml
+spring:
+  profiles:
+    active: jdbc
+  application:
+    name: config-jdbc-server
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/config_jdbc?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&serverTimezone=GMT%2B8
+    username: root
+    password: 12345678
+    driver-class-name: com.mysql.jdbc.Driver
+  cloud:
+    config:
+      label: master
+      server:
+        jdbc: true
+server:
+  port: 8769
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+spring.cloud.config.server.jdbc.sql: SELECT key1, value1 from config_properties where APPLICATION=? and PROFILE=? and LABEL=?

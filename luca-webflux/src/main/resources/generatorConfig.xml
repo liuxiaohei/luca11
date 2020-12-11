@@ -69,8 +69,8 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="flyway_schema_history"
-               domainObjectName="flywaySchemaHistory"
+        <table tableName="config_properties"
+               domainObjectName="ConfigProperties"
                enableUpdateByPrimaryKey="true"
                enableDeleteByPrimaryKey="true"
                enableInsert="true"
