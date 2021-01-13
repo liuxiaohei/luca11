@@ -39,11 +39,6 @@ public class LucaClassLoader extends URLClassLoader {
         return super.loadClass(name, resolve);
     }
 
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        return Optional.ofNullable(super.findClass(name)).orElseThrow(() -> new ClassNotFoundException(name));
-    }
-
     private static URL[] getURLs(String[] paths) {
         var dirs = new ArrayList<String>();
         Stream.of(paths).peek(dirs::add).forEach(path -> collectDirs(path, dirs));

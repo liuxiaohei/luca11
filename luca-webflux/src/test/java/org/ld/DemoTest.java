@@ -63,7 +63,7 @@ public class DemoTest {
 
     @Test
     public void dabao() throws IOException {
-        var tag = "studio-2.0.0-final";
+        var tag = "studio-2.1.0-rc0";
         var list = Arrays.asList("tdt", "syncher-server", "syncher-client");
         var digestMap = new HashMap<String, String>();
         list.forEach(s -> {
@@ -116,7 +116,7 @@ public class DemoTest {
 
     @Test
     public void tdt1_Xdabao() throws IOException {
-        var tag = "studio-1.5.0-rc4";
+        var tag = "studio-1.5.0-rc5";
         var list = Arrays.asList("tdt", "canal-server", "canal-client");
         var digestMap = new HashMap<String, String>();
         list.forEach(s -> {

@@ -30,25 +30,14 @@ import java.util.concurrent.TimeUnit;
 @Order(0)
 public class SynchronizationAspect {
 
-    ThreadLocal<Boolean> syncThreads = new ThreadLocal<>();
-
     @Autowired
     private NumberRedisTemplate numberRedisTemplate;
 
     @Around("@annotation(sync)")
     public Object cutPoint(ProceedingJoinPoint point, Synchronized sync) throws Throwable {
-        Boolean hasSync = syncThreads.get();
-        if (hasSync == null || !hasSync) {
-            hasSync = true;
-        } else {
-            return point.proceed();
-        }
-        try {
-            syncThreads.set(hasSync);
+
             return executePoint(point, sync);
-        } finally {
-            syncThreads.remove();
-        }
+
     }
 
     private Object executePoint(ProceedingJoinPoint point, Synchronized sync) throws Throwable {
