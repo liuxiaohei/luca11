@@ -10,7 +10,6 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 /**
- * ld
  * 可中断执行之后触发回调函数
  * 可监测执行期间的状态 当执行期间启动报错会自动触发回调函数
  * 自动配置MDC 对于使用者来说释放的过程透明
@@ -55,7 +54,7 @@ public class LucaExecutor implements Executor {
 
     @SuppressWarnings("unused")
     public synchronized void addAfterCancel(Runnable afterCancel) {
-        this.afterCancels.add(0,afterCancel);
+        this.afterCancels.add(0, afterCancel);
     }
 
     public synchronized void cancel() {
@@ -63,14 +62,14 @@ public class LucaExecutor implements Executor {
             return;
         }
         canceled = true;
-        CompletableFuture.runAsync(() -> {
+        CancelServiceExecutorHolder.Executor.submit(() -> {
             if (null != current) {
                 current.handle((e, t) -> {
                     if (t instanceof InterruptedException) {
                         if (runner != null)
                             runner.interrupt();
                     }
-                    afterCancels.forEach(Runnable::run);
+                    afterCancels.parallelStream().forEach(Runnable::run);
                     return null;
                 });
                 try {
@@ -84,7 +83,7 @@ public class LucaExecutor implements Executor {
                     MDC.remove(mdcKey);
                 }
             }
-        }, CancelServiceExecutorHolder.Executor);
+        });
     }
 
     public LucaExecutor(ExecutorService pool,
