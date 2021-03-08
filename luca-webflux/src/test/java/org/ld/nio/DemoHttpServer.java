@@ -1,5 +1,15 @@
 package org.ld.nio;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.*;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.ld.utils.StringUtil;
 
@@ -13,6 +23,10 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * https://www.jianshu.com/p/ed0177a9b2e3
+ */
+@Slf4j
 public class DemoHttpServer {
 
     /**
@@ -44,7 +58,7 @@ public class DemoHttpServer {
                                     // 将字节转化为为UTF-8的字符串
                                     var receivedString = StandardCharsets.UTF_8.newDecoder().decode(buffer).toString();
                                     // 控制台打印出来
-                                    System.out.println(System.currentTimeMillis() + " 接收到来自服务器" + sc.socket().getRemoteSocketAddress() + "的信息:" + receivedString);
+                                    log.info(System.currentTimeMillis() + " 接收到来自服务器" + sc.socket().getRemoteSocketAddress() + "的信息:" + receivedString);
                                     // 为下一次读取作准备
                                     selectionKey.interestOps(SelectionKey.OP_READ);
                                 }
@@ -116,7 +130,7 @@ public class DemoHttpServer {
                             try (socketChannel) {
                                 var socket = socketChannel.socket();
                                 var remoteAddr = socket.getRemoteSocketAddress();
-                                System.out.println("Connection closed by client: " + remoteAddr);
+                                log.info("Connection closed by client: " + remoteAddr);
                             }
                             selectedKey.cancel();
                             return;
@@ -134,7 +148,7 @@ public class DemoHttpServer {
 
     private void request(SocketChannel socketChannel, String req) throws IOException {
         if (StringUtil.isNotEmpty(req))
-            System.out.println(System.currentTimeMillis() + " 接收到客户端的请求 " + req);
+            log.info(System.currentTimeMillis() + " 接收到客户端的请求 " + req);
         var buffer = ByteBuffer.allocate(50);
         if ("/user/get".equals(req)) {
             buffer.put("xhm".getBytes());
@@ -146,4 +160,59 @@ public class DemoHttpServer {
             socketChannel.write(buffer);
         }
     }
+
+    //netty
+    // https://www.jianshu.com/p/fd815bd437cd
+    @Test
+    public void nettyServer() throws Exception {
+        ServerBootstrap b = new ServerBootstrap();
+        NioEventLoopGroup group = new NioEventLoopGroup();
+        b.group(group)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<io.netty.channel.socket.SocketChannel>() {
+                    @Override
+                    public void initChannel(io.netty.channel.socket.SocketChannel ch) {
+                        log.info("initChannel ch:" + ch);
+                        ch.pipeline()
+                                .addLast("decoder", new HttpRequestDecoder())   // 1 将字节流转换为实体对象Message
+                                .addLast("encoder", new HttpResponseEncoder())  // 2 ​ Encoder最重要的实现类是MessageToByteEncoder<T>，这个类的作用就是将消息实体T从对象转换成byte，写入到ByteBuf，然后再丢给剩下的ChannelOutboundHandler传给客户端，流程图如下：
+                                .addLast("aggregator", new HttpObjectAggregator(512 * 1024))    // 3
+                                .addLast("handler", new SimpleChannelInboundHandler<FullHttpRequest>() {
+                                    @Override
+                                    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
+                                        log.info("class:" + msg.getClass().getName());
+                                        DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                                                HttpResponseStatus.OK,
+                                                Unpooled.wrappedBuffer("test".getBytes())); // 2
+                                        HttpHeaders heads = response.headers();
+                                        heads.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN + "; charset=UTF-8");
+                                        heads.add(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes()); // 3
+                                        heads.add(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+                                        ctx.write(response);
+                                    }
+
+                                    @Override
+                                    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+                                        log.info("channelReadComplete");
+                                        super.channelReadComplete(ctx);
+                                        ctx.flush(); // 4
+                                    }
+
+                                    @Override
+                                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                                        log.info("exceptionCaught");
+                                        if (null != cause) cause.printStackTrace();
+                                        if (null != ctx) ctx.close();
+                                    }
+                                });
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
+                .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
+
+        b.bind(9999).sync();
+        Thread.sleep(100000);
+    }
+
+
 }

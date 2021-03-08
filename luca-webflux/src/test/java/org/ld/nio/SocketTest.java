@@ -1,12 +1,18 @@
 package org.ld.nio;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.ld.exception.CodeStackException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,14 +23,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
+/**
+ * https://www.jianshu.com/p/b9f3f6a16911
+ */
+@Slf4j
 public class SocketTest {
 
-    /**
-     * Bio Test
-     */
-    @Test
-    public void BSocket() throws IOException, InterruptedException {
-        var port = 8987;
+    // 客户端 发送请求 并打印结果
+    public void clientRequest(int port) {
         new Thread(() -> {
             try {
                 Thread.sleep(2000);
@@ -32,18 +38,43 @@ public class SocketTest {
                 var in = socket.getInputStream();
                 var b = new byte[1024];
                 int len;
-                while ((len = in.read(b)) != -1) { // 阻塞2
-                    System.out.println(new String(b, 0, len));
+                while ((len = in.read(b)) != -1) {
+                    log.info(new String(b, 0, len));
                 }
+//                第二种NIO请求方式
+//                var channel = SocketChannel.open(new InetSocketAddress("localhost", port));
+//                var buffer = ByteBuffer.allocate(1024);
+//                channel.read(buffer);
+//                buffer.flip();
+//                log.info(new String(buffer.array(), 0, buffer.limit()));
+
+//                第三种 AIO请求方式
+//                var socket = new Socket("localhost", 8887);
+//                var reader = new BufferedReader(new InputStreamReader(System.in));
+//                var line = reader.readLine();
+//                socket.getOutputStream().write(line.getBytes());
+//                var resp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//                log.info(" 接收到的响应 " + resp.readLine());
+
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new CodeStackException(e);
             }
         }).start();
+    }
+
+    /**
+     * Bio Test
+     */
+    @Test
+    public void BSocket() throws IOException, InterruptedException {
+        var port = 8987;
+        clientRequest(port);
+        // 服务端 返回请求
         final var socket = new ServerSocket(port);
-        try (final var clientSocket = socket.accept()) { // 阻塞1
-            OutputStream out = clientSocket.getOutputStream();
-            System.out.println("Accepted connection from " + clientSocket);
-            out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));
+        try (final var clientSocket = socket.accept()) {  // 监测到事件 阻塞1
+            var out = clientSocket.getOutputStream();
+            log.info("Accepted connection from " + clientSocket);
+            out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));// 数据传输  阻塞2
             out.flush();
         } catch (IOException e) {
             throw new CodeStackException(e);
@@ -55,20 +86,10 @@ public class SocketTest {
      * NioTest
      */
     @Test
-    public void NSocket() throws IOException, InterruptedException {
+    public void NSocket() throws IOException {
         var port = 8988;
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-                var channel = SocketChannel.open(new InetSocketAddress("localhost", port));
-                var buffer = ByteBuffer.allocate(1024);
-                channel.read(buffer);
-                buffer.flip();
-                System.out.println(new String(buffer.array(), 0, buffer.limit()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        clientRequest(port);
+        // 服务端 返回请求
         var serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
         var ss = serverChannel.socket();
@@ -77,48 +98,45 @@ public class SocketTest {
         var selector = Selector.open();
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
         final var msg = ByteBuffer.wrap("Hi!\r\n".getBytes());
-        new Thread(() -> {
-            while (true) {
+        while (true) {
+            try {
+                selector.select();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                break;
+            }
+            var readyKeys = selector.selectedKeys();
+            var iterator = readyKeys.iterator();
+            while (iterator.hasNext()) {
+                SelectionKey key = iterator.next();
+                iterator.remove();
                 try {
-                    selector.select();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    break;
-                }
-                var readyKeys = selector.selectedKeys();
-                var iterator = readyKeys.iterator();
-                while (iterator.hasNext()) {
-                    SelectionKey key = iterator.next();
-                    iterator.remove();
-                    try {
-                        if (key.isAcceptable()) {
-                            var server = (ServerSocketChannel) key.channel();
-                            var client = server.accept();
-                            client.configureBlocking(false); // 触发内核启动非阻塞
-                            client.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ, msg.duplicate());    //7
-                            System.out.println("Accepted connection from " + client);
-                        }
-                        if (key.isWritable()) {
-                            try (var client = (SocketChannel) key.channel()) {
-                                var buffer = (ByteBuffer) key.attachment();
-                                while (buffer.hasRemaining()) {
-                                    if (client.write(buffer) == 0) {
-                                        break;
-                                    }
+                    if (key.isAcceptable()) {
+                        var server = (ServerSocketChannel) key.channel();
+                        var client = server.accept();
+                        client.configureBlocking(false); // 触发内核启动非阻塞
+                        client.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ, msg.duplicate());    //7
+                        log.info("Accepted connection from " + client);
+                    }
+                    if (key.isWritable()) {
+                        try (var client = (SocketChannel) key.channel()) {
+                            var buffer = (ByteBuffer) key.attachment();
+                            while (buffer.hasRemaining()) {
+                                if (client.write(buffer) == 0) {
+                                    break;
                                 }
                             }
                         }
-                    } catch (IOException ex) {
-                        key.cancel();
-                        try {
-                            key.channel().close();
-                        } catch (IOException ignored) {
-                        }
+                    }
+                } catch (IOException ex) {
+                    key.cancel();
+                    try {
+                        key.channel().close();
+                    } catch (IOException ignored) {
                     }
                 }
             }
-        }).start();
-        Thread.sleep(4000);
+        }
     }
 
     /**
@@ -126,21 +144,7 @@ public class SocketTest {
      */
     @Test
     public void ASocket() throws IOException {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                var socket = new Socket("localhost", 8887);
-                var reader = new BufferedReader(new InputStreamReader(System.in));
-                var line = reader.readLine();
-                socket.getOutputStream().write(line.getBytes());
-                var resp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                System.out.println(" 接收到的响应 " + resp.readLine());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.exit(1);
-        }).start();
-
+        clientRequest(8887);
         //ChannelGroup用来管理共享资源
         var group = AsynchronousChannelGroup.withCachedThreadPool(Executors.newCachedThreadPool(), 10);
         var server = AsynchronousServerSocketChannel.open(group);
@@ -149,22 +153,21 @@ public class SocketTest {
         server.setOption(StandardSocketOptions.SO_RCVBUF, 16 * 1024);
         //绑定到指定的主机，端口
         server.bind(new InetSocketAddress("localhost", 8887));
-        System.out.println("Listening on " + "localhost" + ":" + 8887);
+        log.info("Listening on " + "localhost" + ":" + 8887);
         //输出provider
-        System.out.println("Channel Provider : " + server.provider());
+        log.info("Channel Provider : " + server.provider());
         //等待连接，并注册CompletionHandler处理内核完成后的操作。
         server.accept(null, new CompletionHandler<>() {
             final ByteBuffer buffer = ByteBuffer.allocate(1024);
-
             @Override
             public void completed(AsynchronousSocketChannel result, Object attachment) {
-                System.out.println("已连接请输入....");
+                log.info("已连接请输入....");
                 buffer.clear();
                 try {
                     //把socket中的数据读取到buffer中
                     result.read(buffer).get();
                     buffer.flip();
-                    System.out.println("接收到的请求 " + new String(buffer.array()).trim() + " \nfrom " + result);
+                    log.info("接收到的请求 " + new String(buffer.array()).trim() + " \nfrom " + result);
                     buffer.compact();
                     buffer.put(" 已接收到你的信息\n".getBytes());
                     //把收到的直接返回给客户端
@@ -181,7 +184,6 @@ public class SocketTest {
                     }
                 }
             }
-
             @Override
             public void failed(Throwable exc, Object attachment) {
                 System.out.print("Server failed...." + exc.getCause());
@@ -191,6 +193,41 @@ public class SocketTest {
             Thread.sleep(Integer.MAX_VALUE);//因为AIO不会阻塞调用进程，因此必须在主进程阻塞，才能保持进程存活。
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Bio Test
+     */
+    @Test
+    public void NettySocket() throws InterruptedException {
+        var port = 8987;
+        clientRequest(port);
+        // 服务端 返回请求
+        final var buf = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("Hi!\r\n", StandardCharsets.UTF_8));
+        var group = new NioEventLoopGroup();
+        try {
+            var b = new ServerBootstrap();                                                         //1
+            b.group(group)                                                                         //2
+                    .channel(NioServerSocketChannel.class)
+                    .localAddress(new InetSocketAddress(port))
+                    .childHandler(new ChannelInitializer<io.netty.channel.socket.SocketChannel>() {//3
+                        @Override
+                        public void initChannel(io.netty.channel.socket.SocketChannel ch) {
+                            ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {             //4
+                                @Override
+                                public void channelActive(ChannelHandlerContext ctx) {
+                                    ctx.writeAndFlush(buf.duplicate()).addListener(ChannelFutureListener.CLOSE);//5
+                                }
+                            });
+                        }
+                    });
+            b.bind().sync()
+                    .channel()
+                    .closeFuture()
+                    .sync();//6
+        } finally {
+            group.shutdownGracefully().sync();        //7
         }
     }
 
