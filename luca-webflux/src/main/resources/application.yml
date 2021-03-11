@@ -2,10 +2,26 @@
 server:
   port: 9999
   address: 0.0.0.0
-# mybatis xml 地址
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 200
 mybatis:
+  configuration:
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+#    打印SQL语句
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    自动驼峰
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 30
+  # mybatis xml 地址
   mapperLocations: classpath:/mapper/*.xml
 spring:
+  # 允许bean 覆盖
+  main:
+    allow-bean-definition-overriding: true
   mvc:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
   application:
@@ -44,6 +60,17 @@ spring:
 ribbon:
   ReadTimeout: 60000
   ConnectTimeout: 60000
+  SocketTimeout: 2000
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  MaxAutoRetries: 1
+  MaxAutoRetriesNextServer: 3
+  OkToRetryOnAllOperations: true
+  ServerListRefreshInterval: 10000
+  eureka:
+    enabled: true
 eureka:
   instance:
     lease-expiration-duration-in-seconds: 10
@@ -69,3 +96,15 @@ eureka:
 #    url: r2dbc:jdbc:mysql://127.0.0.1:3306/luca?useSSL=false
 #    username: root
 #    password: 12345678
+
+# config 服务健康验证
+health:
+  config:
+    enabled: false
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 200000

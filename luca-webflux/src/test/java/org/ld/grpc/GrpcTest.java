@@ -8,11 +8,16 @@ import org.ld.beans.GrpcServer;
 import org.ld.grpc.grpc.LucaGrpcClient;
 import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.grpc.server.GrpcServerProperties;
+import org.ld.mapper.CursorMapper;
+import org.ld.mapper.JobMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 @Import(GrpcServer.class)
 @RunWith(SpringRunner.class)
@@ -23,8 +28,19 @@ public class GrpcTest {
     @Resource
     private GrpcServerProperties grpcProperties;
 
+    @Resource
+    private CursorMapper cursorMapper;
+
     @Test
-    public void test() throws InterruptedException {
+    @Transactional
+    public void test1() throws IOException {
+        try (var c = cursorMapper.scan(1)) {
+            c.forEach(e -> log.info("测试流式查询" + e.toString()));
+        }
+    }
+
+    @Test
+    public void test() {
         LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
                 ScheduleJob.builder()
                         .beanName("grpcServer")

@@ -30,4 +30,5 @@ public interface JobMapper {
     int updateByPrimaryKeySelective(ScheduleJob record);
 
     int updateByPrimaryKey(ScheduleJob record);
+
 }

@@ -11,15 +11,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.ld.exception.CodeStackException;
+import org.ld.utils.SleepUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
@@ -30,23 +31,23 @@ import java.util.concurrent.Executors;
 public class SocketTest {
 
     // 客户端 发送请求 并打印结果
-    public void clientRequest(int port) {
+    public static void clientRequest(int port) {
         new Thread(() -> {
             try {
                 Thread.sleep(2000);
-                var socket = new Socket("localhost", port);
-                var in = socket.getInputStream();
-                var b = new byte[1024];
-                int len;
-                while ((len = in.read(b)) != -1) {
-                    log.info(new String(b, 0, len));
-                }
+//                var socket = new Socket("localhost", port);
+//                var in = socket.getInputStream();
+//                var b = new byte[1024];
+//                int len;
+//                while ((len = in.read(b)) != -1) {
+//                    log.info(new String(b, 0, len));
+//                }
 //                第二种NIO请求方式
-//                var channel = SocketChannel.open(new InetSocketAddress("localhost", port));
-//                var buffer = ByteBuffer.allocate(1024);
-//                channel.read(buffer);
-//                buffer.flip();
-//                log.info(new String(buffer.array(), 0, buffer.limit()));
+                var channel = SocketChannel.open(new InetSocketAddress("localhost", port));
+                var buffer = ByteBuffer.allocate(1024);
+                channel.read(buffer);
+                buffer.flip();
+                log.info(new String(buffer.array(), 0, buffer.limit()));
 
 //                第三种 AIO请求方式
 //                var socket = new Socket("localhost", 8887);
@@ -159,6 +160,7 @@ public class SocketTest {
         //等待连接，并注册CompletionHandler处理内核完成后的操作。
         server.accept(null, new CompletionHandler<>() {
             final ByteBuffer buffer = ByteBuffer.allocate(1024);
+
             @Override
             public void completed(AsynchronousSocketChannel result, Object attachment) {
                 log.info("已连接请输入....");
@@ -184,6 +186,7 @@ public class SocketTest {
                     }
                 }
             }
+
             @Override
             public void failed(Throwable exc, Object attachment) {
                 System.out.print("Server failed...." + exc.getCause());
@@ -197,38 +200,44 @@ public class SocketTest {
     }
 
     /**
-     * Bio Test
+     * Netty Test
      */
     @Test
-    public void NettySocket() throws InterruptedException {
+    public  void netty() throws InterruptedException {
         var port = 8987;
         clientRequest(port);
         // 服务端 返回请求
-        final var buf = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("Hi!\r\n", StandardCharsets.UTF_8));
         var group = new NioEventLoopGroup();
-        try {
-            var b = new ServerBootstrap();                                                         //1
-            b.group(group)                                                                         //2
-                    .channel(NioServerSocketChannel.class)
-                    .localAddress(new InetSocketAddress(port))
-                    .childHandler(new ChannelInitializer<io.netty.channel.socket.SocketChannel>() {//3
-                        @Override
-                        public void initChannel(io.netty.channel.socket.SocketChannel ch) {
-                            ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {             //4
-                                @Override
-                                public void channelActive(ChannelHandlerContext ctx) {
-                                    ctx.writeAndFlush(buf.duplicate()).addListener(ChannelFutureListener.CLOSE);//5
-                                }
-                            });
-                        }
-                    });
-            b.bind().sync()
-                    .channel()
-                    .closeFuture()
-                    .sync();//6
-        } finally {
-            group.shutdownGracefully().sync();        //7
-        }
+        var c = new ServerBootstrap()
+                .group(group)                                                                         //2
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<io.netty.channel.socket.SocketChannel>() {       //3
+                    @Override
+                    public void initChannel(io.netty.channel.socket.SocketChannel ch) {
+                        ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {                    //4
+                            @Override
+                            public void channelActive(ChannelHandlerContext ctx) {
+                                final var buf = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("Hi!\r\n", StandardCharsets.UTF_8));
+                                ctx.writeAndFlush(buf.duplicate()).addListener(ChannelFutureListener.CLOSE);//5
+                            }
+                        });
+                    }
+                })
+                .bind(port)
+                .channel();
+
+        CompletableFuture.runAsync(() -> {
+            SleepUtil.sleep(3000);
+            c.close();
+        }); // 模拟链路关闭
+
+        c.closeFuture() // 这个函数会阻塞住主线程 等待channel 关闭
+                .sync()
+                .addListener((ChannelFutureListener) future -> {
+                    group.shutdownGracefully();        //7
+                    log.info(future.channel().toString() + " 链路关闭");
+                })
+                .sync();//6
     }
 
 }
