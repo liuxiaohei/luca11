@@ -8,7 +8,9 @@ server:
       max: 200
 mybatis:
   configuration:
+#    开启延迟加载
     lazy-loading-enabled: true
+#    关闭积极加载
     aggressive-lazy-loading: false
 #    打印SQL语句
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
