@@ -9,10 +9,7 @@ import org.ld.actors.Buncher;
 import org.ld.beans.Flush;
 import org.ld.beans.Queue;
 import org.ld.beans.SetTarget;
-import org.ld.utils.ActorSystemHolder;
-import org.ld.utils.JsonUtil;
-import org.ld.utils.SnowflakeId;
-import org.ld.utils.ZLogger;
+import org.ld.utils.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +23,11 @@ import java.util.stream.Stream;
 
 @Slf4j
 public class DemoTest {
+
+    @Test
+    public void  main() {
+        log.info(HttpClient.get("http://www.baidu.com",null, StringUtil::stream2String));
+    }
 
     /**
      * 无限流

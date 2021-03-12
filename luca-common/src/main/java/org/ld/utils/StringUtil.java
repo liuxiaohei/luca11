@@ -1,6 +1,13 @@
 package org.ld.utils;
 
-import java.util.*;
+import org.ld.exception.CodeStackException;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @SuppressWarnings("all")
@@ -70,6 +77,24 @@ public class StringUtil {
         return Optional.ofNullable(str)
                 .filter(e -> e.contains(delimiter))
                 .map(e -> e.substring(e.lastIndexOf(".") + 1)).orElseGet(other);
+    }
+
+    // 遍历Stream之后会自动关闭
+    public static String stream2String(InputStream is) {
+        try (var i = is) {
+            if (null == is) {
+                return null;
+            }
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            StringBuilder stringBuilder = new StringBuilder();
+            String str;
+            while ((str = br.readLine()) != null) {
+                stringBuilder.append(str);
+            }
+            return stringBuilder.toString();
+        } catch (Exception e) {
+            throw new CodeStackException(e);
+        }
     }
 
 }
