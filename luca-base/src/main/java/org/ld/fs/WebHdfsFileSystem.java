@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-//@SuppressWarnings("unused")
+@SuppressWarnings("unused")
 public class WebHdfsFileSystem {
 
     private static final Integer DEFAULT_FILE_BUFFER_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
@@ -118,19 +118,19 @@ public class WebHdfsFileSystem {
     }
 
     public boolean delete(String path, boolean recursive) {
-        return runWithHttp(path, HttpFSOperation.DELETE, Map.of("recursive", String.valueOf(recursive)), m -> getBooleanResponse(m));
+        return runWithHttp(path, HttpFSOperation.DELETE, Map.of("recursive", String.valueOf(recursive)), this::getBooleanResponse);
     }
 
     public boolean mkdirs(String path) {
-        return runWithHttp(path, HttpFSOperation.MKDIRS, new HashMap<>(), m -> getBooleanResponse(m));
+        return runWithHttp(path, HttpFSOperation.MKDIRS, new HashMap<>(), this::getBooleanResponse);
     }
 
     public boolean rename(String src, String dst) {
-        return runWithHttp(src, HttpFSOperation.RENAME, Map.of("destination", URLEncoder.encode(dst, StandardCharsets.UTF_8)), m -> getBooleanResponse(m));
+        return runWithHttp(src, HttpFSOperation.RENAME, Map.of("destination", URLEncoder.encode(dst, StandardCharsets.UTF_8)), this::getBooleanResponse);
     }
 
     public boolean truncate(String path, long newLength) {
-        return runWithHttp(path, HttpFSOperation.TRUNCATE, Map.of("newlength", String.valueOf(newLength)), m -> getBooleanResponse(m));
+        return runWithHttp(path, HttpFSOperation.TRUNCATE, Map.of("newlength", String.valueOf(newLength)), this::getBooleanResponse);
     }
 
     public void setPermission(final String p, final String permission) {
