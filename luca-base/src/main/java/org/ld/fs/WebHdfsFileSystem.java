@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -45,18 +46,17 @@ public class WebHdfsFileSystem {
         this.version = "v1";
     }
 
-    public FSDataOutputStream create(String path) throws IOException {
+    public OutputStream create(String path) throws IOException {
         return runWithHttp(path, Map.of("data", "TRUE", "overwrite", String.valueOf(true), "buffersize", String.valueOf(DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.CREATE);
     }
 
-    public FSDataOutputStream append(String path) throws IOException {
+    public OutputStream append(String path) throws IOException {
         return runWithHttp(path, Map.of("data", "TRUE","buffersize", String.valueOf(DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.APPEND);
     }
 
     public InputStream open(final String f) throws IOException {
         final String openUrl = getUrl(f, Map.of("offset", String.valueOf(0L),"buffersize", "" + (WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.OPEN.name());
-        return new FSDataInputStream(
-                new ByteRangeInputStream(
+        return new ByteRangeInputStream(
                         new ByteRangeInputStream.URLOpener(null) {
                             @Override
                             protected HttpURLConnection connect(long offset, boolean resolved)
@@ -106,7 +106,7 @@ public class WebHdfsFileSystem {
                         final String urlStr = url.toString();
                         return new URL(urlStr.substring(0, urlStr.indexOf('?')) + query);
                     }
-                });
+                };
     }
 
     public boolean exists(String path) {
@@ -118,19 +118,19 @@ public class WebHdfsFileSystem {
     }
 
     public boolean delete(String path, boolean recursive) {
-        return runWithHttp(path, HttpFSOperation.DELETE, Map.of("recursive", String.valueOf(recursive)), m -> getBooleanResponse(path + "DELETE", m));
+        return runWithHttp(path, HttpFSOperation.DELETE, Map.of("recursive", String.valueOf(recursive)), m -> getBooleanResponse(m));
     }
 
     public boolean mkdirs(String path) {
-        return runWithHttp(path, HttpFSOperation.MKDIRS, new HashMap<>(), m -> getBooleanResponse("MKDIRS", m));
+        return runWithHttp(path, HttpFSOperation.MKDIRS, new HashMap<>(), m -> getBooleanResponse(m));
     }
 
     public boolean rename(String src, String dst) {
-        return runWithHttp(src, HttpFSOperation.RENAME, Map.of("destination", URLEncoder.encode(dst, StandardCharsets.UTF_8)), m -> getBooleanResponse(src + "RENAME", m));
+        return runWithHttp(src, HttpFSOperation.RENAME, Map.of("destination", URLEncoder.encode(dst, StandardCharsets.UTF_8)), m -> getBooleanResponse(m));
     }
 
     public boolean truncate(String path, long newLength) {
-        return runWithHttp(path, HttpFSOperation.TRUNCATE, Map.of("newlength", String.valueOf(newLength)), m -> getBooleanResponse(path + "TRUNCATE", m));
+        return runWithHttp(path, HttpFSOperation.TRUNCATE, Map.of("newlength", String.valueOf(newLength)), m -> getBooleanResponse(m));
     }
 
     public void setPermission(final String p, final String permission) {
@@ -217,7 +217,7 @@ public class WebHdfsFileSystem {
     /**
      * 返回OutPutStream OutPutStream关闭 连接资源才会关闭
      */
-    private FSDataOutputStream runWithHttp(String path, Map<String, String> params, HttpFSOperation op) throws IOException {
+    private OutputStream runWithHttp(String path, Map<String, String> params, HttpFSOperation op) throws IOException {
         final String url = getUrl(path, params, op.name());
         HttpURLConnection conn = HttpClient.getStreamUrlConnection(url);
         conn.setRequestMethod(op.getRestType());
@@ -232,7 +232,7 @@ public class WebHdfsFileSystem {
             conn.setChunkedStreamingMode(32 << 10); //32kB-chunk
         }
         HttpURLConnection conn1 = conn;
-        return new FSDataOutputStream(new BufferedOutputStream(conn1.getOutputStream(), DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)) {
+        return new BufferedOutputStream(conn1.getOutputStream(), DEFAULT_FILE_BUFFER_SIZE_IN_BYTES) {
             @Override
             public void close() throws IOException {
                 try {
@@ -259,7 +259,7 @@ public class WebHdfsFileSystem {
         return "http://" + getUri().getHost() + ":" + getUri().getPort() + "/webhdfs/" + version + toSafePath(path, "/") + params1.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&", "?", ""));
     }
 
-    private Boolean getBooleanResponse(String op, InputStream is) {
+    private Boolean getBooleanResponse(InputStream is) {
         try {
             return objectMapper.convertValue(objectMapper.readTree(StringUtil.stream2String(is)).findValue("boolean"), Boolean.class);
         } catch (Exception e) {
