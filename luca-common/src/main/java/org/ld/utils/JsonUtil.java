@@ -3,17 +3,15 @@ package org.ld.utils;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.node.NullNode;
+import lombok.extern.slf4j.Slf4j;
 import org.ld.exception.CodeStackException;
-import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -25,6 +23,7 @@ import java.util.stream.Stream;
 /**
  * json工具
  */
+@Slf4j
 public class JsonUtil {
 
     public static <T> List<T> json2List(String json, Class<T> cls) {
@@ -49,7 +48,7 @@ public class JsonUtil {
             BeanUtils.copyProperties(t, t1);
             return t1;
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            log.error(e.getMessage());
             return json2Obj(obj2Json(t), clazz);
         }
     }
@@ -71,8 +70,6 @@ public class JsonUtil {
             throw new CodeStackException(e);
         }
     }
-
-    private static final Logger LOG = ZLogger.newInstance();
 
     /**
      * json字符串转对象
@@ -96,15 +93,20 @@ public class JsonUtil {
             var objectMapper = new ObjectMapper().addHandler(handler);
             var t = objectMapper.readValue(json, cls);
             if (!unknownProperties.isEmpty()) {
-                LOG.warn("unknown properties: " + obj2PrettyJson(unknownProperties));
+                log.warn("unknown properties: " + obj2PrettyJson(unknownProperties));
             }
             return t;
         } catch (JsonProcessingException e) {
             var id = getShortUuid();
-            LOG.error(id + " json转换异常:" + json);
-            LOG.error(id + " className" + cls.getName());
+            log.error(id + " json转换异常:" + json);
+            log.error(id + " className" + cls.getName());
             throw new CodeStackException(e);
         }
+    }
+
+    public static Map<String,Object> stream2Map(InputStream is) throws IOException {
+        var reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
+        return reader.readValue(is);
     }
 
     public static Map<String, String> json2StringMap(String json) {

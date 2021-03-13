@@ -5,14 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.ContentSummary;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.web.ByteRangeInputStream;
 import org.apache.hadoop.hdfs.web.resources.OffsetParam;
 import org.apache.hadoop.util.StringUtils;
-import org.codehaus.jackson.map.ObjectReader;
 import org.ld.exception.CodeStackException;
 import org.ld.uc.UCFunction;
 import org.ld.utils.HttpClient;
+import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.springframework.http.MediaType;
 
@@ -142,8 +144,7 @@ public class WebHdfsFileSystem {
     }
 
     public Map<String,Object> getFileChecksum(final String p) {
-        ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
-        return runWithHttp(p, HttpFSOperation.GETFILECHECKSUM, new HashMap<>(), reader::readValue);
+        return runWithHttp(p, HttpFSOperation.GETFILECHECKSUM, new HashMap<>(), JsonUtil::stream2Map);
     }
 
     /**
@@ -151,8 +152,7 @@ public class WebHdfsFileSystem {
      * Return the {@link ContentSummary} of a given {@link Path}.
      */
     public Map<String,Object> getContentSummary(String path) {
-        ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
-        return runWithHttp(path, HttpFSOperation.GETCONTENTSUMMARY, new HashMap<>(), reader::readValue);
+        return runWithHttp(path, HttpFSOperation.GETCONTENTSUMMARY, new HashMap<>(), JsonUtil::stream2Map);
     }
 
     public boolean createNewFile(String f) throws IOException {
@@ -169,13 +169,12 @@ public class WebHdfsFileSystem {
     }
 
     public Map<String, Object> getFileStatus(String path) {
-        ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
-        return runWithHttp(path, HttpFSOperation.GETFILESTATUS, new HashMap<>(), reader::readValue);
+        return runWithHttp(path, HttpFSOperation.GETFILESTATUS, new HashMap<>(), JsonUtil::stream2Map);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Map<String,Object>> listStatus(String path) {
-        ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
-        Map<?, ?> json = runWithHttp(path, HttpFSOperation.LISTSTATUS, new HashMap<>(), reader::readValue);
+        Map<?, ?> json = runWithHttp(path, HttpFSOperation.LISTSTATUS, new HashMap<>(), JsonUtil::stream2Map);
         final Map<?, ?> rootmap = (Map<?, ?>) json.get(FileStatus.class.getSimpleName() + "es");
         final List<?> array = Optional.of(FileStatus.class.getSimpleName())
                 .map(rootmap::get)
