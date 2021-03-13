@@ -9,9 +9,12 @@ import org.ld.actors.Buncher;
 import org.ld.beans.Flush;
 import org.ld.beans.Queue;
 import org.ld.beans.SetTarget;
+import org.ld.fs.WebHdfsFileSystem;
 import org.ld.utils.*;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +26,13 @@ import java.util.stream.Stream;
 
 @Slf4j
 public class DemoTest {
+
+    @Test
+    public void hdfs() throws URISyntaxException {
+        var fs = new WebHdfsFileSystem(Map.of("guardian_access_token","KDIL6n5mDhilwcfpcqCX-TDH"), new URI("http://node540:50070"));
+        var a = fs.listStatus("/tmp");
+        Arrays.stream(a).forEach(e -> System.out.println(e.toString()));
+    }
 
     @Test
     public void  main() {
