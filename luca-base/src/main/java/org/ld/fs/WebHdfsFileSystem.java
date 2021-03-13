@@ -237,8 +237,8 @@ public class WebHdfsFileSystem {
         HttpURLConnection conn = HttpClient.getStreamUrlConnection(url);
         conn.setRequestMethod(op.getRestType());
         conn.setInstanceFollowRedirects(false);
-        conn.setChunkedStreamingMode(32 << 10); //32kB-chunk
-        if (conn.getResponseCode() == 307) {
+        conn.setChunkedStreamingMode(32 << 10); // 32kB-chunk
+        if (conn.getResponseCode() == 307) {    // 跨VPN情况
             String location = conn.getHeaderField("location");
             conn.disconnect();
             conn = HttpClient.getStreamUrlConnection(location);
@@ -284,9 +284,7 @@ public class WebHdfsFileSystem {
     }
 
     private static class LocalFileSystemHolder {
-
         static LocalFileSystem localFileSystem;
-
         static {
             try {
                 localFileSystem = new LocalFileSystem(FileSystem.getLocal(new Configuration()));
