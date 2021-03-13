@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
-import org.apache.hadoop.fs.ContentSummary;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.web.ByteRangeInputStream;
 import org.apache.hadoop.hdfs.web.resources.OffsetParam;
@@ -18,10 +20,7 @@ import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.springframework.http.MediaType;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -31,84 +30,81 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * http://hadoop.apache.org/docs/r1.0.4/webhdfs.html
+ */
 @Slf4j
 @SuppressWarnings("unused")
+@AllArgsConstructor
 public class WebHdfsFileSystem {
 
     private static final Integer DEFAULT_FILE_BUFFER_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
-    private final  Map<String,String> selfParams;
-    private final String version;
+    private static final String version = "v1";
+    private final Map<String, String> selfParams;
     @Getter
     private final URI uri;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public WebHdfsFileSystem(Map<String,String> selfParams, URI uri) {
-        this.selfParams = selfParams;
-        this.uri = uri;
-        this.version = "v1";
-    }
 
     public OutputStream create(String path) throws IOException {
         return runWithHttp(path, Map.of("data", "TRUE", "overwrite", String.valueOf(true), "buffersize", String.valueOf(DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.CREATE);
     }
 
     public OutputStream append(String path) throws IOException {
-        return runWithHttp(path, Map.of("data", "TRUE","buffersize", String.valueOf(DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.APPEND);
+        return runWithHttp(path, Map.of("data", "TRUE", "buffersize", String.valueOf(DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.APPEND);
     }
 
     public InputStream open(final String f) throws IOException {
-        final String openUrl = getUrl(f, Map.of("offset", String.valueOf(0L),"buffersize", "" + (WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.OPEN.name());
+        final String openUrl = getUrl(f, Map.of("offset", String.valueOf(0L), "buffersize", "" + (WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.OPEN.name());
         return new ByteRangeInputStream(
-                        new ByteRangeInputStream.URLOpener(null) {
-                            @Override
-                            protected HttpURLConnection connect(long offset, boolean resolved)
-                                    throws IOException {
-                                assert offset == 0;
-                                HttpURLConnection conn = HttpClient.getStreamUrlConnection(openUrl);
-                                conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-                                setURL(conn.getURL());
-                                return conn;
-                            }
-                        },
-                        new ByteRangeInputStream.URLOpener(null) {
-                            @Override
-                            protected HttpURLConnection connect(final long offset, final boolean resolved) throws IOException {
-                                final URL offsetUrl = offset == 0L ? new URL(openUrl) : new URL(openUrl + "&" + new OffsetParam(offset));
-                                HttpURLConnection conn = HttpClient.getStreamUrlConnection(offsetUrl.toString());
-                                conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-                                setURL(conn.getURL());
-                                return conn;
-                            }
-                        }) {
-                    private static final String OFFSET_PARAM_PREFIX = OffsetParam.NAME + "=";
-
+                new ByteRangeInputStream.URLOpener(null) {
                     @Override
-                    protected URL getResolvedUrl(HttpURLConnection connection) throws IOException {
-                        URL url = connection.getURL();
-                        String query = url.getQuery();
-                        if (query == null) {
-                            return url;
-                        }
-                        final String lower = StringUtils.toLowerCase(query);
-                        if (!lower.startsWith(OFFSET_PARAM_PREFIX) && !lower.contains("&" + OFFSET_PARAM_PREFIX)) {
-                            return url;
-                        }
-                        StringBuilder b = null;
-                        for (final StringTokenizer st = new StringTokenizer(query, "&"); st.hasMoreTokens(); ) {
-                            final String token = st.nextToken();
-                            if (!StringUtils.toLowerCase(token).startsWith(OFFSET_PARAM_PREFIX)) {
-                                if (b == null) {
-                                    b = new StringBuilder("?").append(token);
-                                } else {
-                                    b.append('&').append(token);
-                                }
-                            }
-                        }
-                        query = b == null ? "" : b.toString();
-                        final String urlStr = url.toString();
-                        return new URL(urlStr.substring(0, urlStr.indexOf('?')) + query);
+                    protected HttpURLConnection connect(long offset, boolean resolved)
+                            throws IOException {
+                        assert offset == 0;
+                        HttpURLConnection conn = HttpClient.getStreamUrlConnection(openUrl);
+                        conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+                        setURL(conn.getURL());
+                        return conn;
                     }
-                };
+                },
+                new ByteRangeInputStream.URLOpener(null) {
+                    @Override
+                    protected HttpURLConnection connect(final long offset, final boolean resolved) throws IOException {
+                        final URL offsetUrl = offset == 0L ? new URL(openUrl) : new URL(openUrl + "&" + new OffsetParam(offset));
+                        HttpURLConnection conn = HttpClient.getStreamUrlConnection(offsetUrl.toString());
+                        conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+                        setURL(conn.getURL());
+                        return conn;
+                    }
+                }) {
+            private static final String OFFSET_PARAM_PREFIX = OffsetParam.NAME + "=";
+
+            @Override
+            protected URL getResolvedUrl(HttpURLConnection connection) throws IOException {
+                URL url = connection.getURL();
+                String query = url.getQuery();
+                if (query == null) {
+                    return url;
+                }
+                final String lower = StringUtils.toLowerCase(query);
+                if (!lower.startsWith(OFFSET_PARAM_PREFIX) && !lower.contains("&" + OFFSET_PARAM_PREFIX)) {
+                    return url;
+                }
+                StringBuilder b = null;
+                for (final StringTokenizer st = new StringTokenizer(query, "&"); st.hasMoreTokens(); ) {
+                    final String token = st.nextToken();
+                    if (!StringUtils.toLowerCase(token).startsWith(OFFSET_PARAM_PREFIX)) {
+                        if (b == null) {
+                            b = new StringBuilder("?").append(token);
+                        } else {
+                            b.append('&').append(token);
+                        }
+                    }
+                }
+                query = b == null ? "" : b.toString();
+                final String urlStr = url.toString();
+                return new URL(urlStr.substring(0, urlStr.indexOf('?')) + query);
+            }
+        };
     }
 
     public boolean exists(String path) {
@@ -140,18 +136,17 @@ public class WebHdfsFileSystem {
     }
 
     public void setOwner(final String p, final String owner, final String group) {
-        runWithHttp(p, HttpFSOperation.SETOWNER, Map.of("owner", owner,"group", group), e -> null);
+        runWithHttp(p, HttpFSOperation.SETOWNER, Map.of("owner", owner, "group", group), e -> null);
     }
 
-    public Map<String,Object> getFileChecksum(final String p) {
+    public Map<String, Object> getFileChecksum(final String p) {
         return runWithHttp(p, HttpFSOperation.GETFILECHECKSUM, new HashMap<>(), JsonUtil::stream2Map);
     }
 
     /**
      * http://cn.voidcc.com/question/p-dxrzacex-xw.html 可用这个方法获取文件夹的大小
-     * Return the {@link ContentSummary} of a given {@link Path}.
      */
-    public Map<String,Object> getContentSummary(String path) {
+    public Map<String, Object> getContentSummary(String path) {
         return runWithHttp(path, HttpFSOperation.GETCONTENTSUMMARY, new HashMap<>(), JsonUtil::stream2Map);
     }
 
@@ -173,7 +168,7 @@ public class WebHdfsFileSystem {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Map<String,Object>> listStatus(String path) {
+    public List<Map<String, Object>> listStatus(String path) {
         Map<?, ?> json = runWithHttp(path, HttpFSOperation.LISTSTATUS, new HashMap<>(), JsonUtil::stream2Map);
         final Map<?, ?> rootmap = (Map<?, ?>) json.get(FileStatus.class.getSimpleName() + "es");
         final List<?> array = Optional.of(FileStatus.class.getSimpleName())
@@ -182,6 +177,27 @@ public class WebHdfsFileSystem {
                 .map(list -> (List<?>) list)
                 .orElseGet(ArrayList::new);
         return (List<Map<String, Object>>) array;
+    }
+
+    public void copyFromLocalFile(boolean delSrc, String src, String target) throws IOException {
+        File file = new File(src);
+        if (!file.exists()) {
+            throw new CodeStackException(String.format("File %s does not exist.", src));
+        }
+        if (!file.isFile()) {
+            throw new CodeStackException(String.format("%s isn't a file.", src));
+        }
+        try (InputStream stream = new FileInputStream(src); OutputStream outputStream = create(target)) {
+            byte[] buffer = new byte[DEFAULT_FILE_BUFFER_SIZE_IN_BYTES];
+            int len = stream.read(buffer);
+            while (len != -1) {
+                outputStream.write(buffer, 0, len);
+                len = stream.read(buffer);
+            }
+        }
+        if (delSrc) {
+            LocalFileSystemHolder.localFileSystem.delete(new Path(src),true);
+        }
     }
 
     /**
@@ -260,9 +276,23 @@ public class WebHdfsFileSystem {
 
     private Boolean getBooleanResponse(InputStream is) {
         try {
+            final ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.convertValue(objectMapper.readTree(StringUtil.stream2String(is)).findValue("boolean"), Boolean.class);
         } catch (Exception e) {
             throw new CodeStackException(e);
+        }
+    }
+
+    private static class LocalFileSystemHolder {
+
+        static LocalFileSystem localFileSystem;
+
+        static {
+            try {
+                localFileSystem = new LocalFileSystem(FileSystem.getLocal(new Configuration()));
+            } catch (IOException e) {
+                throw new CodeStackException(e);
+            }
         }
     }
 
