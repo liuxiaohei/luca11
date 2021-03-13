@@ -1,6 +1,5 @@
 package org.ld.fs;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,11 +17,15 @@ import org.codehaus.jackson.map.ObjectReader;
 import org.ld.exception.CodeStackException;
 import org.ld.uc.UCFunction;
 import org.ld.utils.HttpClient;
+import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.springframework.http.MediaType;
 
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -144,6 +147,22 @@ public class WebHdfsFileSystem {
     public MD5MD5CRC32FileChecksum getFileChecksum(final String p) {
         ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
         return runWithHttp(p, HttpFSOperation.GETFILECHECKSUM, new HashMap<>(), is -> toMD5MD5CRC32FileChecksum(reader.readValue(is)));
+    }
+
+    /**
+     * http://cn.voidcc.com/question/p-dxrzacex-xw.html 可用这个方法获取文件夹的大小
+     * Return the {@link ContentSummary} of a given {@link Path}.
+     */
+    public ContentSummary getContentSummary(String path) {
+        ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
+        Map<?, ?> json = runWithHttp(path, HttpFSOperation.GETCONTENTSUMMARY, new HashMap<>(), reader::readValue);
+        return toContentSummary(json);
+    }
+
+    //todo 不能这样直接转化
+    static ContentSummary toContentSummary(Map<?, ?> json) {
+        String j = JsonUtil.obj2Json(json);
+        return JsonUtil.json2Obj(j,ContentSummary.class);
     }
 
     static MD5MD5CRC32FileChecksum toMD5MD5CRC32FileChecksum(Map<?, ?> json) throws IOException {
@@ -322,11 +341,7 @@ public class WebHdfsFileSystem {
 
     private Boolean getBooleanResponse(String op, InputStream is) {
         try {
-            String s = StringUtil.stream2String(is);
-            JsonNode tree = objectMapper.readTree(s);
-            Boolean result = objectMapper.convertValue(tree.findValue("boolean"), Boolean.class);
-            log.info(op + (result ? "成功" : "失败"));
-            return result;
+            return objectMapper.convertValue(objectMapper.readTree(StringUtil.stream2String(is)).findValue("boolean"), Boolean.class);
         } catch (Exception e) {
             throw new CodeStackException(e);
         }
