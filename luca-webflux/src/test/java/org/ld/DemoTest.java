@@ -31,7 +31,7 @@ public class DemoTest {
     public void hdfs() throws URISyntaxException {
         var fs = new WebHdfsFileSystem(Map.of("guardian_access_token","KDIL6n5mDhilwcfpcqCX-TDH"), new URI("http://node540:50070"));
         var a = fs.listStatus("/tmp");
-        Arrays.stream(a).forEach(e -> System.out.println(e.toString()));
+        a.forEach(e -> System.out.println(JsonUtil.obj2Json(e)));
     }
 
     @Test

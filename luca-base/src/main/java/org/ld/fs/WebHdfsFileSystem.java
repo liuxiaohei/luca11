@@ -6,10 +6,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import org.apache.hadoop.fs.*;
-import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.DFSUtilClient;
-import org.apache.hadoop.hdfs.protocol.FsPermissionExtension;
-import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
 import org.apache.hadoop.hdfs.web.ByteRangeInputStream;
 import org.apache.hadoop.hdfs.web.resources.OffsetParam;
 import org.apache.hadoop.util.StringUtils;
@@ -17,11 +13,12 @@ import org.codehaus.jackson.map.ObjectReader;
 import org.ld.exception.CodeStackException;
 import org.ld.uc.UCFunction;
 import org.ld.utils.HttpClient;
-import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.springframework.http.MediaType;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -32,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-@SuppressWarnings("unused")
+//@SuppressWarnings("unused")
 public class WebHdfsFileSystem {
 
     private static final Integer DEFAULT_FILE_BUFFER_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
@@ -56,7 +53,7 @@ public class WebHdfsFileSystem {
         return runWithHttp(path, Map.of("data", "TRUE","buffersize", String.valueOf(DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.APPEND);
     }
 
-    public FSDataInputStream open(final String f) throws IOException {
+    public InputStream open(final String f) throws IOException {
         final String openUrl = getUrl(f, Map.of("offset", String.valueOf(0L),"buffersize", "" + (WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) WebHdfsFileSystem.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.OPEN.name());
         return new FSDataInputStream(
                 new ByteRangeInputStream(
@@ -136,62 +133,26 @@ public class WebHdfsFileSystem {
         return runWithHttp(path, HttpFSOperation.TRUNCATE, Map.of("newlength", String.valueOf(newLength)), m -> getBooleanResponse(path + "TRUNCATE", m));
     }
 
-    public void setPermission(final String p, final FsPermission permission) {
-        runWithHttp(p, HttpFSOperation.SETPERMISSION, Map.of("permission", "777"), e -> null);
+    public void setPermission(final String p, final String permission) {
+        runWithHttp(p, HttpFSOperation.SETPERMISSION, Map.of("permission", permission), e -> null);
     }
 
     public void setOwner(final String p, final String owner, final String group) {
         runWithHttp(p, HttpFSOperation.SETOWNER, Map.of("owner", owner,"group", group), e -> null);
     }
 
-    public MD5MD5CRC32FileChecksum getFileChecksum(final String p) {
+    public Map<String,Object> getFileChecksum(final String p) {
         ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
-        return runWithHttp(p, HttpFSOperation.GETFILECHECKSUM, new HashMap<>(), is -> toMD5MD5CRC32FileChecksum(reader.readValue(is)));
+        return runWithHttp(p, HttpFSOperation.GETFILECHECKSUM, new HashMap<>(), reader::readValue);
     }
 
     /**
      * http://cn.voidcc.com/question/p-dxrzacex-xw.html 可用这个方法获取文件夹的大小
      * Return the {@link ContentSummary} of a given {@link Path}.
      */
-    public ContentSummary getContentSummary(String path) {
+    public Map<String,Object> getContentSummary(String path) {
         ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
-        Map<?, ?> json = runWithHttp(path, HttpFSOperation.GETCONTENTSUMMARY, new HashMap<>(), reader::readValue);
-        return toContentSummary(json);
-    }
-
-    //todo 不能这样直接转化
-    static ContentSummary toContentSummary(Map<?, ?> json) {
-        String j = JsonUtil.obj2Json(json);
-        return JsonUtil.json2Obj(j,ContentSummary.class);
-    }
-
-    static MD5MD5CRC32FileChecksum toMD5MD5CRC32FileChecksum(Map<?, ?> json) throws IOException {
-        if (json == null) {
-            return null;
-        } else {
-            final var m = (Map<?,?>) json.get(FileChecksum.class.getSimpleName());
-            final var algorithm = (String) m.get("algorithm");
-            final var length = ((Number) m.get("length")).intValue();
-            final MD5MD5CRC32FileChecksum checksum;
-            switch (MD5MD5CRC32FileChecksum.getCrcTypeFromAlgorithmName(algorithm)) {
-                case CRC32:
-                    checksum = new MD5MD5CRC32GzipFileChecksum();
-                    break;
-                case CRC32C:
-                    checksum = new MD5MD5CRC32CastagnoliFileChecksum();
-                    break;
-                default:
-                    throw new CodeStackException("Unknown algorithm: " + algorithm);
-            }
-            checksum.readFields(new DataInputStream(new ByteArrayInputStream(StringUtils.hexStringToByte((String) m.get("bytes")))));
-            if (!checksum.getAlgorithmName().equals(algorithm)) {
-                throw new CodeStackException("Algorithm not matched. Expected " + algorithm + ", Received " + checksum.getAlgorithmName());
-            } else if (length != checksum.getLength()) {
-                throw new CodeStackException("Length not matched: length=" + length + ", checksum.getLength()=" + checksum.getLength());
-            } else {
-                return checksum;
-            }
-        }
+        return runWithHttp(path, HttpFSOperation.GETCONTENTSUMMARY, new HashMap<>(), reader::readValue);
     }
 
     public boolean createNewFile(String f) throws IOException {
@@ -207,43 +168,12 @@ public class WebHdfsFileSystem {
         runWithHttp(trg, HttpFSOperation.CONCAT, Map.of("sources", String.join(",", srcs)), e -> null);
     }
 
-    public FileStatus getFileStatus(String path) {
+    public Map<String, Object> getFileStatus(String path) {
         ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
-        Map<?, ?> json = runWithHttp(path, HttpFSOperation.GETFILESTATUS, new HashMap<>(), reader::readValue);
-        return makeMyQualified(toFileStatus(json, true), path);
+        return runWithHttp(path, HttpFSOperation.GETFILESTATUS, new HashMap<>(), reader::readValue);
     }
 
-    private static HdfsFileStatus toFileStatus(Map<?, ?> json, boolean includesType) {
-        if (json == null) {
-            return null;
-        } else {
-            Map<?, ?> m = includesType ? (Map<?,?>) json.get(FileStatus.class.getSimpleName()) : json;
-            return new HdfsFileStatus(
-                    ((Number) m.get("length")).longValue(),
-                    m.get("type").equals("DIRECTORY"),
-                    ((Number) m.get("replication")).shortValue(),
-                    ((Number) m.get("blockSize")).longValue(),
-                    ((Number) m.get("modificationTime")).longValue(),
-                    ((Number) m.get("accessTime")).longValue(),
-                    toFsPermission((String) m.get("permission"), (Boolean) m.get("aclBit"), (Boolean) m.get("encBit")),
-                    (String) m.get("owner"),
-                    (String) m.get("group"),
-                    !m.get("type").equals("SYMLINK") ? null : DFSUtilClient.string2Bytes((String) m.get("symlink")),
-                    DFSUtilClient.string2Bytes((String) m.get("pathSuffix")),
-                    m.containsKey("fileId") ? ((Number) m.get("fileId")).longValue() : 0L,
-                    m.get("childrenNum") == null ? -1 : ((Number)m.get("childrenNum")).intValue(),
-                    null,
-                    m.containsKey("storagePolicy") ? (byte) ((int) ((Number) m.get("storagePolicy")).longValue()) : 0);
-        }
-    }
-    private static FsPermission toFsPermission(String s, Boolean aclBit, Boolean encBit) {
-        FsPermission perm = new FsPermission(Short.parseShort(s, 8));
-        boolean aBit = aclBit != null ? aclBit : false;
-        boolean eBit = encBit != null ? encBit : false;
-        return !aBit && !eBit ? perm : new FsPermissionExtension(perm, aBit, eBit);
-    }
-
-    public FileStatus[] listStatus(String path) {
+    public List<Map<String,Object>> listStatus(String path) {
         ObjectReader reader = new org.codehaus.jackson.map.ObjectMapper().reader(Map.class);
         Map<?, ?> json = runWithHttp(path, HttpFSOperation.LISTSTATUS, new HashMap<>(), reader::readValue);
         final Map<?, ?> rootmap = (Map<?, ?>) json.get(FileStatus.class.getSimpleName() + "es");
@@ -252,17 +182,7 @@ public class WebHdfsFileSystem {
                 .filter(list -> list instanceof List<?>)
                 .map(list -> (List<?>) list)
                 .orElseGet(ArrayList::new);
-        final FileStatus[] statuses = new FileStatus[array.size()];
-        int i = 0;
-        for (Object object : array) {
-            final Map<?, ?> m = (Map<?, ?>) object;
-            statuses[i++] = makeMyQualified(toFileStatus(m, false), path);
-        }
-        return statuses;
-    }
-
-    public FileStatus[] listStatus(String f, PathFilter filter) {
-        return Stream.of(listStatus(f)).filter(s -> filter.accept(s.getPath())).toArray(FileStatus[]::new);
+        return (List<Map<String, Object>>) array;
     }
 
     /**
@@ -345,10 +265,6 @@ public class WebHdfsFileSystem {
         } catch (Exception e) {
             throw new CodeStackException(e);
         }
-    }
-
-    private FileStatus makeMyQualified(HdfsFileStatus f, String parent) {
-        return new FileStatus(f.getLen(), f.isDir(), f.getReplication(), f.getBlockSize(), f.getModificationTime(), f.getAccessTime(), f.getPermission(), f.getOwner(), f.getGroup(), f.isSymlink() ? new Path(f.getSymlink()) : null, f.getFullPath(new Path(parent)));
     }
 
     @Getter
