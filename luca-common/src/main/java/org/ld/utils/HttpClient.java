@@ -137,7 +137,7 @@ public class HttpClient {
                     }
                 }
             } else {
-                throw new CodeStackException("请求失败");
+                throw new CodeStackException("请求失败 URL :" + url + " method:" + method);
             }
         } catch (Exception e) {
             throw new CodeStackException(e);
