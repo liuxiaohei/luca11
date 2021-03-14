@@ -1,6 +1,5 @@
 package org.ld.fs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -126,7 +125,7 @@ public class WebHdfsFileSystem {
         return "http://" + uri.getHost() + ":" + uri.getPort() + "/webhdfs/" + version + StringUtil.toSafeUrlPath(path, "/") + Stream.concat(Map.of("op", op).entrySet().stream(), Stream.concat(params.entrySet().stream(), selfParams.entrySet().stream())).map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&", "?", ""));
     }
 
-    private static Boolean getBooleanResponse(InputStream is) throws JsonProcessingException {
+    private static Boolean getBooleanResponse(InputStream is) throws Exception {
         return new ObjectMapper().convertValue(new ObjectMapper().readTree(StringUtil.stream2String(is)).findValue("boolean"), Boolean.class);
     }
 }
