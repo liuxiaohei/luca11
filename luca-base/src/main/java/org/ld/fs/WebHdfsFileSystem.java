@@ -18,11 +18,9 @@ import java.util.stream.*;
 
 /** http://hadoop.apache.org/docs/r1.0.4/webhdfs.html */
 @Slf4j
-@SuppressWarnings("unused")
 @AllArgsConstructor
 public class WebHdfsFileSystem {
 
-    private static final String OFFSET_PARAM_PREFIX = OffsetParam.NAME + "=";
     private static final String version = "v1";
     private final Map<String, String> selfParams;
     private final URI uri;
@@ -82,6 +80,7 @@ public class WebHdfsFileSystem {
             urlSetter.accept(conn.getURL());
             return conn;
         };
+        final String OFFSET_PARAM_PREFIX = "offset" + "=";
         final var openUrl = getUrl(f, Map.of("offset", String.valueOf(0L), "buffersize", "" + (FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), "OPEN");
         return new ByteRangeInputStream(
                 new ByteRangeInputStream.URLOpener(null) {
