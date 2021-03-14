@@ -101,10 +101,14 @@ public class StringUtil {
         }
     }
 
+    public static String toSafeUrlPath(String path) {
+        return URLEncoder.encode(path, StandardCharsets.UTF_8);
+    }
+
     /**
      * 将带有特殊字符的路径转换成为url可显示的路径 delimiters 为可以进行特殊处理不去转换的特殊字符集合
      */
-    public static String toSafePath(String path, String... exclude) {
+    public static String toSafeUrlPath(String path, String... exclude) {
         if (exclude.length == 0) {
             return URLEncoder.encode(path, StandardCharsets.UTF_8);
         } else if (exclude.length == 1) {
@@ -119,7 +123,7 @@ public class StringUtil {
             final var delimiter = exclude[0];
             final var sl = new ArrayList<String>();
             for (var a : path.split(delimiter)) {
-                sl.add(toSafePath(a, Stream.of(exclude).skip(1).toArray(String[]::new)));
+                sl.add(toSafeUrlPath(a, Stream.of(exclude).skip(1).toArray(String[]::new)));
             }
             return String.join(delimiter, sl);
         }

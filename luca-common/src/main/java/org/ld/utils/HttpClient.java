@@ -75,14 +75,19 @@ public class HttpClient {
         };
     }
 
-    public static HttpURLConnection getStreamUrlConnection(String url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setConnectTimeout(30000);
-        conn.setReadTimeout(30000);
-        conn.setRequestProperty("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        conn.setDoOutput(true);
-        conn.setUseCaches(false);
-        return conn;
+    public static HttpURLConnection getStreamUrlConnection(String url) {
+        try {
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setConnectTimeout(30000);
+            conn.setReadTimeout(30000);
+            conn.setRequestProperty("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            return conn;
+        } catch (Exception e) {
+            throw new CodeStackException(e);
+        }
     }
 
     public static <R> R get(String url, Headers headers, UCFunction<InputStream, R> handler) {

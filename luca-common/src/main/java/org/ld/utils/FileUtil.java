@@ -7,6 +7,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
+import org.apache.hadoop.fs.Path;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -412,6 +413,25 @@ public class FileUtil {
                 outChannel.write(buffer);
                 buffer.clear();//写完要重置buffer，重设position=0,limit=capacity
             }
+        }
+    }
+
+    /**
+     * 将本地文件copy到指定的outputStream
+     */
+    public void copyFromLocalFile(boolean delSrc, String src, OutputStream outputStream) throws IOException {
+        var file = new File(src);
+        if (!file.exists()) {
+            throw new CodeStackException(String.format("File %s does not exist.", src));
+        }
+        if (!file.isFile()) {
+            throw new CodeStackException(String.format("%s isn't a file.", src));
+        }
+        try (var is = new FileInputStream(src); var os = outputStream) {
+            FileUtil.copyInputStream2OutputStream(is,os);
+        }
+        if (delSrc) {
+            FileUtil.LocalFileSystemHolder.localFileSystem.delete(new Path(src), true);
         }
     }
 
