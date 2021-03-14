@@ -75,7 +75,7 @@ public class WebHdfsFileSystem {
 
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> listStatus(final String path) {
-        return run(path, "LISTSTATUS", "GET", new HashMap<>(), is -> (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) ((Map<?, ?>)JsonUtil.stream2Map(is)).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new));
+        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "LISTSTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, is -> (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) ((Map<?, ?>)JsonUtil.stream2Map(is)).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new));
     }
 
     private <T> T run(String path, String opName, String method, Map<String, String> params, UCFunction<InputStream, T> responseGetter) {
