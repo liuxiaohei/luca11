@@ -72,8 +72,8 @@ public class WebHdfs {
         return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "APPEND"), "POST", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
     }
 
-    public InputStream open(final String f) {
-        return HttpClient.execute("GET", getUrl(f, Map.of("offset", "0", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "OPEN"), HttpClient.STREAM_HEAD_SUPPLIER.get(), null, is -> is);
+    public <T> T open(final String f,UCFunction<InputStream, T> handler) {
+        return HttpClient.execute("GET", getUrl(f, Map.of("offset", "0", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "OPEN"), HttpClient.STREAM_HEAD_SUPPLIER.get(), null, handler);
     }
 
     private String getUrl(final String path, final Map<String, String> params, final String op) {
