@@ -61,6 +61,11 @@ public class WebHdfsFileSystem {
         return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "GETFILESTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, JsonUtil::stream2Map);
     }
 
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> listStatus(final String path) {
+        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "LISTSTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, is -> (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) ((Map<?, ?>)JsonUtil.stream2Map(is)).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new));
+    }
+
     public OutputStream create(final String path) {
         return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "overwrite", "true", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "CREATE"), "PUT", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
     }
@@ -71,11 +76,6 @@ public class WebHdfsFileSystem {
 
     public InputStream open(final String f) {
         return HttpClient.execute("GET", getUrl(f, Map.of("offset", "0", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "OPEN"), HttpClient.STREAM_HEAD_SUPPLIER.get(), null, is -> is);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> listStatus(final String path) {
-        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "LISTSTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, is -> (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) ((Map<?, ?>)JsonUtil.stream2Map(is)).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new));
     }
 
     private String getUrl(final String path, final Map<String, String> params, final String op) {
