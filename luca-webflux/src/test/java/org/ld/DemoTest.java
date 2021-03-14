@@ -28,8 +28,8 @@ import java.util.stream.Stream;
 public class DemoTest {
 
     @Test
-    public void hdfs() throws URISyntaxException {
-        var fs = new WebHdfsFileSystem(Map.of("guardian_access_token","KDIL6n5mDhilwcfpcqCX-TDH"), new URI("http://node540:50070"));
+    public void hdfs() {
+        var fs = new WebHdfsFileSystem(Map.of("guardian_access_token","KDIL6n5mDhilwcfpcqCX-TDH"), "node540:50070");
         var a = fs.listStatus("/tmp");
         a.forEach(e -> System.out.println(JsonUtil.obj2Json(e)));
     }

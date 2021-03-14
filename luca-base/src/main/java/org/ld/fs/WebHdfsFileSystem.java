@@ -6,10 +6,8 @@ import org.ld.uc.UCFunction;
 import org.ld.utils.*;
 
 import java.io.*;
-import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 /** http://hadoop.apache.org/docs/r1.0.4/webhdfs.html */
 @Slf4j
@@ -18,7 +16,7 @@ public class WebHdfsFileSystem {
     private static final UCFunction<InputStream,Boolean> boolResult = is -> JsonUtil.getResponse(is,"boolean",Boolean.class);
     private static final String version = "v1";
     private final Map<String, String> selfParams;
-    private final URI uri;
+    private final String address;
 
     public Boolean delete(final String path,final boolean recursive) {
         return HttpClient.execute("DELETE", getUrl(path, Map.of("recursive", recursive + ""), "DELETE"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
@@ -79,6 +77,6 @@ public class WebHdfsFileSystem {
     }
 
     private String getUrl(final String path, final Map<String, String> params, final String op) {
-        return "http://" + uri.getHost() + ":" + uri.getPort() + "/webhdfs/" + version + StringUtil.toSafeUrlPath(path, "/") + Stream.concat(Map.of("op", op).entrySet().stream(), Stream.concat(params.entrySet().stream(), selfParams.entrySet().stream())).map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&", "?", ""));
+        return "http://" + address + "/webhdfs/" + version + StringUtil.toSafeUrlPath(path, "/") + Stream.concat(Map.of("op", op).entrySet().stream(), Stream.concat(params.entrySet().stream(), selfParams.entrySet().stream())).map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&", "?", ""));
     }
 }
