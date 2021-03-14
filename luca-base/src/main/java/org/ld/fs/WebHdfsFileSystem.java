@@ -13,55 +13,55 @@ import java.util.stream.*;
 @Slf4j
 @AllArgsConstructor
 public class WebHdfsFileSystem {
-    private static final UCFunction<InputStream,Boolean> boolResult = is -> JsonUtil.getResponse(is,"boolean",Boolean.class);
+    private static final UCFunction<InputStream, Boolean> boolResult = is -> JsonUtil.getResponse(is, "boolean", Boolean.class);
     private static final String version = "v1";
     private final Map<String, String> selfParams;
     private final String address;
 
-    public Boolean delete(final String path,final boolean recursive) {
-        return HttpClient.execute("DELETE", getUrl(path, Map.of("recursive", recursive + ""), "DELETE"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
+    public Boolean delete(final String path, final boolean recursive) {
+        return HttpClient.delete(getUrl(path, Map.of("recursive", recursive + ""), "DELETE"), HttpClient.JSON_HEAD_SUPPLIER.get(), boolResult);
     }
 
     public Boolean mkdirs(final String path) {
-        return HttpClient.execute("PUT", getUrl(path, new HashMap<>(), "MKDIRS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
+        return HttpClient.put(getUrl(path, new HashMap<>(), "MKDIRS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
-    public Boolean rename(final String src,final  String dst) {
-        return HttpClient.execute("PUT", getUrl(src, Map.of("destination", StringUtil.toSafeUrlPath(dst)), "RENAME"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
+    public Boolean rename(final String src, final String dst) {
+        return HttpClient.put(getUrl(src, Map.of("destination", StringUtil.toSafeUrlPath(dst)), "RENAME"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
     public Boolean truncate(final String path, long newLength) {
-        return HttpClient.execute("POST", getUrl(path, Map.of("newlength", newLength + ""), "TRUNCATE"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
+        return HttpClient.post(getUrl(path, Map.of("newlength", newLength + ""), "TRUNCATE"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
     public void setPermission(final String p, final String permission) {
-        HttpClient.execute("PUT", getUrl(p, Map.of("permission", permission), "SETPERMISSION"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
+        HttpClient.put(getUrl(p, Map.of("permission", permission), "SETPERMISSION"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
     }
 
     public void setOwner(final String p, final String owner, final String group) {
-        HttpClient.execute("PUT", getUrl(p, Map.of("owner", owner, "group", group), "SETOWNER"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
+        HttpClient.put(getUrl(p, Map.of("owner", owner, "group", group), "SETOWNER"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
     }
 
     public Map<String, Object> getFileChecksum(final String p) {
-        return HttpClient.execute("GET", getUrl(p, new HashMap<>(), "GETFILECHECKSUM"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, JsonUtil::stream2Map);
+        return HttpClient.get(getUrl(p, new HashMap<>(), "GETFILECHECKSUM"), HttpClient.JSON_HEAD_SUPPLIER.get(), JsonUtil::stream2Map);
     }
 
     /** http://cn.voidcc.com/question/p-dxrzacex-xw.html 可用这个方法获取文件夹的大小 */
     public Map<String, Object> getContentSummary(final String path) {
-        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "GETCONTENTSUMMARY"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, JsonUtil::stream2Map);
+        return HttpClient.get(getUrl(path, new HashMap<>(), "GETCONTENTSUMMARY"), HttpClient.JSON_HEAD_SUPPLIER.get(), JsonUtil::stream2Map);
     }
 
     public void concat(final String trg, final String[] srcs) {
-        HttpClient.execute("POST", getUrl(trg, Map.of("sources", String.join(",", srcs)), "CONCAT"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
+        HttpClient.post(getUrl(trg, Map.of("sources", String.join(",", srcs)), "CONCAT"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
     }
 
     public Map<String, Object> getFileStatus(final String path) {
-        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "GETFILESTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, JsonUtil::stream2Map);
+        return HttpClient.get(getUrl(path, new HashMap<>(), "GETFILESTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), JsonUtil::stream2Map);
     }
 
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> listStatus(final String path) {
-        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "LISTSTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, is -> (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) ((Map<?, ?>)JsonUtil.stream2Map(is)).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new));
+        return HttpClient.get(getUrl(path, new HashMap<>(), "LISTSTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), is -> (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) ((Map<?, ?>) JsonUtil.stream2Map(is)).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new));
     }
 
     public OutputStream create(final String path) {

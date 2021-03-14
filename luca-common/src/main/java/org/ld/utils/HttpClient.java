@@ -101,15 +101,11 @@ public class HttpClient {
         return execute("POST", url, headers, body, handler);
     }
 
-    public static <R> R postForObject(String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
-        return execute("POST", url, headers, body, handler);
-    }
-
-    public static <R> R putForObject(String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
+    public static <R> R put(String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
         return execute("PUT", url, headers, body, handler);
     }
 
-    public static <R> R patchForObject(String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
+    public static <R> R patch(String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
         return execute("PATCH", url, headers, body, handler);
     }
 
