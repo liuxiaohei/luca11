@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 @Slf4j
 public class HttpClient {
 
-    public static final Supplier<Headers> JSON_HEAD_SUPPLIER =() -> new Headers.Builder().add("Content-Type", "application/json").build();
+    public static final Supplier<Headers> JSON_HEAD_SUPPLIER = () -> new Headers.Builder().add("Content-Type", "application/json").build();
     public static final Supplier<Headers> STREAM_HEAD_SUPPLIER =() -> new Headers.Builder().add("Content-Type", "application/octet-stream").build();
 
     private static class OkHttpClientHandler {

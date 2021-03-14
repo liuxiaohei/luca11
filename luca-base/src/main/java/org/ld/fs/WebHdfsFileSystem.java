@@ -20,45 +20,45 @@ public class WebHdfsFileSystem {
     private final Map<String, String> selfParams;
     private final URI uri;
 
-    public boolean delete(final String path,final boolean recursive) {
-        return run(path, "DELETE", "DELETE", Map.of("recursive", recursive + ""), boolResult);
+    public Boolean delete(final String path,final boolean recursive) {
+        return HttpClient.execute("DELETE", getUrl(path, Map.of("recursive", recursive + ""), "DELETE"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
-    public boolean mkdirs(final String path) {
-        return run(path, "MKDIRS", "PUT", new HashMap<>(), boolResult);
+    public Boolean mkdirs(final String path) {
+        return HttpClient.execute("PUT", getUrl(path, new HashMap<>(), "MKDIRS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
-    public boolean rename(final String src,final  String dst) {
-        return run(src, "RENAME", "PUT", Map.of("destination", StringUtil.toSafeUrlPath(dst)), boolResult);
+    public Boolean rename(final String src,final  String dst) {
+        return HttpClient.execute("PUT", getUrl(src, Map.of("destination", StringUtil.toSafeUrlPath(dst)), "RENAME"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
-    public boolean truncate(final  String path, long newLength) {
-        return run(path, "TRUNCATE", "POST", Map.of("newlength", newLength + ""), boolResult);
+    public Boolean truncate(final String path, long newLength) {
+        return HttpClient.execute("POST", getUrl(path, Map.of("newlength", newLength + ""), "TRUNCATE"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
     public void setPermission(final String p, final String permission) {
-        run(p, "SETPERMISSION", "PUT", Map.of("permission", permission), e -> 0);
+        HttpClient.execute("PUT", getUrl(p, Map.of("permission", permission), "SETPERMISSION"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
     }
 
     public void setOwner(final String p, final String owner, final String group) {
-        run(p, "SETOWNER", "PUT", Map.of("owner", owner, "group", group), e -> 0);
+        HttpClient.execute("PUT", getUrl(p, Map.of("owner", owner, "group", group), "SETOWNER"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
     }
 
     public Map<String, Object> getFileChecksum(final String p) {
-        return run(p, "GETFILECHECKSUM", "GET", new HashMap<>(), JsonUtil::stream2Map);
+        return HttpClient.execute("GET", getUrl(p, new HashMap<>(), "GETFILECHECKSUM"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, JsonUtil::stream2Map);
     }
 
     /** http://cn.voidcc.com/question/p-dxrzacex-xw.html 可用这个方法获取文件夹的大小 */
     public Map<String, Object> getContentSummary(final String path) {
-        return run(path, "GETCONTENTSUMMARY", "GET", new HashMap<>(), JsonUtil::stream2Map);
+        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "GETCONTENTSUMMARY"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, JsonUtil::stream2Map);
     }
 
     public void concat(final String trg, final String[] srcs) {
-        run(trg, "CONCAT", "POST", Map.of("sources", String.join(",", srcs)), e -> 0);
+        HttpClient.execute("POST", getUrl(trg, Map.of("sources", String.join(",", srcs)), "CONCAT"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
     }
 
     public Map<String, Object> getFileStatus(final String path) {
-        return run(path, "GETFILESTATUS", "GET", new HashMap<>(), JsonUtil::stream2Map);
+        return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "GETFILESTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, JsonUtil::stream2Map);
     }
 
     public OutputStream create(final String path) {
@@ -76,10 +76,6 @@ public class WebHdfsFileSystem {
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> listStatus(final String path) {
         return HttpClient.execute("GET", getUrl(path, new HashMap<>(), "LISTSTATUS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, is -> (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) ((Map<?, ?>)JsonUtil.stream2Map(is)).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new));
-    }
-
-    private <T> T run(String path, String opName, String method, Map<String, String> params, UCFunction<InputStream, T> responseGetter) {
-        return HttpClient.execute(method, getUrl(path, params, opName), HttpClient.JSON_HEAD_SUPPLIER.get(), null, responseGetter);
     }
 
     private String getUrl(final String path, final Map<String, String> params, final String op) {
