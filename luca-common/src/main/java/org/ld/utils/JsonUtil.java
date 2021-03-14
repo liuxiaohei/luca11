@@ -119,6 +119,14 @@ public class JsonUtil {
         }
     }
 
+    public static <T> T getResponse(InputStream is,String key,Class<T> tClass) {
+        try {
+            return new ObjectMapper().convertValue(new ObjectMapper().readTree(StringUtil.stream2String(is)).findValue(key), tClass);
+        } catch (Exception e) {
+            throw new CodeStackException(e);
+        }
+    }
+
     /**
      * 遍历对象的属性并转换成 指定泛型的ConfigList 对象
      * 其中String 类型不会出现 ""str""类型的春初而是直接存储

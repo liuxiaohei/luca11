@@ -1,6 +1,5 @@
 package org.ld.fs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ld.uc.UCFunction;
@@ -17,24 +16,25 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class WebHdfsFileSystem {
 
+    private static UCFunction<InputStream,Boolean> boolResult = is -> JsonUtil.getResponse(is,"boolean",Boolean.class);
     private static final String version = "v1";
     private final Map<String, String> selfParams;
     private final URI uri;
 
     public boolean delete(final String path,final boolean recursive) {
-        return run(path, "DELETE", "DELETE", Map.of("recursive", recursive + ""), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "DELETE", "DELETE", Map.of("recursive", recursive + ""), boolResult);
     }
 
     public boolean mkdirs(final String path) {
-        return run(path, "MKDIRS", "PUT", new HashMap<>(), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "MKDIRS", "PUT", new HashMap<>(), boolResult);
     }
 
     public boolean rename(final String src,final  String dst) {
-        return run(src, "RENAME", "PUT", Map.of("destination", StringUtil.toSafeUrlPath(dst)), WebHdfsFileSystem::getBooleanResponse);
+        return run(src, "RENAME", "PUT", Map.of("destination", StringUtil.toSafeUrlPath(dst)), boolResult);
     }
 
     public boolean truncate(final  String path, long newLength) {
-        return run(path, "TRUNCATE", "POST", Map.of("newlength", newLength + ""), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "TRUNCATE", "POST", Map.of("newlength", newLength + ""), boolResult);
     }
 
     public void setPermission(final String p, final String permission) {
@@ -85,9 +85,5 @@ public class WebHdfsFileSystem {
 
     private String getUrl(final String path, final Map<String, String> params, final String op) {
         return "http://" + uri.getHost() + ":" + uri.getPort() + "/webhdfs/" + version + StringUtil.toSafeUrlPath(path, "/") + Stream.concat(Map.of("op", op).entrySet().stream(), Stream.concat(params.entrySet().stream(), selfParams.entrySet().stream())).map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&", "?", ""));
-    }
-
-    private static Boolean getBooleanResponse(InputStream is) throws Exception {
-        return new ObjectMapper().convertValue(new ObjectMapper().readTree(StringUtil.stream2String(is)).findValue("boolean"), Boolean.class);
     }
 }
