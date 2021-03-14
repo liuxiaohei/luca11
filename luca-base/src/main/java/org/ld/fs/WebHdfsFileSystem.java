@@ -3,17 +3,14 @@ package org.ld.fs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Headers;
-import org.apache.hadoop.hdfs.web.ByteRangeInputStream;
-import org.apache.hadoop.hdfs.web.resources.OffsetParam;
 import org.ld.uc.UCFunction;
 import org.ld.utils.*;
 
 import java.io.*;
-import java.net.*;
+import java.net.URI;
 import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** http://hadoop.apache.org/docs/r1.0.4/webhdfs.html */
 @Slf4j
@@ -24,16 +21,8 @@ public class WebHdfsFileSystem {
     private final Map<String, String> selfParams;
     private final URI uri;
 
-    public OutputStream create(String path) throws IOException {
-        return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "overwrite", String.valueOf(true), "buffersize", String.valueOf(FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), "CREATE"), "PUT", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
-    }
-
-    public OutputStream append(String path) throws IOException {
-        return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "buffersize", String.valueOf(FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), "APPEND"), "POST", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
-    }
-
     public boolean delete(String path, boolean recursive) {
-        return run(path, "DELETE", "DELETE", Map.of("recursive", String.valueOf(recursive)), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "DELETE", "DELETE", Map.of("recursive", recursive + ""), WebHdfsFileSystem::getBooleanResponse);
     }
 
     public boolean mkdirs(String path) {
@@ -45,7 +34,7 @@ public class WebHdfsFileSystem {
     }
 
     public boolean truncate(String path, long newLength) {
-        return run(path, "TRUNCATE", "POST", Map.of("newlength", String.valueOf(newLength)), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "TRUNCATE", "POST", Map.of("newlength", newLength + ""), WebHdfsFileSystem::getBooleanResponse);
     }
 
     public void setPermission(final String p, final String permission) {
@@ -73,43 +62,16 @@ public class WebHdfsFileSystem {
         return run(path, "GETFILESTATUS", "GET", new HashMap<>(), JsonUtil::stream2Map);
     }
 
-    public InputStream open(final String f) throws IOException {
-        final BiFunction<String, Consumer<URL>, HttpURLConnection> getConnection = (url, urlSetter) -> {
-            final var conn = HttpClient.getStreamUrlConnection(url);
-            urlSetter.accept(conn.getURL());
-            return conn;
-        };
-        final String OFFSET_PARAM_PREFIX = "offset" + "=";
-        final var openUrl = getUrl(f, Map.of("offset", String.valueOf(0L), "buffersize", "" + (FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), "OPEN");
-        return new ByteRangeInputStream(
-                new ByteRangeInputStream.URLOpener(null) {
-                    protected HttpURLConnection connect(long offset, boolean resolved) {
-                        assert offset == 0;
-                        return getConnection.apply(openUrl, this::setURL);
-                    }
-                },
-                new ByteRangeInputStream.URLOpener(null) {
-                    protected HttpURLConnection connect(final long offset, final boolean resolved) throws IOException {
-                        return getConnection.apply((offset == 0L ? new URL(openUrl) : new URL(openUrl + "&" + new OffsetParam(offset))).toString(), this::setURL);
-                    }
-                }) {
-            @Override
-            protected URL getResolvedUrl(HttpURLConnection connection) throws IOException {
-                final var url = connection.getURL();
-                if (url.getQuery() == null || Optional.of(url.getQuery().toLowerCase(Locale.ENGLISH)).map(lower -> !lower.startsWith(OFFSET_PARAM_PREFIX) && !lower.contains("&" + OFFSET_PARAM_PREFIX)).orElse(false)) {
-                    return url;
-                }
-                StringBuilder b = null;
-                final var st = new StringTokenizer(url.getQuery(), "&");
-                while (st.hasMoreTokens()) {
-                    final var token = st.nextToken();
-                    if (!token.toLowerCase(Locale.ENGLISH).startsWith(OFFSET_PARAM_PREFIX)) {
-                        b = b == null ? new StringBuilder("?").append(token) : b.append('&').append(token);
-                    }
-                }
-                return new URL(Optional.of(url.toString()).map(urlStr -> urlStr.substring(0, urlStr.indexOf('?'))).orElse("") + (b == null ? "" : b.toString()));
-            }
-        };
+    public OutputStream create(String path) {
+        return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "overwrite", "true", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "CREATE"), "PUT", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
+    }
+
+    public OutputStream append(String path) {
+        return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "APPEND"), "POST", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
+    }
+
+    public InputStream open(final String f) {
+        return HttpClient.execute("GET", getUrl(f, Map.of("offset", "0", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "OPEN"), HttpClient.STREAM_HEAD_SUPPLIER.get(), null, is -> is);
     }
 
     @SuppressWarnings("unchecked")
@@ -118,7 +80,7 @@ public class WebHdfsFileSystem {
     }
 
     private <T> T run(String path, String opName, String method, Map<String, String> params, UCFunction<InputStream, T> responseGetter) {
-        return HttpClient.execute(method, getUrl(path, params, opName), new Headers.Builder().add("Content-Type", "application/json").build(), null, responseGetter);
+        return HttpClient.execute(method, getUrl(path, params, opName), HttpClient.JSON_HEAD_SUPPLIER.get(), null, responseGetter);
     }
 
     private String getUrl(final String path, final Map<String, String> params, final String op) {

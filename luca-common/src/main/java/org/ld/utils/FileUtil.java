@@ -31,6 +31,9 @@ import java.util.zip.ZipOutputStream;
 public class FileUtil {
 
     public static final Integer DEFAULT_FILE_BUFFER_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
+
+    public static final String DEFAULT_BUFFER_SIZE_STRING = DEFAULT_FILE_BUFFER_SIZE_IN_BYTES + "";
+
     private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
     /**

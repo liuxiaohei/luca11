@@ -13,30 +13,28 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @Slf4j
 public class HttpClient {
-    private static final int READ_TIME_OUT = 30000;
-    private static final int CONNECT_TIME_OUT = 30000;
-    private static final int MAX_IDLE_CONNECTS = 20;
-    public static String STREAM_TYPE = "application/octet-stream";
-    private static final OkHttpClient okHttpClient;
 
-    static {
-        okHttpClient = new OkHttpClient.Builder()
-                .readTimeout(READ_TIME_OUT, TimeUnit.SECONDS)
-                .connectTimeout(CONNECT_TIME_OUT, TimeUnit.SECONDS)
-                .connectionPool(new ConnectionPool(MAX_IDLE_CONNECTS, 5, TimeUnit.SECONDS))
+    public static final Supplier<Headers> JSON_HEAD_SUPPLIER =() -> new Headers.Builder().add("Content-Type", "application/json").build();
+    public static final Supplier<Headers> STREAM_HEAD_SUPPLIER =() -> new Headers.Builder().add("Content-Type", "application/octet-stream").build();
+
+    private static class OkHttpClientHandler {
+        private static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(30000, TimeUnit.SECONDS)
+                .connectTimeout(30000, TimeUnit.SECONDS)
+                .connectionPool(new ConnectionPool(20, 5, TimeUnit.SECONDS))
                 .build();
     }
 
     /**
      * 返回OutPutStream OutPutStream关闭 连接资源才会关闭
      */
-    public static OutputStream getOutputStreamByUrl(String url, String method, int bufferSize) throws IOException {
+    public static OutputStream getOutputStreamByUrl(String url, String method, int bufferSize) {
         UCFunction<String, HttpURLConnection> getConnection = u -> {
             var conn = HttpClient.getStreamUrlConnection(u);
             conn.setRequestMethod(method);
@@ -56,28 +54,33 @@ public class HttpClient {
             throw new CodeStackException(e);
         }
         var conn1 = conn;
-        return new BufferedOutputStream(conn1.getOutputStream(), bufferSize) {
-            @Override
-            public void close() throws IOException {
-                try {
-                    super.close();
-                } finally {
+        try {
+            return new BufferedOutputStream(conn1.getOutputStream(), bufferSize) {
+                @Override
+                public void close() throws IOException {
                     try {
-                        conn1.getInputStream();
-                        if (!((conn1.getResponseCode() == 200) || (conn1.getResponseCode() == 201) || (conn1.getResponseCode() == 202))) {
-                            log.error("请求失败----Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
-                        }
+                        super.close();
                     } finally {
-                        conn1.disconnect();
+                        try {
+                            conn1.getInputStream();
+                            var code = conn1.getResponseCode();
+                            if (!(code >= 200 && code < 300)) {
+                                log.error("请求失败----Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
+                            }
+                        } finally {
+                            conn1.disconnect();
+                        }
                     }
                 }
-            }
-        };
+            };
+        } catch (Exception e) {
+            throw new CodeStackException(e);
+        }
     }
 
     public static HttpURLConnection getStreamUrlConnection(String url) {
         try {
-            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            final var conn = (HttpURLConnection) new URL(url).openConnection();
             conn.setConnectTimeout(30000);
             conn.setReadTimeout(30000);
             conn.setRequestProperty("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -115,16 +118,16 @@ public class HttpClient {
     }
 
     public static <R> R execute(String method, String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
-        Request.Builder requestBuild = new Request.Builder()
+        var requestBuild = new Request.Builder()
                 .url(url)
                 .method(method, body);
         if (headers != null) {
             requestBuild.headers(headers);
         }
         try {
-            Response response = okHttpClient.newCall(requestBuild.build()).execute();
+            var response = OkHttpClientHandler.okHttpClient.newCall(requestBuild.build()).execute();
             if (response.isSuccessful()) {
-                ResponseBody responseBody = response.body();
+                var responseBody = response.body();
                 if (responseBody != null) {
                     try (var in = responseBody.byteStream()) {
                         if (null == in) {
@@ -137,6 +140,8 @@ public class HttpClient {
                         }
                     }
                 }
+            } else {
+                throw new CodeStackException("请求失败");
             }
         } catch (Exception e) {
             throw new CodeStackException(e);
@@ -145,16 +150,16 @@ public class HttpClient {
     }
 
     public static <R> R executeWithUnClose(String method, String url, Headers headers, RequestBody body, Function<InputStream, R> handler) {
-        Request.Builder requestBuild = new Request.Builder()
+        var requestBuild = new Request.Builder()
                 .url(url)
                 .method(method, body);
         if (headers != null) {
             requestBuild.headers(headers);
         }
         try {
-            Response response = okHttpClient.newCall(requestBuild.build()).execute();
+            var response = OkHttpClientHandler.okHttpClient.newCall(requestBuild.build()).execute();
             if (response.isSuccessful()) {
-                ResponseBody responseBody = response.body();
+                var responseBody = response.body();
                 if (responseBody != null) {
                     var in = responseBody.byteStream();
                     if (null == in) {
