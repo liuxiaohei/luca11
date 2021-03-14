@@ -21,19 +21,19 @@ public class WebHdfsFileSystem {
     private final Map<String, String> selfParams;
     private final URI uri;
 
-    public boolean delete(String path, boolean recursive) {
+    public boolean delete(final String path,final boolean recursive) {
         return run(path, "DELETE", "DELETE", Map.of("recursive", recursive + ""), WebHdfsFileSystem::getBooleanResponse);
     }
 
-    public boolean mkdirs(String path) {
+    public boolean mkdirs(final String path) {
         return run(path, "MKDIRS", "PUT", new HashMap<>(), WebHdfsFileSystem::getBooleanResponse);
     }
 
-    public boolean rename(String src, String dst) {
+    public boolean rename(final String src,final  String dst) {
         return run(src, "RENAME", "PUT", Map.of("destination", StringUtil.toSafeUrlPath(dst)), WebHdfsFileSystem::getBooleanResponse);
     }
 
-    public boolean truncate(String path, long newLength) {
+    public boolean truncate(final  String path, long newLength) {
         return run(path, "TRUNCATE", "POST", Map.of("newlength", newLength + ""), WebHdfsFileSystem::getBooleanResponse);
     }
 
@@ -50,7 +50,7 @@ public class WebHdfsFileSystem {
     }
 
     /** http://cn.voidcc.com/question/p-dxrzacex-xw.html 可用这个方法获取文件夹的大小 */
-    public Map<String, Object> getContentSummary(String path) {
+    public Map<String, Object> getContentSummary(final String path) {
         return run(path, "GETCONTENTSUMMARY", "GET", new HashMap<>(), JsonUtil::stream2Map);
     }
 
@@ -58,15 +58,15 @@ public class WebHdfsFileSystem {
         run(trg, "CONCAT", "POST", Map.of("sources", String.join(",", srcs)), e -> 0);
     }
 
-    public Map<String, Object> getFileStatus(String path) {
+    public Map<String, Object> getFileStatus(final String path) {
         return run(path, "GETFILESTATUS", "GET", new HashMap<>(), JsonUtil::stream2Map);
     }
 
-    public OutputStream create(String path) {
+    public OutputStream create(final String path) {
         return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "overwrite", "true", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "CREATE"), "PUT", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
     }
 
-    public OutputStream append(String path) {
+    public OutputStream append(final String path) {
         return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "APPEND"), "POST", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
     }
 
@@ -75,7 +75,7 @@ public class WebHdfsFileSystem {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> listStatus(String path) {
+    public List<Map<String, Object>> listStatus(final String path) {
         return (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) run(path, "LISTSTATUS", "GET", new HashMap<>(), JsonUtil::stream2Map).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new);
     }
 
