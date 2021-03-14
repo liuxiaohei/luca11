@@ -1,12 +1,12 @@
 package org.ld.fs;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import org.apache.hadoop.hdfs.web.ByteRangeInputStream;
 import org.apache.hadoop.hdfs.web.resources.OffsetParam;
-import org.ld.exception.CodeStackException;
 import org.ld.uc.UCFunction;
 import org.ld.utils.*;
 
@@ -36,53 +36,53 @@ public class WebHdfsFileSystem {
     }
 
     public boolean delete(String path, boolean recursive) {
-        return run(path, "DELETE","DELETE", Map.of("recursive", String.valueOf(recursive)), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "DELETE", "DELETE", Map.of("recursive", String.valueOf(recursive)), WebHdfsFileSystem::getBooleanResponse);
     }
 
     public boolean mkdirs(String path) {
-        return run(path, "MKDIRS","PUT", new HashMap<>(), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "MKDIRS", "PUT", new HashMap<>(), WebHdfsFileSystem::getBooleanResponse);
     }
 
     public boolean rename(String src, String dst) {
-        return run(src, "RENAME","PUT", Map.of("destination", StringUtil.toSafeUrlPath(dst)), WebHdfsFileSystem::getBooleanResponse);
+        return run(src, "RENAME", "PUT", Map.of("destination", StringUtil.toSafeUrlPath(dst)), WebHdfsFileSystem::getBooleanResponse);
     }
 
     public boolean truncate(String path, long newLength) {
-        return run(path, "TRUNCATE","POST", Map.of("newlength", String.valueOf(newLength)), WebHdfsFileSystem::getBooleanResponse);
+        return run(path, "TRUNCATE", "POST", Map.of("newlength", String.valueOf(newLength)), WebHdfsFileSystem::getBooleanResponse);
     }
 
     public void setPermission(final String p, final String permission) {
-        run(p, "SETPERMISSION","PUT", Map.of("permission", permission), e -> null);
+        run(p, "SETPERMISSION", "PUT", Map.of("permission", permission), e -> 0);
     }
 
     public void setOwner(final String p, final String owner, final String group) {
-        run(p, "SETOWNER","PUT", Map.of("owner", owner, "group", group), e -> null);
+        run(p, "SETOWNER", "PUT", Map.of("owner", owner, "group", group), e -> 0);
     }
 
     public Map<String, Object> getFileChecksum(final String p) {
-        return run(p, "GETFILECHECKSUM","GET", new HashMap<>(), JsonUtil::stream2Map);
+        return run(p, "GETFILECHECKSUM", "GET", new HashMap<>(), JsonUtil::stream2Map);
     }
 
     /** http://cn.voidcc.com/question/p-dxrzacex-xw.html 可用这个方法获取文件夹的大小 */
     public Map<String, Object> getContentSummary(String path) {
-        return run(path, "GETCONTENTSUMMARY","GET", new HashMap<>(), JsonUtil::stream2Map);
+        return run(path, "GETCONTENTSUMMARY", "GET", new HashMap<>(), JsonUtil::stream2Map);
     }
 
     public void concat(final String trg, final String[] srcs) {
-        run(trg, "CONCAT","POST", Map.of("sources", String.join(",", srcs)), e -> null);
+        run(trg, "CONCAT", "POST", Map.of("sources", String.join(",", srcs)), e -> 0);
     }
 
     public Map<String, Object> getFileStatus(String path) {
-        return run(path, "GETFILESTATUS","GET", new HashMap<>(), JsonUtil::stream2Map);
+        return run(path, "GETFILESTATUS", "GET", new HashMap<>(), JsonUtil::stream2Map);
     }
 
     public InputStream open(final String f) throws IOException {
-        final var openUrl = getUrl(f, Map.of("offset", String.valueOf(0L), "buffersize", "" + (FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), "OPEN");
-        final BiFunction<String, Consumer<URL>,HttpURLConnection> getConnection = (url,urlSetter) -> {
+        final BiFunction<String, Consumer<URL>, HttpURLConnection> getConnection = (url, urlSetter) -> {
             final var conn = HttpClient.getStreamUrlConnection(url);
             urlSetter.accept(conn.getURL());
             return conn;
         };
+        final var openUrl = getUrl(f, Map.of("offset", String.valueOf(0L), "buffersize", "" + (FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), "OPEN");
         return new ByteRangeInputStream(
                 new ByteRangeInputStream.URLOpener(null) {
                     protected HttpURLConnection connect(long offset, boolean resolved) {
@@ -116,7 +116,7 @@ public class WebHdfsFileSystem {
 
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> listStatus(String path) {
-        return (List<Map<String, Object>>)Optional.ofNullable((Map<?, ?>) run(path, "LISTSTATUS","GET", new HashMap<>(), JsonUtil::stream2Map).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new);
+        return (List<Map<String, Object>>) Optional.ofNullable((Map<?, ?>) run(path, "LISTSTATUS", "GET", new HashMap<>(), JsonUtil::stream2Map).get("FileStatuses")).map(r -> r.get("FileStatus")).filter(list -> list instanceof List<?>).map(list -> (List<?>) list).orElseGet(ArrayList::new);
     }
 
     private <T> T run(String path, String opName, String method, Map<String, String> params, UCFunction<InputStream, T> responseGetter) {
@@ -124,15 +124,10 @@ public class WebHdfsFileSystem {
     }
 
     private String getUrl(final String path, final Map<String, String> params, final String op) {
-        return "http://" + uri.getHost() + ":" + uri.getPort() + "/webhdfs/" + version + StringUtil.toSafeUrlPath(path, "/") + Stream.concat(Map.of("op", op).entrySet().stream(),Stream.concat(params.entrySet().stream(),selfParams.entrySet().stream())).map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&", "?", ""));
+        return "http://" + uri.getHost() + ":" + uri.getPort() + "/webhdfs/" + version + StringUtil.toSafeUrlPath(path, "/") + Stream.concat(Map.of("op", op).entrySet().stream(), Stream.concat(params.entrySet().stream(), selfParams.entrySet().stream())).map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&", "?", ""));
     }
 
-    private static Boolean getBooleanResponse(InputStream is) {
-        try {
-            final var objectMapper = new ObjectMapper();
-            return objectMapper.convertValue(objectMapper.readTree(StringUtil.stream2String(is)).findValue("boolean"), Boolean.class);
-        } catch (Exception e) {
-            throw new CodeStackException(e);
-        }
+    private static Boolean getBooleanResponse(InputStream is) throws JsonProcessingException {
+        return new ObjectMapper().convertValue(new ObjectMapper().readTree(StringUtil.stream2String(is)).findValue("boolean"), Boolean.class);
     }
 }
