@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class WebHdfsFileSystem {
 
-    private static UCFunction<InputStream,Boolean> boolResult = is -> JsonUtil.getResponse(is,"boolean",Boolean.class);
+    private static final UCFunction<InputStream,Boolean> boolResult = is -> JsonUtil.getResponse(is,"boolean",Boolean.class);
     private static final String version = "v1";
     private final Map<String, String> selfParams;
     private final URI uri;
