@@ -9,12 +9,10 @@ import org.ld.actors.Buncher;
 import org.ld.beans.Flush;
 import org.ld.beans.Queue;
 import org.ld.beans.SetTarget;
-import org.ld.fs.WebHdfsFileSystem;
+import org.ld.fs.WebHdfs;
 import org.ld.utils.*;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +27,7 @@ public class DemoTest {
 
     @Test
     public void hdfs() {
-        var fs = new WebHdfsFileSystem(Map.of("guardian_access_token","KDIL6n5mDhilwcfpcqCX-TDH"), "node540:50070");
+        var fs = new WebHdfs(Map.of("guardian_access_token","KDIL6n5mDhilwcfpcqCX-TDH"), "node540:50070");
         var a = fs.listStatus("/tmp");
         a.forEach(e -> System.out.println(JsonUtil.obj2Json(e)));
     }
