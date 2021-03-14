@@ -48,57 +48,6 @@ public class WebHdfsFileSystem {
         return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "buffersize", String.valueOf(FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.APPEND.name()), HttpFSOperation.APPEND.getRestType(), FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
     }
 
-    public InputStream open(final String f) throws IOException {
-        final var openUrl = getUrl(f, Map.of("offset", String.valueOf(0L), "buffersize", "" + (FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.OPEN.name());
-        return new ByteRangeInputStream(
-                new ByteRangeInputStream.URLOpener(null) {
-                    @Override
-                    protected HttpURLConnection connect(long offset, boolean resolved) throws IOException {
-                        assert offset == 0;
-                        var conn = HttpClient.getStreamUrlConnection(openUrl);
-                        conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-                        setURL(conn.getURL());
-                        return conn;
-                    }
-                },
-                new ByteRangeInputStream.URLOpener(null) {
-                    @Override
-                    protected HttpURLConnection connect(final long offset, final boolean resolved) throws IOException {
-                        var conn = HttpClient.getStreamUrlConnection((offset == 0L ? new URL(openUrl) : new URL(openUrl + "&" + new OffsetParam(offset))).toString());
-                        conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-                        setURL(conn.getURL());
-                        return conn;
-                    }
-                }) {
-            @Override
-            protected URL getResolvedUrl(HttpURLConnection connection) throws IOException {
-                var url = connection.getURL();
-                var query = url.getQuery();
-                if (query == null) {
-                    return url;
-                }
-                final var lower = query.toLowerCase(Locale.ENGLISH);
-                if (!lower.startsWith(OFFSET_PARAM_PREFIX) && !lower.contains("&" + OFFSET_PARAM_PREFIX)) {
-                    return url;
-                }
-                StringBuilder b = null;
-                for (final var st = new StringTokenizer(query, "&"); st.hasMoreTokens(); ) {
-                    final var token = st.nextToken();
-                    if (!token.toLowerCase(Locale.ENGLISH).startsWith(OFFSET_PARAM_PREFIX)) {
-                        if (b == null) {
-                            b = new StringBuilder("?").append(token);
-                        } else {
-                            b.append('&').append(token);
-                        }
-                    }
-                }
-                query = b == null ? "" : b.toString();
-                final var urlStr = url.toString();
-                return new URL(urlStr.substring(0, urlStr.indexOf('?')) + query);
-            }
-        };
-    }
-
     public boolean exists(String path) {
         try {
             return this.getFileStatus(path) != null;
@@ -157,6 +106,57 @@ public class WebHdfsFileSystem {
 
     public Map<String, Object> getFileStatus(String path) {
         return runWithHttp(path, HttpFSOperation.GETFILESTATUS, new HashMap<>(), JsonUtil::stream2Map);
+    }
+
+    public InputStream open(final String f) throws IOException {
+        final var openUrl = getUrl(f, Map.of("offset", String.valueOf(0L), "buffersize", "" + (FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES > 0 ? (int) FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES : FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES)), HttpFSOperation.OPEN.name());
+        return new ByteRangeInputStream(
+                new ByteRangeInputStream.URLOpener(null) {
+                    @Override
+                    protected HttpURLConnection connect(long offset, boolean resolved) throws IOException {
+                        assert offset == 0;
+                        var conn = HttpClient.getStreamUrlConnection(openUrl);
+                        conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+                        setURL(conn.getURL());
+                        return conn;
+                    }
+                },
+                new ByteRangeInputStream.URLOpener(null) {
+                    @Override
+                    protected HttpURLConnection connect(final long offset, final boolean resolved) throws IOException {
+                        var conn = HttpClient.getStreamUrlConnection((offset == 0L ? new URL(openUrl) : new URL(openUrl + "&" + new OffsetParam(offset))).toString());
+                        conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+                        setURL(conn.getURL());
+                        return conn;
+                    }
+                }) {
+            @Override
+            protected URL getResolvedUrl(HttpURLConnection connection) throws IOException {
+                var url = connection.getURL();
+                var query = url.getQuery();
+                if (query == null) {
+                    return url;
+                }
+                final var lower = query.toLowerCase(Locale.ENGLISH);
+                if (!lower.startsWith(OFFSET_PARAM_PREFIX) && !lower.contains("&" + OFFSET_PARAM_PREFIX)) {
+                    return url;
+                }
+                StringBuilder b = null;
+                for (final var st = new StringTokenizer(query, "&"); st.hasMoreTokens(); ) {
+                    final var token = st.nextToken();
+                    if (!token.toLowerCase(Locale.ENGLISH).startsWith(OFFSET_PARAM_PREFIX)) {
+                        if (b == null) {
+                            b = new StringBuilder("?").append(token);
+                        } else {
+                            b.append('&').append(token);
+                        }
+                    }
+                }
+                query = b == null ? "" : b.toString();
+                final var urlStr = url.toString();
+                return new URL(urlStr.substring(0, urlStr.indexOf('?')) + query);
+            }
+        };
     }
 
     @SuppressWarnings("unchecked")
