@@ -5,10 +5,14 @@ import org.ld.exception.CodeStackException;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @SuppressWarnings("all")
 public class StringUtil {
@@ -94,6 +98,30 @@ public class StringUtil {
             return stringBuilder.toString();
         } catch (Exception e) {
             throw new CodeStackException(e);
+        }
+    }
+
+    /**
+     * 将带有特殊字符的路径转换成为url可显示的路径 delimiters 为可以进行特殊处理不去转换的特殊字符集合
+     */
+    public static String toSafePath(String path, String... exclude) {
+        if (exclude.length == 0) {
+            return URLEncoder.encode(path, StandardCharsets.UTF_8);
+        } else if (exclude.length == 1) {
+            final var delimiter = exclude[0];
+            if (delimiter.equals(path)) return path;
+            final var sl = new ArrayList<String>();
+            for (var a : path.split(delimiter)) {
+                sl.add(URLEncoder.encode(a, StandardCharsets.UTF_8));
+            }
+            return String.join(delimiter, sl);
+        } else {
+            final var delimiter = exclude[0];
+            final var sl = new ArrayList<String>();
+            for (var a : path.split(delimiter)) {
+                sl.add(toSafePath(a, Stream.of(exclude).skip(1).toArray(String[]::new)));
+            }
+            return String.join(delimiter, sl);
         }
     }
 

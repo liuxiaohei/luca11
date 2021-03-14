@@ -7,10 +7,13 @@ import org.ld.uc.UCFunction;
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.http.MediaType;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
@@ -28,6 +31,48 @@ public class HttpClient {
                 .connectTimeout(CONNECT_TIME_OUT, TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool(MAX_IDLE_CONNECTS, 5, TimeUnit.SECONDS))
                 .build();
+    }
+
+    /**
+     * 返回OutPutStream OutPutStream关闭 连接资源才会关闭
+     */
+    public static OutputStream getOutputStreamByUrl(String url, String method, int bufferSize) throws IOException {
+        UCFunction<String, HttpURLConnection> getConnection = u -> {
+            var conn = HttpClient.getStreamUrlConnection(u);
+            conn.setRequestMethod(method);
+            conn.setInstanceFollowRedirects(false);
+            conn.setChunkedStreamingMode(32 << 10); // 32kB-chunk
+            return conn;
+        };
+        HttpURLConnection conn;
+        try {
+            conn = getConnection.apply(url);
+            if (conn.getResponseCode() == 307) {    // 跨VPN情况
+                var location = conn.getHeaderField("location");
+                conn.disconnect();
+                conn = getConnection.apply(location);
+            }
+        } catch (Throwable e) {
+            throw new CodeStackException(e);
+        }
+        var conn1 = conn;
+        return new BufferedOutputStream(conn1.getOutputStream(), bufferSize) {
+            @Override
+            public void close() throws IOException {
+                try {
+                    super.close();
+                } finally {
+                    try {
+                        conn1.getInputStream();
+                        if (!((conn1.getResponseCode() == 200) || (conn1.getResponseCode() == 201) || (conn1.getResponseCode() == 202))) {
+                            log.error("请求失败----Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
+                        }
+                    } finally {
+                        conn1.disconnect();
+                    }
+                }
+            }
+        };
     }
 
     public static HttpURLConnection getStreamUrlConnection(String url) throws IOException {

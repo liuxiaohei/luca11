@@ -2,9 +2,11 @@ package org.ld.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class FileUtil {
 
+    public static final Integer DEFAULT_FILE_BUFFER_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
     private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
     /**
@@ -412,4 +415,28 @@ public class FileUtil {
         }
     }
 
+    public static void copyInputStream2OutputStream(InputStream from, OutputStream to) {
+        try {
+            var buffer = new byte[DEFAULT_FILE_BUFFER_SIZE_IN_BYTES];
+            var len = from.read(buffer);
+            while (len != -1) {
+                to.write(buffer, 0, len);
+                len = from.read(buffer);
+            }
+        } catch (Exception e) {
+            throw new CodeStackException(e);
+        }
+    }
+
+    public static class LocalFileSystemHolder {
+        public static LocalFileSystem localFileSystem;
+
+        static {
+            try {
+                localFileSystem = new LocalFileSystem(FileSystem.getLocal(new Configuration()));
+            } catch (IOException e) {
+                throw new CodeStackException(e);
+            }
+        }
+    }
 }
