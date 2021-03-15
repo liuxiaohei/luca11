@@ -16,23 +16,28 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+/**
+ * https://www.jianshu.com/p/a71a42f4634b
+ */
 @SuppressWarnings("unused")
 @Slf4j
 public class HttpClient {
 
     public static final Supplier<Headers> JSON_HEAD_SUPPLIER = () -> new Headers.Builder().add("Content-Type", "application/json").build();
-    public static final Supplier<Headers> STREAM_HEAD_SUPPLIER =() -> new Headers.Builder().add("Content-Type", "application/octet-stream").build();
+    public static final Supplier<Headers> STREAM_HEAD_SUPPLIER = () -> new Headers.Builder().add("Content-Type", "application/octet-stream").build();
 
     private static class OkHttpClientHandler {
         private static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .readTimeout(30000, TimeUnit.SECONDS)
-                .connectTimeout(30000, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool(20, 5, TimeUnit.SECONDS))
+                .retryOnConnectionFailure(true)
                 .build();
     }
 
     /**
      * 返回OutPutStream OutPutStream关闭 连接资源才会关闭
+     * todo 暂时没有 从Okhttp 中找到可以直接从一次请求的连接中获取conn对象的手段
      */
     public static OutputStream getOutputStreamByUrl(String url, String method, int bufferSize) {
         UCFunction<String, HttpURLConnection> getConnection = u -> {
@@ -65,7 +70,7 @@ public class HttpClient {
                             conn1.getInputStream();
                             var code = conn1.getResponseCode();
                             if (!(code >= 200 && code < 300)) {
-                                log.error("请求失败----Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
+                                log.error("请求失败 Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
                             }
                         } finally {
                             conn1.disconnect();
