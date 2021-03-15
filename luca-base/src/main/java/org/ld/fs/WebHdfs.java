@@ -26,6 +26,18 @@ public class WebHdfs {
         return HttpClient.put(getUrl(path, new HashMap<>(), "MKDIRS"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
 
+    public Boolean setReplication(final String path, short replication) {
+        return HttpClient.put(getUrl(path, Map.of("replication", "" + replication), "SETREPLICATION"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
+    }
+
+    public void setTimes(String p, long mtime, long atime) {
+        HttpClient.put(getUrl(p, Map.of("modificationtime", mtime + "", "accesstime", "" + atime), "SETTIMES"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, e -> 0);
+    }
+
+    public Map<String, Object> getHomeDirectory() {
+        return HttpClient.get(getUrl("", new HashMap<>(), "GETHOMEDIRECTORY"), HttpClient.JSON_HEAD_SUPPLIER.get(), JsonUtil::stream2Map);
+    }
+
     public Boolean rename(final String src, final String dst) {
         return HttpClient.put(getUrl(src, Map.of("destination", StringUtil.toSafeUrlPath(dst)), "RENAME"), HttpClient.JSON_HEAD_SUPPLIER.get(), null, boolResult);
     }
@@ -72,7 +84,7 @@ public class WebHdfs {
         return HttpClient.getOutputStreamByUrl(getUrl(path, Map.of("data", "TRUE", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "APPEND"), "POST", FileUtil.DEFAULT_FILE_BUFFER_SIZE_IN_BYTES);
     }
 
-    public <T> T open(final String f,UCFunction<InputStream, T> handler) {
+    public <T> T open(final String f, UCFunction<InputStream, T> handler) {
         return HttpClient.execute("GET", getUrl(f, Map.of("offset", "0", "buffersize", FileUtil.DEFAULT_BUFFER_SIZE_STRING), "OPEN"), HttpClient.STREAM_HEAD_SUPPLIER.get(), null, handler);
     }
 

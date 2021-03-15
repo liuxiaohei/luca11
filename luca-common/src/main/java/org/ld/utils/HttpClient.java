@@ -131,20 +131,15 @@ public class HttpClient {
                 var responseBody = response.body();
                 if (responseBody != null) {
                     try (var in = responseBody.byteStream()) {
-                        if (null == in) {
-                            return null;
-                        }
-                        try {
+                        if (null != in) {
                             return handler.apply(in);
-                        } catch (Throwable e) {
-                            throw new CodeStackException(e);
                         }
                     }
                 }
             } else {
                 throw new CodeStackException("请求失败 URL :" + url + " method:" + method);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new CodeStackException(e);
         }
         return null;
