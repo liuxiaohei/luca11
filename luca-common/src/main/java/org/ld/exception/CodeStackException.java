@@ -8,7 +8,7 @@ import org.ld.enums.UserErrorCodeEnum;
  */
 public class CodeStackException extends RuntimeException {
 
-    private final ErrorCode errorCode;
+    private ErrorCode errorCode;
 
     public static CodeStackException of(Throwable e) {
         if (e instanceof CodeStackException) {
@@ -16,6 +16,13 @@ public class CodeStackException extends RuntimeException {
         } else {
             return new CodeStackException(e);
         }
+    }
+
+    public static CodeStackException of(UserErrorCodeEnum userErrorCodeEnum,Throwable e) {
+        var r = of(e);
+        r.errorCode = new ErrorCode(userErrorCodeEnum);
+        r.errorCode.setMsg(e.getMessage());
+        return r;
     }
 
     public CodeStackException(String msg) {
@@ -32,13 +39,6 @@ public class CodeStackException extends RuntimeException {
         super(e.getMessage(), e);
         super.setStackTrace(e.getStackTrace());
         this.errorCode = SystemErrorCodeEnum.getSystemErrorCode(e);
-    }
-
-    public CodeStackException(UserErrorCodeEnum userErrorCodeEnum, Throwable e) {
-        super(e.getMessage(), e);
-        super.setStackTrace(e.getStackTrace());
-        this.errorCode = new ErrorCode(userErrorCodeEnum);
-        this.errorCode.setMsg(e.getMessage());
     }
 
     public ErrorCode getErrorCode() {

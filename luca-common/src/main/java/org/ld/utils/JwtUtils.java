@@ -44,7 +44,7 @@ public class JwtUtils {
                     .build();
             verifier.verify(token);
         } catch (Exception e) {
-            throw new CodeStackException(UserErrorCodeEnum.USELESS_TOKEN, e);
+            throw CodeStackException.of(UserErrorCodeEnum.USELESS_TOKEN, e);
         }
     }
 
