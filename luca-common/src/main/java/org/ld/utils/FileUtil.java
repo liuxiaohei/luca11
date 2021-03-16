@@ -4,10 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocalFileSystem;
-import org.apache.hadoop.fs.Path;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -434,7 +430,7 @@ public class FileUtil {
             FileUtil.copyInputStream2OutputStream(is,os);
         }
         if (delSrc) {
-            FileUtil.LocalFileSystemHolder.localFileSystem.delete(new Path(src), true);
+            LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
         }
     }
 
@@ -448,18 +444,6 @@ public class FileUtil {
             }
         } catch (Exception e) {
             throw new CodeStackException(e);
-        }
-    }
-
-    public static class LocalFileSystemHolder {
-        public static LocalFileSystem localFileSystem;
-
-        static {
-            try {
-                localFileSystem = new LocalFileSystem(FileSystem.getLocal(new Configuration()));
-            } catch (IOException e) {
-                throw new CodeStackException(e);
-            }
         }
     }
 }
