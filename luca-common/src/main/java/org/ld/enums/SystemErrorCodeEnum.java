@@ -93,8 +93,6 @@ public enum SystemErrorCodeEnum {
                     logger.info("ErrorCode:" + e.code + " Reason:" + e.msg);
                     return new ErrorCode(e);
                 })
-                .orElseGet(() ->
-                        new ErrorCode(SystemErrorCodeEnum.UNKNOWN)
-                                .setMsg(t.getMessage()));
+                .orElseGet(() -> new ErrorCode(SystemErrorCodeEnum.UNKNOWN).setMsg(t.getMessage()));
     }
 }
