@@ -82,7 +82,10 @@ public class FileUtil {
                         in.close();
                         if (deleteFileAfterClose && file.exists()) {
                             LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
-                            if (deleteDirAfterClose && file.getParentFile().exists() && file.getParentFile().listFiles().length == 0) {
+                            if (deleteDirAfterClose && file.getParentFile().exists() && Optional
+                                    .ofNullable(file.getParentFile())
+                                    .map(File::listFiles)
+                                    .map(e -> e.length == 0).orElse(false)) {
                                 LOG.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
                             }
                         } // 自动删除文件
@@ -151,8 +154,7 @@ public class FileUtil {
     /**
      * 上传文件到指定的路径
      */
-    public static void saveFile(MultipartFile f,
-                                String dirBasePath) throws IOException {
+    public static void saveFile(MultipartFile f, String dirBasePath) throws IOException {
         String fileName = f.getOriginalFilename();
         String type = f.getContentType();
         System.out.println(fileName + " ," + type);
@@ -189,9 +191,8 @@ public class FileUtil {
      */
     public static void makeDirs(String path) {
         File file = new File(path);
-        // 如果文件夹不存在则创建
         if (!file.exists() && !file.isDirectory()) {
-            file.mkdirs();
+            LOG.info("创建文件" + (file.mkdirs() ? "成功" : "失败"));
         } else {
             System.out.println("创建目录失败：" + path);
         }
@@ -261,11 +262,11 @@ public class FileUtil {
     public static byte[] toByteArray(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024 * 4];
-        int n = 0;
+        int n;
         while ((n = in.read(buffer)) != -1) {
             out.write(buffer, 0, n);
         }
-        try (ByteArrayOutputStream o = out) {
+        try (ByteArrayOutputStream ignored = out) {
             return out.toByteArray();
         }
     }
@@ -305,11 +306,11 @@ public class FileUtil {
     public static void delTempChild(File file) {
         if (file.isDirectory()) {
             String[] children = file.list();//获取文件夹下所有子文件夹
-            for (String child : children) {
+            for (String child : Optional.ofNullable(children).orElseGet(() -> new String[0])) {
                 delTempChild(new File(file, child));
             }
         }
-        file.delete();
+        LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
     }
 
     private static void compress(File sourceFile,
@@ -336,9 +337,9 @@ public class FileUtil {
             } else {
                 for (File file : listFiles) {
                     if (KeepDirStructure) {
-                        compress(file, zos, name + "/" + file.getName(), KeepDirStructure);
+                        compress(file, zos, name + "/" + file.getName(), true);
                     } else {
-                        compress(file, zos, file.getName(), KeepDirStructure);
+                        compress(file, zos, file.getName(), false);
                     }
                 }
             }
@@ -427,7 +428,7 @@ public class FileUtil {
             throw new CodeStackException(String.format("%s isn't a file.", src));
         }
         try (var is = new FileInputStream(src); var os = outputStream) {
-            FileUtil.copyInputStream2OutputStream(is,os);
+            FileUtil.copyInputStream2OutputStream(is, os);
         }
         if (delSrc) {
             LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
