@@ -24,7 +24,7 @@ public class ThreadInterruptDemo {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
-                throw new CodeStackException(e);
+                throw CodeStackException.of(e);
             }
             System.out.println("HelloWorld1");
             System.out.println("HelloWorld2");
@@ -48,7 +48,7 @@ public class ThreadInterruptDemo {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
-                throw new CodeStackException(e);
+                throw CodeStackException.of(e);
             }
             System.out.println("HelloWorld1");
             System.out.println("HelloWorld2");

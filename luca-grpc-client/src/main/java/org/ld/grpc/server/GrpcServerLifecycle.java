@@ -43,7 +43,7 @@ public class GrpcServerLifecycle implements SmartLifecycle {
                 awaitThread.start();
             }
         } catch (IOException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 

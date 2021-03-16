@@ -55,7 +55,7 @@ public class ExcelUtils {
                     .sheet()
                     .doRead();
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
         objects.forEach(o -> dbStructures.add((T) o));
         return dbStructures;

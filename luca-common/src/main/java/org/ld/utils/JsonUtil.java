@@ -32,7 +32,7 @@ public class JsonUtil {
         try {
             return objectMapper.readValue(json, type);
         } catch (JsonProcessingException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -58,7 +58,7 @@ public class JsonUtil {
         try {
             return mapper.writeValueAsString(obj);
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -67,7 +67,7 @@ public class JsonUtil {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -100,7 +100,7 @@ public class JsonUtil {
             var id = getShortUuid();
             log.error(id + " json转换异常:" + json);
             log.error(id + " className" + cls.getName());
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -115,7 +115,7 @@ public class JsonUtil {
             return new ObjectMapper().readValue(json, new TypeReference<>() {
             });
         } catch (IOException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -123,7 +123,7 @@ public class JsonUtil {
         try {
             return new ObjectMapper().convertValue(new ObjectMapper().readTree(StringUtil.stream2String(is)).findValue(key), tClass);
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -152,7 +152,7 @@ public class JsonUtil {
                                         .filter(s -> !"null".equals(s))
                                         .orElse(null);
                             } catch (JsonProcessingException ex) {
-                                throw new CodeStackException(ex);
+                                throw CodeStackException.of(ex);
                             }
                         }
                         if (null == value) {
@@ -163,7 +163,7 @@ public class JsonUtil {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -181,14 +181,14 @@ public class JsonUtil {
             try {
                 return new ObjectMapper().convertValue(new ObjectMapper().readTree(valueStr), valueType);
             } catch (Exception e1) {
-                throw new CodeStackException(e1);
+                throw CodeStackException.of(e1);
             }
         }));
         try {
             final JsonNode node = new ObjectMapper().readTree(new ObjectMapper().writeValueAsString(stringObjectMap));
             return new ObjectMapper().convertValue(node, clazz);
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 

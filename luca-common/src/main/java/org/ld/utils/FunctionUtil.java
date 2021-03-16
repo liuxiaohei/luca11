@@ -18,16 +18,16 @@ public class FunctionUtil {
     public static <T, R> R applyWithUC(UCFunction<T, R> function, T t) {
         try {
             return function.apply(t);
-        } catch (Throwable throwable) {
-            throw new CodeStackException(throwable);
+        } catch (Throwable e) {
+            throw CodeStackException.of(e);
         }
     }
 
     public static void runWithUC(UCRunnable runnable) {
         try {
             runnable.run();
-        } catch (Throwable throwable) {
-            throw new CodeStackException(throwable);
+        } catch (Throwable e) {
+            throw CodeStackException.of(e);
         }
     }
 

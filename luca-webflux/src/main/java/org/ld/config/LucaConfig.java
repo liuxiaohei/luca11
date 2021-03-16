@@ -280,7 +280,7 @@ public class LucaConfig {
             flyway.migrate();
         } catch (Exception e) {
             log.error("", e);
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -330,7 +330,7 @@ public class LucaConfig {
                     try {
                         return e.getDeclaredMethod("methodForParams");
                     } catch (NoSuchMethodException noSuchMethodException) {
-                        throw new CodeStackException(noSuchMethodException);
+                        throw CodeStackException.of(noSuchMethodException);
                     }
                 }).get(), -1);
     }

@@ -16,7 +16,7 @@ public class JclUtils {
                     new Class[]{tClass},
                     (proxy, method, args) -> object.getClass().getMethod(method.getName(), method.getParameterTypes()).invoke(object, args));
         } catch (Throwable e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 

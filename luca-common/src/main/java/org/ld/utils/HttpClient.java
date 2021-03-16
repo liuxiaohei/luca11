@@ -47,19 +47,14 @@ public class HttpClient {
             conn.setChunkedStreamingMode(32 << 10); // 32kB-chunk
             return conn;
         };
-        HttpURLConnection conn;
         try {
-            conn = getConnection.apply(url);
+            var conn = getConnection.apply(url);
             if (conn.getResponseCode() == 307) {    // 跨VPN情况
                 var location = conn.getHeaderField("location");
                 conn.disconnect();
                 conn = getConnection.apply(location);
             }
-        } catch (Throwable e) {
-            throw new CodeStackException(e);
-        }
-        var conn1 = conn;
-        try {
+            var conn1 = conn;
             return new BufferedOutputStream(conn1.getOutputStream(), bufferSize) {
                 @Override
                 public void close() throws IOException {
@@ -78,8 +73,8 @@ public class HttpClient {
                     }
                 }
             };
-        } catch (Exception e) {
-            throw new CodeStackException(e);
+        } catch (Throwable e) {
+            throw CodeStackException.of(e);
         }
     }
 
@@ -94,7 +89,7 @@ public class HttpClient {
             conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             return conn;
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -119,30 +114,16 @@ public class HttpClient {
     }
 
     public static <R> R execute(String method, String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
-        var requestBuild = new Request.Builder()
-                .url(url)
-                .method(method, body);
-        if (headers != null) {
-            requestBuild.headers(headers);
-        }
-        try {
-            var response = OkHttpClientHandler.okHttpClient.newCall(requestBuild.build()).execute();
-            if (response.isSuccessful()) {
-                var responseBody = response.body();
-                if (responseBody != null) {
-                    try (var in = responseBody.byteStream()) {
-                        if (null != in) {
-                            return handler.apply(in);
-                        }
-                    }
+        return executeWithUnClose(method, url, headers, body, is -> {
+            try (var in = is) {
+                if (null != in) {
+                    return handler.apply(in);
                 }
-            } else {
-                throw new CodeStackException("请求失败 URL :" + url + " method:" + method);
+            } catch (Throwable e) {
+                throw CodeStackException.of(e);
             }
-        } catch (Throwable e) {
-            throw new CodeStackException(e);
-        }
-        return null;
+            return null;
+        });
     }
 
     public static <R> R executeWithUnClose(String method, String url, Headers headers, RequestBody body, Function<InputStream, R> handler) {
@@ -164,10 +145,10 @@ public class HttpClient {
                     return handler.apply(in);
                 }
             } else {
-                throw new CodeStackException("请求失败");
+                throw new CodeStackException("请求失败 URL :" + url + " method:" + method);
             }
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
         return null;
     }

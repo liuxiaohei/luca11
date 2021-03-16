@@ -29,7 +29,7 @@ public class CircularByteBuffer {
         try {
             inputStream = new PipedInputStream((PipedOutputStream) outputStream, bufferSize);
         } catch (IOException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 

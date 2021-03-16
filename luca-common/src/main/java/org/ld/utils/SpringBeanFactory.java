@@ -22,7 +22,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
         try {
             return applicationContext.getBean(clazz);
         } catch (BeansException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -33,7 +33,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
         try {
             return applicationContext.getBean(name);
         } catch (BeansException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -44,7 +44,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
         try {
             return applicationContext.getType(name);
         } catch (BeansException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -52,7 +52,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
         try {
             return applicationContext.findAnnotationOnBean(beanName,clazz);
         } catch (BeansException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -60,7 +60,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
         try {
             return applicationContext.getBean(beanName,clazz);
         } catch (BeansException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -68,7 +68,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
         try {
             return applicationContext.getBeanNamesForType(clazz);
         } catch (BeansException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -84,7 +84,7 @@ public class SpringBeanFactory implements ApplicationContextAware {
         try {
             return applicationContext.getBeanNamesForAnnotation(clazz);
         } catch (BeansException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 }

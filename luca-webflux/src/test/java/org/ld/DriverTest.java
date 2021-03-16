@@ -27,7 +27,7 @@ public class DriverTest {
                 stmt.execute("INSERT INTO table_name_date  VALUES (DEFAULT, DEFAULT)");
             }
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 }

@@ -58,7 +58,7 @@ public class SocketTest {
 //                log.info(" 接收到的响应 " + resp.readLine());
 
             } catch (Exception e) {
-                throw new CodeStackException(e);
+                throw CodeStackException.of(e);
             }
         }).start();
     }
@@ -78,7 +78,7 @@ public class SocketTest {
             out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));// 数据传输  阻塞2
             out.flush();
         } catch (IOException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
         Thread.sleep(1000);
     }

@@ -40,7 +40,7 @@ public class RespBean<T> {
                     }
                     return null;
                 })
-                .orElseGet(() -> new CodeStackException(e));
+                .orElseGet(() -> CodeStackException.of(e));
         this.setErrorCode(Optional.of(se)
                 .map(CodeStackException::getErrorCode)
                 .map(ErrorCode::getCode)

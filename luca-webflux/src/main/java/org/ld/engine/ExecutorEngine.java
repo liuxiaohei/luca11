@@ -44,7 +44,7 @@ public class ExecutorEngine {
                     .build();
             scheduler.scheduleJob(jobDetail, trigger);
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 }

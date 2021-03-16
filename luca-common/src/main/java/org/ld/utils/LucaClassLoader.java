@@ -73,7 +73,7 @@ public class LucaClassLoader extends URLClassLoader {
             Thread.currentThread().setContextClassLoader(this);
             return function.get();
         } catch (Throwable e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         } finally {
             Thread.currentThread().setContextClassLoader(storeClassLoader);
         }

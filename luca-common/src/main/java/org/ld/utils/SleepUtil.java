@@ -9,7 +9,7 @@ public class SleepUtil {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 }

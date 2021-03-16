@@ -107,7 +107,7 @@ public class SynchronizationAspect {
                 }
             }
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         } finally {
             if (StringUtil.isNotEmpty(key)) {
                 numberRedisTemplate.delete(key);

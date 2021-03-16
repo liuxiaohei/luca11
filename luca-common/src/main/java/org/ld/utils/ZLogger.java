@@ -18,7 +18,7 @@ public class ZLogger {
             try {
                 return org.slf4j.LoggerFactory.getLogger(ClassLoader.getSystemClassLoader().loadClass(className));
             } catch (Exception e) {
-                throw new CodeStackException(e);
+                throw CodeStackException.of(e);
             }
         });
     }

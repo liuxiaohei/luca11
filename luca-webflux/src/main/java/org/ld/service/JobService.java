@@ -103,7 +103,7 @@ public class JobService {
         try {
             updateScheduleJob(scheduler, jobBean);
         } catch (SchedulerException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 
@@ -221,7 +221,7 @@ public class JobService {
             try {
                 scheduler.pauseJob(getJobKey(scheduleJob.getId()));
             } catch (SchedulerException e) {
-                throw new CodeStackException(e);
+                throw CodeStackException.of(e);
             }
         }
 
@@ -243,7 +243,7 @@ public class JobService {
         try {
             return (CronTrigger) scheduler.getTrigger(getTriggerKey(jobId));
         } catch (SchedulerException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 }

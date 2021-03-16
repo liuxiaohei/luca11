@@ -142,7 +142,7 @@ public class FileUtil {
                 }
             }
         } catch (IOException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         } finally {
             if (deleteZipFile && zipFile.exists()) {
                 LOG.info("删除文件" + (zipFile.delete() ? "成功" : "失败"));
@@ -181,7 +181,7 @@ public class FileUtil {
             LOG.info("创建文件" + (tmp.getParentFile().mkdir() ? "成功" : "失败"));
             file.transferTo(tmp);
         } catch (IOException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
         return tmp;
     }
@@ -238,7 +238,7 @@ public class FileUtil {
             String md5 = DigestUtils.md5Hex(new FileInputStream(fileName));
             return new TextFile(sbf.toString(), fileName, md5, file.length());
         } catch (IOException e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         } finally {
             if (deleteFileAfterRead && file.exists()) {
                 LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
@@ -444,7 +444,7 @@ public class FileUtil {
                 len = from.read(buffer);
             }
         } catch (Exception e) {
-            throw new CodeStackException(e);
+            throw CodeStackException.of(e);
         }
     }
 }
