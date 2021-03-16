@@ -11,14 +11,10 @@ public class CodeStackException extends RuntimeException {
     private ErrorCode errorCode;
 
     public static CodeStackException of(Throwable e) {
-        if (e instanceof CodeStackException) {
-            return (CodeStackException) e;
-        } else {
-            return new CodeStackException(e);
-        }
+        return e instanceof CodeStackException ? (CodeStackException) e : new CodeStackException(e);
     }
 
-    public static CodeStackException of(UserErrorCodeEnum userErrorCodeEnum,Throwable e) {
+    public static CodeStackException of(UserErrorCodeEnum userErrorCodeEnum, Throwable e) {
         var r = of(e);
         r.errorCode = new ErrorCode(userErrorCodeEnum);
         r.errorCode.setMsg(e.getMessage());
