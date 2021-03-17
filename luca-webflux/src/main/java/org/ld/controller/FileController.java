@@ -1,5 +1,6 @@
 package org.ld.controller;
 
+import org.ld.exception.CodeStackException;
 import org.ld.utils.SnowflakeId;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
@@ -39,7 +40,7 @@ public class FileController {
     }
 
     @RequestMapping(value = "/upload/single", method = RequestMethod.POST)
-    public Mono<String> single(@RequestPart("file") Mono<FilePart> file) throws IOException {
+    public Mono<String> single(@RequestPart("file") Mono<FilePart> file) {
         //此时已转换为File类，具体的业务逻辑我就忽略了
         return file.map(filePart -> {
             Path tempFile = null;
@@ -50,10 +51,12 @@ public class FileController {
             }
             AsynchronousFileChannel channel = null;
             try {
+                assert tempFile != null;
                 channel = AsynchronousFileChannel.open(tempFile, StandardOpenOption.WRITE);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            assert channel != null;
             DataBufferUtils.write(filePart.content(), channel, 0).doOnComplete(() -> {
                 System.out.println("finish");
             }).subscribe();
@@ -64,14 +67,14 @@ public class FileController {
     }
 
     @RequestMapping(value = "/upload/numty", method = RequestMethod.POST)
-    public Mono<List<String>> more(@RequestPart("file") Flux<FilePart> file) throws IOException {
+    public Mono<List<String>> more(@RequestPart("file") Flux<FilePart> file) {
         //此时已转换为File类，具体的业务逻辑我就忽略了
         return file.map(filePart -> {
             Path tempFile = null;
             try {
                 tempFile = Files.createTempFile("test", filePart.filename());
             } catch (IOException e) {
-                e.printStackTrace();
+                throw CodeStackException.of(e);
             }
             filePart.transferTo(tempFile.toFile());
             return tempFile;

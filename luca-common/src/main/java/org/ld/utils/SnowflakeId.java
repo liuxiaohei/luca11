@@ -1,5 +1,13 @@
 package org.ld.utils;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
+import org.ld.exception.CodeStackException;
+
+import java.util.function.Supplier;
+
 /**
  * https://www.cnblogs.com/relucent/p/4955340.html
  * Twitter_Snowflake
@@ -36,13 +44,41 @@ public class SnowflakeId {
      */
     private long lastTimestamp = -1L;
 
-    private SnowflakeId(long workerId, long datacenterId) {
-        this.workerId = workerId;
-        this.datacenterId = datacenterId;
+    private SnowflakeId(Supplier<Long> IdGetter) {
+        var makerId = makerId();
+        this.workerId = makerId % 32;
+        this.datacenterId = makerId / 32;
+    }
+
+    CuratorFramework client = null;
+
+    private long makerId() {
+        //ZooKeeper客户端
+        client = CuratorFrameworkFactory.newClient("127.0.0.1:2181", new ExponentialBackoffRetry(1000, 3));
+        client.start();
+        String nodeName = "/IDMaker/ID-";
+        String str;
+        try {
+            str = client.create()             // 创建一个 ZNode 顺序节点
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)//避免zookeeper的顺序节点暴增，可以删除创建的顺序节点
+                    .forPath(nodeName);
+        } catch (Exception e) {
+            throw CodeStackException.of(e);
+        }
+        if (null == str) {
+            return 0;
+        }
+        int index = str.lastIndexOf(nodeName);
+        if (index >= 0) {
+            index += nodeName.length();
+            str = index <= str.length() ? str.substring(index) : "";
+        }
+        return Long.parseLong(str) % 1024;
     }
 
     private static class Holder {
-        private static final SnowflakeId idWorker = new SnowflakeId(0, 0);
+        private static final SnowflakeId idWorker = new SnowflakeId(() -> 0L);
     }
 
     /**
