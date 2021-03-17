@@ -1,11 +1,5 @@
 package org.ld.utils;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.CreateMode;
-import org.ld.exception.CodeStackException;
-
 import java.util.function.Supplier;
 
 /**
@@ -44,48 +38,14 @@ public class SnowflakeId {
      */
     private long lastTimestamp = -1L;
 
-    private SnowflakeId(Supplier<Long> IdGetter) {
-        var makerId = makerId();
+    public static class LocalHolder {
+        static final SnowflakeId idWorker = new SnowflakeId(() -> 0L);
+    }
+
+    public SnowflakeId(Supplier<Long> idGetter) {
+        var makerId = idGetter.get();
         this.workerId = makerId % 32;
         this.datacenterId = makerId / 32;
-    }
-
-    CuratorFramework client = null;
-
-    private long makerId() {
-        //ZooKeeper客户端
-        client = CuratorFrameworkFactory.newClient("127.0.0.1:2181", new ExponentialBackoffRetry(1000, 3));
-        client.start();
-        String nodeName = "/IDMaker/ID-";
-        String str;
-        try {
-            str = client.create()             // 创建一个 ZNode 顺序节点
-                    .creatingParentsIfNeeded()
-                    .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)//避免zookeeper的顺序节点暴增，可以删除创建的顺序节点
-                    .forPath(nodeName);
-        } catch (Exception e) {
-            throw CodeStackException.of(e);
-        }
-        if (null == str) {
-            return 0;
-        }
-        int index = str.lastIndexOf(nodeName);
-        if (index >= 0) {
-            index += nodeName.length();
-            str = index <= str.length() ? str.substring(index) : "";
-        }
-        return Long.parseLong(str) % 1024;
-    }
-
-    private static class Holder {
-        private static final SnowflakeId idWorker = new SnowflakeId(() -> 0L);
-    }
-
-    /**
-     * 最大可能会有20位
-     */
-    public static Long get() {
-        return Holder.idWorker.nextId();
     }
 
     private static final long stepSize = 1024;
@@ -98,7 +58,7 @@ public class SnowflakeId {
     /**
      * 获得下一个ID (该方法是线程安全的)
      */
-    private synchronized long nextId() {
+    public synchronized Long get() {
         var timestamp = timeGen();
         if (timestamp < lastTimestamp) {
             // https://blog.csdn.net/jiangqian6481/article/details/102888944 检测时钟回退并处理

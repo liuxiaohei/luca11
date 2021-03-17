@@ -164,7 +164,7 @@ public class LucaConfig {
                                 return (RespBean<Object>) o; // 防止多余的封装
                             }
                             final var snowflakeId = Optional.ofNullable(AroundController.UUIDS.get())
-                                    .orElseGet(() -> SnowflakeId.get().toString());
+                                    .orElseGet(() -> IDMaker.get().toString());
                             AroundController.UUIDS.set(snowflakeId);
                             log.info(Optional.ofNullable(AroundController.UUIDS.get())
                                     .map(e -> e + ":")
@@ -195,7 +195,7 @@ public class LucaConfig {
             @Override
             public Mono<Object> resolveArgument(MethodParameter param, BindingContext bindingContext, ServerWebExchange exchange) {
                 var ann = param.getParameterAnnotation(RequestBody.class);
-                final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
+                final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> IDMaker.get().toString());
                 log.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));
                 assert ann != null;
                 return readBody(param, ann.required(), bindingContext, exchange);

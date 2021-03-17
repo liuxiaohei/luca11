@@ -23,6 +23,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Slf4j
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes = {LucaApplication.class})
 public class DemoTest {
 
     @Test
@@ -42,7 +44,7 @@ public class DemoTest {
      */
     @Test
     public void infiniteStream() {
-        Stream.generate(() -> SnowflakeId.get().toString()).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
+        Stream.generate(() -> IDMaker.get().toString()).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
     }
 
     /**
@@ -61,7 +63,7 @@ public class DemoTest {
         List<Long> a = IntStream.rangeClosed(1, 1000000)
                 .parallel()
                 .boxed()
-                .map(e -> SnowflakeId.get())
+                .map(e -> IDMaker.get())
                 .collect(Collectors.toList());
         a.stream().sorted().forEach(System.out::println);
     }

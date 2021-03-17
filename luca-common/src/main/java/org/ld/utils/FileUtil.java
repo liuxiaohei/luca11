@@ -176,7 +176,7 @@ public class FileUtil {
      * 读取Fileduixiang并持久化到本地
      */
     public static File asFile(MultipartFile file) {
-        File tmp = new File("/tmp/" + SnowflakeId.get() + "/" + file.getOriginalFilename());
+        File tmp = new File("/tmp/" +  SnowflakeId.LocalHolder.idWorker.get() + "/" + file.getOriginalFilename());
         try {
             LOG.info("创建文件" + (tmp.getParentFile().mkdir() ? "成功" : "失败"));
             file.transferTo(tmp);

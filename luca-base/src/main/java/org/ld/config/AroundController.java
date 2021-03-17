@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.ld.utils.SnowflakeId;
+import org.ld.utils.IDMaker;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class AroundController {
     @Around("@within(org.springframework.web.bind.annotation.RestController)")
     public Object mapResponseBodyAdvice(ProceedingJoinPoint point) throws Throwable {
         try {
-            final var snowflakeId = Optional.ofNullable(UUIDS.get()).orElseGet(() -> SnowflakeId.get().toString());
+            final var snowflakeId = Optional.ofNullable(UUIDS.get()).orElseGet(() -> IDMaker.get().toString());
             AroundController.UUIDS.set(snowflakeId);
             UUIDS.set(snowflakeId);
             log.info(snowflakeId + ":CLASS_METHOD : " + point.getSignature().getDeclaringTypeName() + "." + point.getSignature().getName());
