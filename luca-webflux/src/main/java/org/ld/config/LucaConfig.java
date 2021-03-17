@@ -84,6 +84,9 @@ public class LucaConfig {
     @Resource
     private DataSourceConfig dataSourceConfig;
 
+    @Resource
+    private SnowflakeId snowflakeId;
+
     /**
      * https://blog.csdn.net/lilinhai548/article/details/107394670
      * http://127.0.0.1:9999/swagger-ui.html#/
@@ -163,9 +166,9 @@ public class LucaConfig {
                             if (o instanceof RespBean) {
                                 return (RespBean<Object>) o; // 防止多余的封装
                             }
-                            final var snowflakeId = Optional.ofNullable(AroundController.UUIDS.get())
-                                    .orElseGet(() -> IDMaker.get().toString());
-                            AroundController.UUIDS.set(snowflakeId);
+                            final var s = Optional.ofNullable(AroundController.UUIDS.get())
+                                    .orElseGet(() -> snowflakeId.get().toString());
+                            AroundController.UUIDS.set(s);
                             log.info(Optional.ofNullable(AroundController.UUIDS.get())
                                     .map(e -> e + ":")
                                     .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
@@ -195,7 +198,7 @@ public class LucaConfig {
             @Override
             public Mono<Object> resolveArgument(MethodParameter param, BindingContext bindingContext, ServerWebExchange exchange) {
                 var ann = param.getParameterAnnotation(RequestBody.class);
-                final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> IDMaker.get().toString());
+                final var shortUUid = Optional.ofNullable(AroundController.UUIDS.get()).orElseGet(() -> snowflakeId.get().toString());
                 log.info(shortUUid + ":RequestBody : {}", JsonUtil.obj2Json(ann));
                 assert ann != null;
                 return readBody(param, ann.required(), bindingContext, exchange);

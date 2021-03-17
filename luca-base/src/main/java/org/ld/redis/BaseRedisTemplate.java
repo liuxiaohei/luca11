@@ -99,7 +99,7 @@ public abstract class BaseRedisTemplate<K, V> extends RedisTemplate<K, V> {
      */
     public List<String> getRandomUniqueKeys(int count) {
         return getNextValues(UNIQUE_KEY, 1000 * 1000L, getRandomInValue(1000) + 1, 0, count)
-                .stream().map(value -> to62RadixString(value)).collect(Collectors.toList());
+                .stream().map(BaseRedisTemplate::to62RadixString).collect(Collectors.toList());
     }
 
     /**

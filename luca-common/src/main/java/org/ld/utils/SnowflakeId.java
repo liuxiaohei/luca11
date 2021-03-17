@@ -1,5 +1,7 @@
 package org.ld.utils;
 
+import org.ld.uc.UCSupplier;
+
 import java.util.function.Supplier;
 
 /**
@@ -42,7 +44,7 @@ public class SnowflakeId {
         static final SnowflakeId idWorker = new SnowflakeId(() -> 0L);
     }
 
-    public SnowflakeId(Supplier<Long> idGetter) {
+    public SnowflakeId(UCSupplier<Long> idGetter) {
         var makerId = idGetter.get();
         this.workerId = makerId % 32;
         this.datacenterId = makerId / 32;

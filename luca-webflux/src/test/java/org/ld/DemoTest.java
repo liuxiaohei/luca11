@@ -5,13 +5,17 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.ld.actors.Buncher;
 import org.ld.beans.Flush;
 import org.ld.beans.Queue;
 import org.ld.beans.SetTarget;
 import org.ld.fs.WebHdfs;
 import org.ld.utils.*;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -23,8 +27,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Slf4j
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(classes = {LucaApplication.class})
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {LucaApplication.class})
 public class DemoTest {
 
     @Test
@@ -39,12 +43,15 @@ public class DemoTest {
         log.info(HttpClient.get("http://www.baidu.com",null, StringUtil::stream2String));
     }
 
+    @Resource
+    SnowflakeId snowflakeId;
+
     /**
      * 无限流
      */
     @Test
     public void infiniteStream() {
-        Stream.generate(() -> IDMaker.get().toString()).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
+        Stream.generate(() -> snowflakeId.get().toString()).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
     }
 
     /**
@@ -63,7 +70,7 @@ public class DemoTest {
         List<Long> a = IntStream.rangeClosed(1, 1000000)
                 .parallel()
                 .boxed()
-                .map(e -> IDMaker.get())
+                .map(e -> snowflakeId.get())
                 .collect(Collectors.toList());
         a.stream().sorted().forEach(System.out::println);
     }

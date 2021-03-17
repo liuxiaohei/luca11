@@ -1,7 +1,7 @@
 package org.ld.controller;
 
 import org.ld.exception.CodeStackException;
-import org.ld.utils.IDMaker;
+import org.ld.utils.SnowflakeId;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,6 +28,9 @@ import java.util.Optional;
 @RequestMapping("/file")
 public class FileController {
 
+    @Resource
+    SnowflakeId snowflakeId;
+
     /**
      * 上传文件
      */
@@ -34,7 +38,7 @@ public class FileController {
     public Object upload(@RequestParam MultipartFile file) throws IOException {
         final var fileName = file.getOriginalFilename();
         final var suffix = Optional.ofNullable(fileName).filter(e -> e.contains(".")).map(e -> e.substring(e.lastIndexOf(".") + 1)).orElse("");
-        final var key = IDMaker.get().toString() + "_" + (file.getSize() / 1024) + Optional.of(suffix).map(e -> "." + e).orElse("");
+        final var key = snowflakeId.get().toString() + "_" + (file.getSize() / 1024) + Optional.of(suffix).map(e -> "." + e).orElse("");
         final var inputStream = file.getInputStream();
         return null;
     }

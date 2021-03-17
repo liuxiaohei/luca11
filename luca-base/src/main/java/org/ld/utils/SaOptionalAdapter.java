@@ -1,7 +1,6 @@
 package org.ld.utils;
 
 import akka.japi.Option;
-
 import java.util.Optional;
 
 public class SaOptionalAdapter {

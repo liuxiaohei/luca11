@@ -2,7 +2,7 @@ package org.ld.engine;
 
 import org.ld.exception.CodeStackException;
 import org.ld.uc.UCRunnable;
-import org.ld.utils.IDMaker;
+import org.ld.utils.SnowflakeId;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +16,9 @@ public class ExecutorEngine {
 
     @Resource
     private Scheduler scheduler;
+
+    @Resource
+    private SnowflakeId snowflakeId;
 
     /**
      * runnable 中的任务 会立刻被调度执行
@@ -37,7 +40,7 @@ public class ExecutorEngine {
         final JobDataMap jobDataMap = new JobDataMap(params);
         try {
             JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
-                    .withIdentity(IDMaker.get().toString(), LocalDateTime.now().toString())
+                    .withIdentity(snowflakeId.get().toString(), LocalDateTime.now().toString())
                     .withDescription("[Nothing]")
                     .setJobData(jobDataMap)
                     .storeDurably()
