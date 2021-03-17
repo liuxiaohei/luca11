@@ -1,6 +1,7 @@
 package org.ld.utils;
 
 import org.ld.exception.CodeStackException;
+import org.ld.uc.UCRunnable;
 import org.ld.uc.UCSupplier;
 
 import java.io.File;
@@ -46,7 +47,7 @@ public class LucaClassLoader extends URLClassLoader {
         dirs.stream().map(path -> {
             var allJars = new File(path).listFiles(pathname -> pathname.getName().endsWith(".jar"));
             var jarURLs = new ArrayList<URL>(Optional.ofNullable(allJars).map(e -> e.length).orElse(0));
-            Optional.ofNullable(allJars).ifPresent(e -> Stream.of(e).forEach(allJar -> FunctionUtil.runWithUC(() -> jarURLs.add(allJar.toURI().toURL()))));
+            Optional.ofNullable(allJars).ifPresent(e -> Stream.of(e).forEach(allJar -> UCRunnable.as(() -> jarURLs.add(allJar.toURI().toURL()))));
             return jarURLs;
         }).forEach(urls::addAll);
         return urls.toArray(new URL[0]);

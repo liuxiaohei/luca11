@@ -2,8 +2,6 @@ package org.ld.utils;
 
 import org.ld.uc.UCSupplier;
 
-import java.util.function.Supplier;
-
 /**
  * https://www.cnblogs.com/relucent/p/4955340.html
  * Twitter_Snowflake

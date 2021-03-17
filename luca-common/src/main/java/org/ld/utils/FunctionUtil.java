@@ -1,35 +1,14 @@
 package org.ld.utils;
 
-import org.ld.exception.CodeStackException;
-import org.ld.uc.UCFunction;
-import org.ld.uc.UCRunnable;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  *
  */
 @SuppressWarnings("unused")
 public class FunctionUtil {
-
-    public static <T, R> R applyWithUC(UCFunction<T, R> function, T t) {
-        try {
-            return function.apply(t);
-        } catch (Throwable e) {
-            throw CodeStackException.of(e);
-        }
-    }
-
-    public static void runWithUC(UCRunnable runnable) {
-        try {
-            runnable.run();
-        } catch (Throwable e) {
-            throw CodeStackException.of(e);
-        }
-    }
 
     /**
      *

@@ -34,6 +34,9 @@ public class CodeStackException extends RuntimeException {
     private CodeStackException(Throwable e) {
         super(e.getMessage(), e);
         super.setStackTrace(e.getStackTrace());
+        if (e instanceof InterruptedException && Thread.currentThread().isInterrupted()) {
+            Thread.currentThread().interrupt();
+        }
         this.errorCode = SystemErrorCodeEnum.getSystemErrorCode(e);
     }
 
