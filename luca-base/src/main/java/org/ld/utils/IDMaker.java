@@ -8,6 +8,7 @@ import org.ld.config.BaseConfig;
 import org.ld.exception.CodeStackException;
 
 /**
+ * https://blog.csdn.net/mnmlist/article/details/103449920
  * 分布式ID生成器 基于SnowflakeId算法生成id 基于 zk的临时有序节点来控制不同节点的设备id 来保证不重复 最多支持同一个集群内1024个节点同时生成不重复的id
  */
 public class IDMaker {
