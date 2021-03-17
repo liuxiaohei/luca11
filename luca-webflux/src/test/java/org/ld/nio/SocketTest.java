@@ -8,6 +8,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.ld.exception.CodeStackException;
@@ -67,6 +68,7 @@ public class SocketTest {
      * Bio Test
      */
     @Test
+    @SneakyThrows
     public void BSocket() throws IOException, InterruptedException {
         var port = 8987;
         clientRequest(port);
@@ -77,8 +79,6 @@ public class SocketTest {
             log.info("Accepted connection from " + clientSocket);
             out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));// 数据传输  阻塞2
             out.flush();
-        } catch (IOException e) {
-            throw CodeStackException.of(e);
         }
         Thread.sleep(1000);
     }

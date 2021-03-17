@@ -1,5 +1,6 @@
 package org.ld.aspect;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -36,7 +37,7 @@ public class SynchronizationAspect {
     @Around("@annotation(sync)")
     public Object cutPoint(ProceedingJoinPoint point, Synchronized sync) throws Throwable {
 
-            return executePoint(point, sync);
+        return executePoint(point, sync);
 
     }
 
@@ -70,7 +71,8 @@ public class SynchronizationAspect {
         return waitIfNecessary(point, DigestUtils.md5Hex(methodName + key), sync);
     }
 
-    private Object waitIfNecessary(ProceedingJoinPoint point, String key, Synchronized sync) throws Throwable {
+    @SneakyThrows
+    private Object waitIfNecessary(ProceedingJoinPoint point, String key, Synchronized sync) {
         Object result = null;
         Boolean lock = false;
         try {
@@ -106,8 +108,6 @@ public class SynchronizationAspect {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw CodeStackException.of(e);
         } finally {
             if (StringUtil.isNotEmpty(key)) {
                 numberRedisTemplate.delete(key);

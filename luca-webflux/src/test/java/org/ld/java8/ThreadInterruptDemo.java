@@ -1,7 +1,9 @@
 package org.ld.java8;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.ld.exception.CodeStackException;
+import org.ld.utils.SleepUtil;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -16,16 +18,13 @@ public class ThreadInterruptDemo {
     // 如何停掉一个处在await状态的IO任务
     // 如果是sql 要调用sql statement 的 canle 方法
     @Test
+    @SneakyThrows
     public void demo() throws InterruptedException {
 //        Statement s = null;
 //        s.cancel();
         var a = new Thread(() -> {
             System.out.println("HelloWorld");
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                throw CodeStackException.of(e);
-            }
+            SleepUtil.sleep(10000);
             System.out.println("HelloWorld1");
             System.out.println("HelloWorld2");
             System.out.println("HelloWorld3");

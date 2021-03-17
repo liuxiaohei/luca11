@@ -1,7 +1,6 @@
 package org.ld.utils;
 
-import org.ld.exception.CodeStackException;
-import org.springframework.beans.BeansException;
+import lombok.SneakyThrows;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
@@ -18,73 +17,53 @@ public class SpringBeanFactory implements ApplicationContextAware {
     /**
      * 获取Bean 实例
      */
+    @SneakyThrows
     public static <T> T getBean(Class<T> clazz) {
-        try {
-            return applicationContext.getBean(clazz);
-        } catch (BeansException e) {
-            throw CodeStackException.of(e);
-        }
+        return applicationContext.getBean(clazz);
     }
 
     /**
      * 获取Bean 实例 需要自己强转
      */
+    @SneakyThrows
     public static Object getBean(String name) {
-        try {
-            return applicationContext.getBean(name);
-        } catch (BeansException e) {
-            throw CodeStackException.of(e);
-        }
+        return applicationContext.getBean(name);
     }
 
     /**
      * 获取Bean 类型 需要自己强转
      */
+    @SneakyThrows
     public static Class<?> getType(String name) {
-        try {
-            return applicationContext.getType(name);
-        } catch (BeansException e) {
-            throw CodeStackException.of(e);
-        }
+        return applicationContext.getType(name);
     }
 
+    @SneakyThrows
     public static <A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> clazz) {
-        try {
-            return applicationContext.findAnnotationOnBean(beanName,clazz);
-        } catch (BeansException e) {
-            throw CodeStackException.of(e);
-        }
+        return applicationContext.findAnnotationOnBean(beanName, clazz);
     }
 
+    @SneakyThrows
     public static <T> T getBean(String beanName, Class<T> clazz) {
-        try {
-            return applicationContext.getBean(beanName,clazz);
-        } catch (BeansException e) {
-            throw CodeStackException.of(e);
-        }
+        return applicationContext.getBean(beanName, clazz);
     }
 
+    @SneakyThrows
     public static String[] getBeanNamesForType(@Nullable Class<?> clazz) {
-        try {
-            return applicationContext.getBeanNamesForType(clazz);
-        } catch (BeansException e) {
-            throw CodeStackException.of(e);
-        }
+        return applicationContext.getBeanNamesForType(clazz);
     }
 
+    @SneakyThrows
     @Override
-    public void setApplicationContext(ApplicationContext context) throws BeansException {
+    public void setApplicationContext(ApplicationContext context) {
         applicationContext = context;
     }
 
     /**
      * 获取Bean 实例
      */
+    @SneakyThrows
     public static String[] getBeanNamesForAnnotation(Class<? extends Annotation> clazz) {
-        try {
-            return applicationContext.getBeanNamesForAnnotation(clazz);
-        } catch (BeansException e) {
-            throw CodeStackException.of(e);
-        }
+        return applicationContext.getBeanNamesForAnnotation(clazz);
     }
 }

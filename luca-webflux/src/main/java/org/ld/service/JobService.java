@@ -1,5 +1,6 @@
 package org.ld.service;
 
+import lombok.SneakyThrows;
 import org.ld.beans.JobQuery;
 import org.ld.beans.PageData;
 import org.ld.engine.JobRunnable;
@@ -88,6 +89,7 @@ public class JobService {
     }
 
     @Transactional
+    @SneakyThrows
     public void update(ScheduleJob jobBean) {
         ScheduleJob job = getAndCheckJob(jobBean.getId());
         checkAndSet(jobBean, job);
@@ -100,11 +102,7 @@ public class JobService {
         validate(jobBean);
         int count = jobMapper.updateByPrimaryKeySelective(jobBean);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
-        try {
-            updateScheduleJob(scheduler, jobBean);
-        } catch (SchedulerException e) {
-            throw CodeStackException.of(e);
-        }
+        updateScheduleJob(scheduler, jobBean);
     }
 
     private void checkAndSet(ScheduleJob jobBean, ScheduleJob job) {
@@ -209,7 +207,8 @@ public class JobService {
         return job;
     }
 
-    public static void updateScheduleJob(Scheduler scheduler, ScheduleJob scheduleJob) throws SchedulerException {
+    @SneakyThrows
+    public static void updateScheduleJob(Scheduler scheduler, ScheduleJob scheduleJob) {
         TriggerKey triggerKey = getTriggerKey(scheduleJob.getId());
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression())
                 .withMisfireHandlingInstructionDoNothing();
@@ -218,11 +217,7 @@ public class JobService {
         trigger.getJobDataMap().put(JOB_PARAM_KEY, scheduleJob);
         scheduler.rescheduleJob(triggerKey, trigger);
         if (scheduleJob.getStatus().equals(STATUS)) {
-            try {
-                scheduler.pauseJob(getJobKey(scheduleJob.getId()));
-            } catch (SchedulerException e) {
-                throw CodeStackException.of(e);
-            }
+            scheduler.pauseJob(getJobKey(scheduleJob.getId()));
         }
 
     }

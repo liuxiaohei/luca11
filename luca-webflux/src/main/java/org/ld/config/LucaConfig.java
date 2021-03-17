@@ -1,12 +1,11 @@
 package org.ld.config;
 
 import akka.actor.ActorSystem;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.Flyway;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.RespBean;
-import org.ld.config.AroundController;
-import org.ld.config.DataSourceConfig;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
@@ -252,6 +251,7 @@ public class LucaConfig {
 
     @PostConstruct
     @SuppressWarnings("all")
+    @SneakyThrows
     public void init() {
         final var targetDb = Optional.ofNullable(dataSourceConfig.getJdbcUrl())
                 .map(str -> str.split("/"))
@@ -281,9 +281,6 @@ public class LucaConfig {
             statement.execute(initSql);
             flyway.repair();
             flyway.migrate();
-        } catch (Exception e) {
-            log.error("", e);
-            throw CodeStackException.of(e);
         }
     }
 

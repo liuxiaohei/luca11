@@ -1,6 +1,7 @@
 package org.ld.grpc.server;
 
 import io.grpc.Server;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.ld.exception.CodeStackException;
 import org.springframework.context.SmartLifecycle;
@@ -22,28 +23,25 @@ public class GrpcServerLifecycle implements SmartLifecycle {
      * 启动grpc服务
      */
     @Override
+    @SneakyThrows
     public void start() {
-        try {
-            Server localServer = this.server;
-            if (localServer == null) {
-                this.server = this.factory.createServer();
-                this.server.start();
-                log.debug("gRPC Server started, listening on address: " + this.factory.getAddress() + ", port: " + this.factory.getPort());
-                Thread awaitThread = new Thread("container-" + (serverCounter.incrementAndGet())) {
-                    @Override
-                    public void run() {
-                        try {
-                            GrpcServerLifecycle.this.server.awaitTermination();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
+        Server localServer = this.server;
+        if (localServer == null) {
+            this.server = this.factory.createServer();
+            this.server.start();
+            log.debug("gRPC Server started, listening on address: " + this.factory.getAddress() + ", port: " + this.factory.getPort());
+            Thread awaitThread = new Thread("container-" + (serverCounter.incrementAndGet())) {
+                @Override
+                public void run() {
+                    try {
+                        GrpcServerLifecycle.this.server.awaitTermination();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                     }
-                };
-                awaitThread.setDaemon(false);
-                awaitThread.start();
-            }
-        } catch (IOException e) {
-            throw CodeStackException.of(e);
+                }
+            };
+            awaitThread.setDaemon(false);
+            awaitThread.start();
         }
     }
 

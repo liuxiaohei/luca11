@@ -1,6 +1,5 @@
 package org.ld.utils;
 
-import org.ld.exception.CodeStackException;
 import org.ld.uc.UCRunnable;
 import org.ld.uc.UCSupplier;
 
@@ -73,8 +72,6 @@ public class LucaClassLoader extends URLClassLoader {
         try {
             Thread.currentThread().setContextClassLoader(this);
             return function.get();
-        } catch (Throwable e) {
-            throw CodeStackException.of(e);
         } finally {
             Thread.currentThread().setContextClassLoader(storeClassLoader);
         }

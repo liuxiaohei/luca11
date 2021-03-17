@@ -1,10 +1,10 @@
 package org.ld.utils;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.ld.exception.CodeStackException;
 import org.ld.uc.UCFunction;
-import org.springframework.cglib.core.internal.Function;
 import org.springframework.http.MediaType;
 
 import java.io.BufferedOutputStream;
@@ -39,6 +39,7 @@ public class HttpClient {
      * 返回OutPutStream OutPutStream关闭 连接资源才会关闭
      * todo 暂时没有 从Okhttp 中找到可以直接从一次请求的连接中获取conn对象的手段
      */
+    @SneakyThrows
     public static OutputStream getOutputStreamByUrl(String url, String method, int bufferSize) {
         UCFunction<String, HttpURLConnection> getConnection = u -> {
             var conn = HttpClient.getStreamUrlConnection(u);
@@ -47,50 +48,43 @@ public class HttpClient {
             conn.setChunkedStreamingMode(32 << 10); // 32kB-chunk
             return conn;
         };
-        try {
-            var conn = getConnection.apply(url);
-            if (conn.getResponseCode() == 307) {    // 跨VPN情况
-                var location = conn.getHeaderField("location");
-                conn.disconnect();
-                conn = getConnection.apply(location);
-            }
-            var conn1 = conn;
-            return new BufferedOutputStream(conn1.getOutputStream(), bufferSize) {
-                @Override
-                public void close() throws IOException {
+        var conn = getConnection.apply(url);
+        if (conn.getResponseCode() == 307) {    // 跨VPN情况
+            var location = conn.getHeaderField("location");
+            conn.disconnect();
+            conn = getConnection.apply(location);
+        }
+        var conn1 = conn;
+        return new BufferedOutputStream(conn1.getOutputStream(), bufferSize) {
+            @Override
+            public void close() throws IOException {
+                try {
+                    super.close();
+                } finally {
                     try {
-                        super.close();
-                    } finally {
-                        try {
-                            conn1.getInputStream();
-                            var code = conn1.getResponseCode();
-                            if (!(code >= 200 && code < 300)) {
-                                log.error("请求失败 Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
-                            }
-                        } finally {
-                            conn1.disconnect();
+                        conn1.getInputStream();
+                        var code = conn1.getResponseCode();
+                        if (!(code >= 200 && code < 300)) {
+                            log.error("请求失败 Code:" + conn1.getResponseCode() + "Message:" + conn1.getResponseMessage());
                         }
+                    } finally {
+                        conn1.disconnect();
                     }
                 }
-            };
-        } catch (Throwable e) {
-            throw CodeStackException.of(e);
-        }
+            }
+        };
     }
 
+    @SneakyThrows
     public static HttpURLConnection getStreamUrlConnection(String url) {
-        try {
-            final var conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setConnectTimeout(30000);
-            conn.setReadTimeout(30000);
-            conn.setRequestProperty("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            conn.setDoOutput(true);
-            conn.setUseCaches(false);
-            conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            return conn;
-        } catch (Exception e) {
-            throw CodeStackException.of(e);
-        }
+        final var conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setConnectTimeout(30000);
+        conn.setReadTimeout(30000);
+        conn.setRequestProperty("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        conn.setDoOutput(true);
+        conn.setUseCaches(false);
+        conn.setRequestMethod(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        return conn;
     }
 
     public static <R> R get(String url, Headers headers, UCFunction<InputStream, R> handler) {
@@ -113,42 +107,38 @@ public class HttpClient {
         return execute("DELETE", url, headers, null, handler);
     }
 
+    @SneakyThrows
     public static <R> R execute(String method, String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
         return executeWithUnClose(method, url, headers, body, is -> {
             try (var in = is) {
                 if (null != in) {
                     return handler.apply(in);
                 }
-            } catch (Throwable e) {
-                throw CodeStackException.of(e);
             }
             return null;
         });
     }
 
-    public static <R> R executeWithUnClose(String method, String url, Headers headers, RequestBody body, Function<InputStream, R> handler) {
+    @SneakyThrows
+    public static <R> R executeWithUnClose(String method, String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
         var requestBuild = new Request.Builder()
                 .url(url)
                 .method(method, body);
         if (headers != null) {
             requestBuild.headers(headers);
         }
-        try {
-            var response = OkHttpClientHandler.okHttpClient.newCall(requestBuild.build()).execute();
-            if (response.isSuccessful()) {
-                var responseBody = response.body();
-                if (responseBody != null) {
-                    var in = responseBody.byteStream();
-                    if (null == in) {
-                        return null;
-                    }
-                    return handler.apply(in);
+        var response = OkHttpClientHandler.okHttpClient.newCall(requestBuild.build()).execute();
+        if (response.isSuccessful()) {
+            var responseBody = response.body();
+            if (responseBody != null) {
+                var in = responseBody.byteStream();
+                if (null == in) {
+                    return null;
                 }
-            } else {
-                throw new CodeStackException("请求失败 URL :" + url + " method:" + method);
+                return handler.apply(in);
             }
-        } catch (Exception e) {
-            throw CodeStackException.of(e);
+        } else {
+            throw new CodeStackException("请求失败 URL :" + url + " method:" + method);
         }
         return null;
     }

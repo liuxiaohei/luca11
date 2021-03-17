@@ -1,6 +1,6 @@
 package org.ld.utils;
 
-import org.ld.exception.CodeStackException;
+import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -84,6 +84,7 @@ public class StringUtil {
     }
 
     // 遍历Stream之后会自动关闭
+    @SneakyThrows
     public static String stream2String(InputStream is) {
         try (var i = is) {
             if (null == is) {
@@ -96,8 +97,6 @@ public class StringUtil {
                 stringBuilder.append(str);
             }
             return stringBuilder.toString();
-        } catch (Exception e) {
-            throw CodeStackException.of(e);
         }
     }
 

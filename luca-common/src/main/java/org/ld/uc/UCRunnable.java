@@ -1,6 +1,6 @@
 package org.ld.uc;
 
-import org.ld.exception.CodeStackException;
+import lombok.SneakyThrows;
 
 import java.io.Serializable;
 
@@ -9,12 +9,9 @@ public interface UCRunnable extends Serializable, Runnable {
 
     void runWithUC() throws Throwable;
 
+    @SneakyThrows
     default void run() {
-        try {
-            runWithUC();
-        } catch (Throwable e) {
-            throw CodeStackException.of(e);
-        }
+        runWithUC();
     }
 
     static Runnable as(UCRunnable runnable) {

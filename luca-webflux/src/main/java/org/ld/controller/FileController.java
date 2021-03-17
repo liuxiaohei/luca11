@@ -74,7 +74,7 @@ public class FileController {
     public Mono<List<String>> more(@RequestPart("file") Flux<FilePart> file) {
         //此时已转换为File类，具体的业务逻辑我就忽略了
         return file.map(filePart -> {
-            Path tempFile = null;
+            Path tempFile;
             try {
                 tempFile = Files.createTempFile("test", filePart.filename());
             } catch (IOException e) {

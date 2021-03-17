@@ -1,7 +1,7 @@
 package org.ld.beans;
 
 import lombok.Getter;
-import org.ld.exception.CodeStackException;
+import lombok.SneakyThrows;
 
 import java.io.*;
 
@@ -24,13 +24,10 @@ public class CircularByteBuffer {
 
     private final InputStream inputStream;
 
+    @SneakyThrows
     public CircularByteBuffer(int bufferSize) {
         outputStream = new PipedOutputStream();
-        try {
-            inputStream = new PipedInputStream((PipedOutputStream) outputStream, bufferSize);
-        } catch (IOException e) {
-            throw CodeStackException.of(e);
-        }
+        inputStream = new PipedInputStream((PipedOutputStream) outputStream, bufferSize);
     }
 
     @SuppressWarnings("unused")

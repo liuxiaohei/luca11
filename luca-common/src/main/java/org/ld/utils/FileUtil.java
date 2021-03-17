@@ -3,6 +3,7 @@ package org.ld.utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.ld.exception.CodeStackException;
 import org.slf4j.Logger;
@@ -119,6 +120,7 @@ public class FileUtil {
      * 解压文件到指定路径
      * 并且换回解压目录
      */
+    @SneakyThrows
     public static List<String> unZip(File zipFile, Boolean deleteZipFile) {
         List<String> paths = new ArrayList<>();
         try (ZipFile zip = new ZipFile(zipFile, Charset.forName("gbk"))) {
@@ -141,8 +143,6 @@ public class FileUtil {
                     }
                 }
             }
-        } catch (IOException e) {
-            throw CodeStackException.of(e);
         } finally {
             if (deleteZipFile && zipFile.exists()) {
                 LOG.info("删除文件" + (zipFile.delete() ? "成功" : "失败"));
@@ -175,14 +175,11 @@ public class FileUtil {
     /**
      * 读取Fileduixiang并持久化到本地
      */
+    @SneakyThrows
     public static File asFile(MultipartFile file) {
-        File tmp = new File("/tmp/" +  SnowflakeId.LocalHolder.idWorker.get() + "/" + file.getOriginalFilename());
-        try {
-            LOG.info("创建文件" + (tmp.getParentFile().mkdir() ? "成功" : "失败"));
-            file.transferTo(tmp);
-        } catch (IOException e) {
-            throw CodeStackException.of(e);
-        }
+        File tmp = new File("/tmp/" + SnowflakeId.LocalHolder.idWorker.get() + "/" + file.getOriginalFilename());
+        LOG.info("创建文件" + (tmp.getParentFile().mkdir() ? "成功" : "失败"));
+        file.transferTo(tmp);
         return tmp;
     }
 
@@ -227,6 +224,7 @@ public class FileUtil {
     /**
      * 读取执行文本文件的内容
      */
+    @SneakyThrows
     public static TextFile readText(String fileName, Boolean deleteFileAfterRead) {
         File file = new File(fileName);
         StringBuilder sbf = new StringBuilder();
@@ -237,8 +235,6 @@ public class FileUtil {
             }
             String md5 = DigestUtils.md5Hex(new FileInputStream(fileName));
             return new TextFile(sbf.toString(), fileName, md5, file.length());
-        } catch (IOException e) {
-            throw CodeStackException.of(e);
         } finally {
             if (deleteFileAfterRead && file.exists()) {
                 LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
@@ -435,16 +431,13 @@ public class FileUtil {
         }
     }
 
+    @SneakyThrows
     public static void copyInputStream2OutputStream(InputStream from, OutputStream to) {
-        try {
-            var buffer = new byte[DEFAULT_FILE_BUFFER_SIZE_IN_BYTES];
-            var len = from.read(buffer);
-            while (len != -1) {
-                to.write(buffer, 0, len);
-                len = from.read(buffer);
-            }
-        } catch (Exception e) {
-            throw CodeStackException.of(e);
+        var buffer = new byte[DEFAULT_FILE_BUFFER_SIZE_IN_BYTES];
+        var len = from.read(buffer);
+        while (len != -1) {
+            to.write(buffer, 0, len);
+            len = from.read(buffer);
         }
     }
 }

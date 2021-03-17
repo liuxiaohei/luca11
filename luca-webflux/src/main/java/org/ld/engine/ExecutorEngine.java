@@ -1,5 +1,6 @@
 package org.ld.engine;
 
+import lombok.SneakyThrows;
 import org.ld.exception.CodeStackException;
 import org.ld.uc.UCRunnable;
 import org.ld.utils.SnowflakeId;
@@ -34,20 +35,17 @@ public class ExecutorEngine {
     /**
      * runnable 中的任务 会按照 Trigger 的要求执行
      */
+    @SneakyThrows
     public void runAsync(UCRunnable runnable, Trigger trigger) {
         final Map<String, UCRunnable> params = new HashMap<>();
         params.put("Runnable", runnable);
         final JobDataMap jobDataMap = new JobDataMap(params);
-        try {
-            JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
-                    .withIdentity(snowflakeId.get().toString(), LocalDateTime.now().toString())
-                    .withDescription("[Nothing]")
-                    .setJobData(jobDataMap)
-                    .storeDurably()
-                    .build();
-            scheduler.scheduleJob(jobDetail, trigger);
-        } catch (Exception e) {
-            throw CodeStackException.of(e);
-        }
+        JobDetail jobDetail = JobBuilder.newJob(RunnableQuartzJob.class)
+                .withIdentity(snowflakeId.get().toString(), LocalDateTime.now().toString())
+                .withDescription("[Nothing]")
+                .setJobData(jobDataMap)
+                .storeDurably()
+                .build();
+        scheduler.scheduleJob(jobDetail, trigger);
     }
 }

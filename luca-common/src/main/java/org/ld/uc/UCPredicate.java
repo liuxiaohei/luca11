@@ -1,6 +1,6 @@
 package org.ld.uc;
 
-import org.ld.exception.CodeStackException;
+import lombok.SneakyThrows;
 
 import java.io.Serializable;
 import java.util.function.Predicate;
@@ -11,11 +11,8 @@ public interface UCPredicate<T> extends Serializable, Predicate<T> {
     boolean testWithUC(T t) throws Throwable;
 
     @Override
+    @SneakyThrows
     default boolean test(T t) {
-        try {
-            return testWithUC(t);
-        } catch (Throwable e) {
-            throw CodeStackException.of(e);
-        }
+        return testWithUC(t);
     }
 }
