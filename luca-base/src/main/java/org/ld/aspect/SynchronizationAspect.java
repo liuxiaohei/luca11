@@ -10,14 +10,14 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.ld.annotation.Synchronized;
 import org.ld.exception.CodeStackException;
-import org.ld.redis.NumberRedisTemplate;
+import org.ld.redis.LongRedisTemplate;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.SleepUtil;
 import org.ld.utils.StringUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
 @Order(0)
 public class SynchronizationAspect {
 
-    @Autowired
-    private NumberRedisTemplate numberRedisTemplate;
+    @Resource
+    private LongRedisTemplate longRedisTemplate;
 
     @Around("@annotation(sync)")
     public Object cutPoint(ProceedingJoinPoint point, Synchronized sync) {
@@ -77,8 +77,8 @@ public class SynchronizationAspect {
             if (StringUtil.isEmpty(key)) {
                 return point.proceed();
             }
-            var boundValueOps = numberRedisTemplate.boundValueOps(key);
-            long time = numberRedisTemplate.getUnsafeCurrentTime();
+            var boundValueOps = longRedisTemplate.boundValueOps(key);
+            long time = longRedisTemplate.getCurrentTime();
             long lockTime = time + sync.expire();
             long timeoutTime = time + sync.timeout();
             while (!Optional.ofNullable(lock).orElse(false)) {
@@ -89,14 +89,14 @@ public class SynchronizationAspect {
                     result = point.proceed();
                     lock = true;
                 } else if (sync.timeoutException()) { //超时需要抛出异常
-                    long currentTime = numberRedisTemplate.getUnsafeCurrentTime();
+                    long currentTime = longRedisTemplate.getCurrentTime();
                     if (timeoutTime < currentTime) {
                         throw new CodeStackException("超过超时时间");
                     }
                     SleepUtil.sleep(10);
                 } else {
-                    long lastLockTime = Optional.ofNullable(boundValueOps.get()).map(Number::longValue).orElse(0L);
-                    long currentTime = numberRedisTemplate.getUnsafeCurrentTime();
+                    long lastLockTime = Optional.ofNullable(boundValueOps.get()).orElse(0L);
+                    long currentTime = longRedisTemplate.getCurrentTime();
                     if (lastLockTime < currentTime) {// 锁已过期,执行目标方法
                         boundValueOps.set(currentTime + sync.expire());
                         result = point.proceed();
@@ -108,7 +108,7 @@ public class SynchronizationAspect {
             }
         } finally {
             if (StringUtil.isNotEmpty(key)) {
-                numberRedisTemplate.delete(key);
+                longRedisTemplate.delete(key);
             }
         }
         return result;

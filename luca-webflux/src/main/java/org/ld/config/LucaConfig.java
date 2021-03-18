@@ -10,13 +10,10 @@ import org.ld.beans.RespBean;
 import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
-import org.ld.redis.NumberRedisTemplate;
 import org.ld.utils.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -288,13 +285,6 @@ public class LucaConfig {
 //        return new ObjectRedisTemplate<Object>(redisConnectionFactory) {
 //        };
 //    }
-
-
-    @Bean
-    @Autowired
-    public NumberRedisTemplate numberTemplate(RedisConnectionFactory redisConnectionFactory) {
-        return new NumberRedisTemplate(redisConnectionFactory);
-    }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
