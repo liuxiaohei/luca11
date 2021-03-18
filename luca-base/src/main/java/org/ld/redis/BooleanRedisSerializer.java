@@ -17,6 +17,7 @@ public class BooleanRedisSerializer implements RedisSerializer<Boolean> {
     /**
      * 解码
      */
+    @Override
     public Boolean deserialize(byte[] bytes) throws SerializationException {
         if (bytes == null || bytes.length == 0) {
             return null;
@@ -27,6 +28,7 @@ public class BooleanRedisSerializer implements RedisSerializer<Boolean> {
     /**
      * 编码
      */
+    @Override
     public byte[] serialize(Boolean t) throws SerializationException {
         if (t == null) {
             return new byte[0];

@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
  * 将akka的Fucture转化成java8的CompletableFuture
  * https://github.com/Comcast/sirius/pull/133/files
  * https://stackoverflow.com/questions/47868480/akka-java-future-oncomplete-oncomplete-is-not-called
+ * @author liudi
  */
 public class SaFutureAdapter<T> extends CompletableFuture<T> {
 

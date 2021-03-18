@@ -10,7 +10,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 public class BooleanRedisTemplate extends BaseRedisTemplate<String, Boolean> {
 
-
     private BooleanRedisTemplate() {
         RedisSerializer<String> stringSerializer = new StringRedisSerializer();
         BooleanRedisSerializer booleanSerializer = new BooleanRedisSerializer();
@@ -31,6 +30,7 @@ public class BooleanRedisTemplate extends BaseRedisTemplate<String, Boolean> {
         afterPropertiesSet();
     }
 
+    @Override
     protected RedisConnection preProcessConnection(RedisConnection connection, boolean existingConnection) {
         return new DefaultStringRedisConnection(connection);
     }

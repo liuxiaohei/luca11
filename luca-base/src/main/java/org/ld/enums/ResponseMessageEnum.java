@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * @author liudi
+ */
 public enum ResponseMessageEnum {
     OK(HttpStatus.OK, "操作成功"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "登录参数错误"),

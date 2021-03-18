@@ -1,5 +1,6 @@
 package org.ld.python;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.python.util.PythonInterpreter;
 
@@ -29,19 +30,16 @@ public class PythonDemo {
      * Permission denied
      */
     @Test
+    @SneakyThrows
     public void test2() {
         Process proc;
-        try {
-            proc = Runtime.getRuntime().exec("py/javaPythonFile.py");
-            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-            String line = null;
-            while ((line = in.readLine()) != null) {
-                System.out.println(line);
-            }
-            in.close();
-            proc.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        proc = Runtime.getRuntime().exec("py/javaPythonFile.py");
+        BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        String line;
+        while ((line = in.readLine()) != null) {
+            System.out.println(line);
         }
+        in.close();
+        proc.waitFor();
     }
 }
