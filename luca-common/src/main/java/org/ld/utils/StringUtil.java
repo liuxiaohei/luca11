@@ -147,4 +147,50 @@ public class StringUtil {
         }
     }
 
+    private final static int MIN_RADIX = 2;
+    private final static int MAX_RADIX = 62;
+
+    /**
+     * All possible chars for representing a number as a String
+     */
+    private final static char[] DIGITS = {
+            '0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'a', 'b',
+            'c', 'd', 'e', 'f', 'g', 'h',
+            'i', 'j', 'k', 'l', 'm', 'n',
+            'o', 'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F',
+            'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R',
+            'S', 'T', 'U', 'V', 'W', 'X',
+            'Y', 'Z',
+    };
+
+    /**
+     * 进制转换 2 - 62
+     */
+    public static String toRadixString(long i, int radix) {
+        if (radix < MIN_RADIX || radix > MAX_RADIX)
+            radix = 10;
+        if (radix == 10)
+            return Long.toString(i);
+        char[] buf = new char[65];
+        int charPos = 64;
+        boolean negative = (i < 0);
+        if (!negative) {
+            i = -i;
+        }
+        while (i <= -radix) {
+            buf[charPos--] = DIGITS[(int) (-(i % radix))];
+            i = i / radix;
+        }
+        buf[charPos] = DIGITS[(int) (-i)];
+
+        if (negative) {
+            buf[--charPos] = '-';
+        }
+        return new String(buf, charPos, (65 - charPos));
+    }
+
 }

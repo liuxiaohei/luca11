@@ -35,13 +35,11 @@ public class SynchronizationAspect {
     private NumberRedisTemplate numberRedisTemplate;
 
     @Around("@annotation(sync)")
-    public Object cutPoint(ProceedingJoinPoint point, Synchronized sync) throws Throwable {
-
+    public Object cutPoint(ProceedingJoinPoint point, Synchronized sync) {
         return executePoint(point, sync);
-
     }
 
-    private Object executePoint(ProceedingJoinPoint point, Synchronized sync) throws Throwable {
+    private Object executePoint(ProceedingJoinPoint point, Synchronized sync) {
         MethodSignature methodSignature = getSignature(point);
         Method method = methodSignature.getMethod();
         String methodName = point.getTarget().getClass() + "#" + method.getName();
@@ -121,7 +119,7 @@ public class SynchronizationAspect {
      */
     private static String getBeanKey(Synchronized sync, Object argObj) {
         StringBuilder key = new StringBuilder();
-        String[] keyParts = sync.keyName().split("|");
+        String[] keyParts = sync.keyName().split("\\|");
         for (int i = 0; i < keyParts.length; i++) {
             key.append(JsonUtil.obj2Json(argObj));
         }

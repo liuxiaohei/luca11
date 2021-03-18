@@ -1,11 +1,9 @@
 package org.ld.config;
 
 import lombok.Getter;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.ld.exception.CodeStackException;
 import org.ld.utils.SnowflakeId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Configuration
 public class BaseConfig {
+
     @Value("${dev.mode:127.0.0.1:2181}")
     private String zkConnectString;
 
@@ -28,15 +27,14 @@ public class BaseConfig {
             var client = CuratorFrameworkFactory.newClient(getZkConnectString(), new ExponentialBackoffRetry(1000, 3));
             client.start();
             var nodeName = "/IDMaker/ID-";
-            String str;
-            str = client.create()             // 创建一个 ZNode 顺序节点
+            String str = client.create()             // 创建一个 ZNode 顺序节点
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)//避免zookeeper的顺序节点暴增，可以删除创建的顺序节点
                     .forPath(nodeName);
             if (null == str) {
                 return 0L;
             }
-            int index = str.lastIndexOf(nodeName);
+            var index = str.lastIndexOf(nodeName);
             if (index >= 0) {
                 index += nodeName.length();
                 str = index <= str.length() ? str.substring(index) : "";
