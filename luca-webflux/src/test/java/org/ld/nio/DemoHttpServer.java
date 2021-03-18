@@ -9,8 +9,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.*;
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.ld.exception.CodeStackException;
 import org.ld.utils.StringUtil;
 
 import java.io.IOException;
@@ -67,7 +69,7 @@ public class DemoHttpServer {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw CodeStackException.of(e);
                     }
                 });
 
@@ -92,56 +94,53 @@ public class DemoHttpServer {
 
     public void server() throws IOException {
         // 1、获取通道
-        try (var serverSocketChannel = ServerSocketChannel.open()) {
-            // 2.设置为非阻塞
-            serverSocketChannel.configureBlocking(false);
-            // 3、绑定连接
-            serverSocketChannel.bind(new InetSocketAddress(9898));
-            // 4、获取Selector选择器
-            var selector = Selector.open();
-            // 5、将通道注册到选择器上,并制定监听事件
-            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-            // 6、采用轮询的方式获取选择器上“准备就绪”的任务
-            while (selector.select() > 0) {
-                // 7、获取当前选择器中所有注册的选择键（“已经准备就绪的事件”）
-                var selectedKeys = selector.selectedKeys().iterator();
-                while (selectedKeys.hasNext()) {
-                    // 8、获取“准备就绪”的时间
-                    var selectedKey = selectedKeys.next();
-                    // 9、判断key是具体的什么事件
-                    if (selectedKey.isAcceptable()) {
-                        // 10、若接受的事件是“接收就绪”事件,就获取客户端连接
-                        var socketChannel = serverSocketChannel.accept();
-                        // 11、切换为非阻塞模式
-                        socketChannel.configureBlocking(false);
-                        // 12、将该通道注册到selector选择器上
-                        socketChannel.register(selector, SelectionKey.OP_READ);
-                    } else if (selectedKey.isReadable()) {
-                        // 13、获取该选择器上的“读就绪”状态的通道
-                        var socketChannel = (SocketChannel) selectedKey.channel();
-                        var byteBuffer = ByteBuffer.allocate(1024 * 3);
-                        // 14、将缓冲区清空以备下次读取
-                        byteBuffer.clear();
-                        // 读取服务器发送来的数据到缓冲区中
-                        int readCount;
-                        readCount = socketChannel.read(byteBuffer);
-                        // 如果没有数据 则关闭
-                        if (readCount == -1) {
-                            try (socketChannel) {
-                                var socket = socketChannel.socket();
-                                var remoteAddr = socket.getRemoteSocketAddress();
-                                log.info("Connection closed by client: " + remoteAddr);
-                            }
-                            selectedKey.cancel();
-                            return;
-                        }
-                        // 有数据 则处理
-                        var receiveText = new String(byteBuffer.array(), 0, readCount);
-                        request(socketChannel, receiveText);
-                        selectedKey.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+        @Cleanup var serverSocketChannel = ServerSocketChannel.open();
+        // 2.设置为非阻塞
+        serverSocketChannel.configureBlocking(false);
+        // 3、绑定连接
+        serverSocketChannel.bind(new InetSocketAddress(9898));
+        // 4、获取Selector选择器
+        var selector = Selector.open();
+        // 5、将通道注册到选择器上,并制定监听事件
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        // 6、采用轮询的方式获取选择器上“准备就绪”的任务
+        while (selector.select() > 0) {
+            // 7、获取当前选择器中所有注册的选择键（“已经准备就绪的事件”）
+            var selectedKeys = selector.selectedKeys().iterator();
+            while (selectedKeys.hasNext()) {
+                // 8、获取“准备就绪”的时间
+                var selectedKey = selectedKeys.next();
+                // 9、判断key是具体的什么事件
+                if (selectedKey.isAcceptable()) {
+                    // 10、若接受的事件是“接收就绪”事件,就获取客户端连接
+                    var socketChannel = serverSocketChannel.accept();
+                    // 11、切换为非阻塞模式
+                    socketChannel.configureBlocking(false);
+                    // 12、将该通道注册到selector选择器上
+                    socketChannel.register(selector, SelectionKey.OP_READ);
+                } else if (selectedKey.isReadable()) {
+                    // 13、获取该选择器上的“读就绪”状态的通道
+                    @Cleanup var socketChannel = (SocketChannel) selectedKey.channel();
+                    var byteBuffer = ByteBuffer.allocate(1024 * 3);
+                    // 14、将缓冲区清空以备下次读取
+                    byteBuffer.clear();
+                    // 读取服务器发送来的数据到缓冲区中
+                    int readCount;
+                    readCount = socketChannel.read(byteBuffer);
+                    // 如果没有数据 则关闭
+                    if (readCount == -1) {
+                        var socket = socketChannel.socket();
+                        var remoteAddr = socket.getRemoteSocketAddress();
+                        log.info("Connection closed by client: " + remoteAddr);
+                        selectedKey.cancel();
+                        return;
                     }
-                    selectedKeys.remove();
+                    // 有数据 则处理
+                    var receiveText = new String(byteBuffer.array(), 0, readCount);
+                    request(socketChannel, receiveText);
+                    selectedKey.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                 }
+                selectedKeys.remove();
             }
         }
     }
@@ -209,7 +208,6 @@ public class DemoHttpServer {
                 })
                 .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
                 .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
-
         b.bind(9999).sync();
         Thread.sleep(100000);
     }

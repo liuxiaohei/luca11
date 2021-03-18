@@ -3,6 +3,7 @@ package org.ld.molecule.utils;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
@@ -51,11 +52,10 @@ public class ExcelUtils {
     public static <T> List<T> readFile(Callable<InputStream> inputStreamSupplier, Class<T> tClass) {
         final List<T> dbStructures = new ArrayList<>();
         final List<Object> objects = new ArrayList<>();
-        try (InputStream in = inputStreamSupplier.call()) {
-            EasyExcel.read(in, tClass, getListener(objects::addAll))
-                    .sheet()
-                    .doRead();
-        }
+        @Cleanup var in = inputStreamSupplier.call();
+        EasyExcel.read(in, tClass, getListener(objects::addAll))
+                .sheet()
+                .doRead();
         objects.forEach(o -> dbStructures.add((T) o));
         return dbStructures;
     }

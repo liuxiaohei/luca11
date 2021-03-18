@@ -8,6 +8,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -69,17 +70,16 @@ public class SocketTest {
      */
     @Test
     @SneakyThrows
-    public void BSocket() throws IOException, InterruptedException {
+    public void BSocket() {
         var port = 8987;
         clientRequest(port);
         // 服务端 返回请求
         final var socket = new ServerSocket(port);
-        try (final var clientSocket = socket.accept()) {  // 监测到事件 阻塞1
-            var out = clientSocket.getOutputStream();
-            log.info("Accepted connection from " + clientSocket);
-            out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));// 数据传输  阻塞2
-            out.flush();
-        }
+        @Cleanup final var clientSocket = socket.accept();   // 监测到事件 阻塞1
+        var out = clientSocket.getOutputStream();
+        log.info("Accepted connection from " + clientSocket);
+        out.write("Hi!\r\n".getBytes(StandardCharsets.UTF_8));// 数据传输  阻塞2
+        out.flush();
         Thread.sleep(1000);
     }
 
@@ -120,12 +120,11 @@ public class SocketTest {
                         log.info("Accepted connection from " + client);
                     }
                     if (key.isWritable()) {
-                        try (var client = (SocketChannel) key.channel()) {
-                            var buffer = (ByteBuffer) key.attachment();
-                            while (buffer.hasRemaining()) {
-                                if (client.write(buffer) == 0) {
-                                    break;
-                                }
+                        @Cleanup var client = (SocketChannel) key.channel();
+                        var buffer = (ByteBuffer) key.attachment();
+                        while (buffer.hasRemaining()) {
+                            if (client.write(buffer) == 0) {
+                                break;
                             }
                         }
                     }
@@ -203,7 +202,7 @@ public class SocketTest {
      * Netty Test
      */
     @Test
-    public  void netty() throws InterruptedException {
+    public void netty() throws InterruptedException {
         var port = 8987;
         clientRequest(port);
         // 服务端 返回请求

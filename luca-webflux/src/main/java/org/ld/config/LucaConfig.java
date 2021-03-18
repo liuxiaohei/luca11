@@ -1,6 +1,7 @@
 package org.ld.config;
 
 import akka.actor.ActorSystem;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.Flyway;
@@ -173,7 +174,7 @@ public class LucaConfig {
                                     .orElse("") + "Response Body : " + JsonUtil.obj2Json(o));
                             return new RespBean<>(o);
                         });
-                return writeBody(body, MethodParameterHolder.param, exchange);
+                return writeBody(body, MethodParameterHolder.PARAM, exchange);
             }
         };
     }
@@ -272,16 +273,15 @@ public class LucaConfig {
                         , dataSourceConfig.getUserName()
                         , dataSourceConfig.getPassWord()).load();
         log.info("init Db jdbcUrl:" + rawJdbcUrl + " database:" + targetDb); //自动创建database
-        try (final var connection = DriverManager.getConnection(
+        @Cleanup final var connection = DriverManager.getConnection(
                 rawJdbcUrl,
                 dataSourceConfig.getUserName(),
                 dataSourceConfig.getPassWord());
-             final var statement = connection.createStatement()
-        ) {
-            statement.execute(initSql);
-            flyway.repair();
-            flyway.migrate();
-        }
+        @Cleanup final var statement = connection.createStatement();
+        statement.execute(initSql);
+        flyway.repair();
+        flyway.migrate();
+
     }
 
 //    @Bean
@@ -325,7 +325,7 @@ public class LucaConfig {
             return null;
         }
 
-        static final MethodParameter param = new MethodParameter(
+        static final MethodParameter PARAM = new MethodParameter(
                 Optional.of(MethodParameterHolder.class).map(e -> {
                     try {
                         return e.getDeclaredMethod("methodForParams");

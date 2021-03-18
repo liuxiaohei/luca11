@@ -16,8 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -93,14 +92,14 @@ public class DemoTest {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            var result = convertStreamToStr(process.getInputStream());
+            var result = StringUtil.convertStreamToStr(process.getInputStream());
             if (result.size() < 2) {
                 throw new RuntimeException("拉取镜像失败");
             }
             digestMap.put(s, result.get(1));
         });
         var process = Runtime.getRuntime().exec("docker images");
-        var result = convertStreamToStr(process.getInputStream());
+        var result = StringUtil.convertStreamToStr(process.getInputStream());
         var s1 = result.stream().skip(1).filter(s -> s.startsWith("172.16.1.99/postcommit/")).collect(Collectors.toList());
         var imageIdMap = list.stream()
                 .collect(Collectors.toMap(
@@ -146,14 +145,14 @@ public class DemoTest {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            var result = convertStreamToStr(process.getInputStream());
+            var result = StringUtil.convertStreamToStr(process.getInputStream());
             if (result.size() < 2) {
                 throw new RuntimeException("拉取镜像失败");
             }
             digestMap.put(s, result.get(1));
         });
         var process = Runtime.getRuntime().exec("docker images");
-        var result = convertStreamToStr(process.getInputStream());
+        var result = StringUtil.convertStreamToStr(process.getInputStream());
         var s1 = result.stream().skip(1).filter(s -> s.startsWith("172.16.1.99/gold/")).collect(Collectors.toList());
         var imageIdMap = list.stream()
                 .collect(Collectors.toMap(
@@ -183,28 +182,6 @@ public class DemoTest {
             System.out.println(digestMap.get(e));
             System.out.println("=======");
         });
-    }
-
-    public List<String> convertStreamToStr(InputStream is) {
-        final String chars = "\n";
-        String result;
-        if (is != null) {
-            var writer = new StringWriter();
-            var buffer = new char[1024];
-            try (is) {
-                var reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            result = writer.toString();
-        } else {
-            result = "";
-        }
-        return Stream.of(result.split(chars)).collect(Collectors.toList());
     }
 
     @Test

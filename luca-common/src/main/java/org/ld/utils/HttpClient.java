@@ -1,5 +1,6 @@
 package org.ld.utils;
 
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -110,10 +111,9 @@ public class HttpClient {
     @SneakyThrows
     public static <R> R execute(String method, String url, Headers headers, RequestBody body, UCFunction<InputStream, R> handler) {
         return executeWithUnClose(method, url, headers, body, is -> {
-            try (var in = is) {
-                if (null != in) {
-                    return handler.apply(in);
-                }
+            @Cleanup var in = is;
+            if (null != in) {
+                return handler.apply(in);
             }
             return null;
         });

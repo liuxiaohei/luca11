@@ -1,17 +1,17 @@
 package org.ld.utils;
 
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("all")
@@ -86,18 +86,37 @@ public class StringUtil {
     // 遍历Stream之后会自动关闭
     @SneakyThrows
     public static String stream2String(InputStream is) {
-        try (var i = is) {
-            if (null == is) {
-                return null;
-            }
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            StringBuilder stringBuilder = new StringBuilder();
-            String str;
-            while ((str = br.readLine()) != null) {
-                stringBuilder.append(str);
-            }
-            return stringBuilder.toString();
+        @Cleanup var i = is;
+        if (null == is) {
+            return null;
         }
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        StringBuilder stringBuilder = new StringBuilder();
+        String str;
+        while ((str = br.readLine()) != null) {
+            stringBuilder.append(str);
+        }
+        return stringBuilder.toString();
+    }
+
+    @SneakyThrows
+    public static List<String> convertStreamToStr(InputStream is) {
+        final String chars = "\n";
+        String result;
+        if (is != null) {
+            var writer = new StringWriter();
+            var buffer = new char[1024];
+            @Cleanup var i = is;
+            var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+            result = writer.toString();
+        } else {
+            result = "";
+        }
+        return Stream.of(result.split(chars)).collect(Collectors.toList());
     }
 
     public static String toSafeUrlPath(String path) {

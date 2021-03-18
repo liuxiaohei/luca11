@@ -6,10 +6,12 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@With // https://www.jianshu.com/p/6660142f70c7
 @ApiModel("分页请求体")
 public class PageReq {
 

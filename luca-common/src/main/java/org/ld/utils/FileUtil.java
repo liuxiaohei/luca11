@@ -1,13 +1,9 @@
 package org.ld.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.ld.exception.CodeStackException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,13 +21,12 @@ import java.util.zip.ZipOutputStream;
 /**
  * 操作本地文件工具类
  */
+@Slf4j
 public class FileUtil {
 
     public static final Integer DEFAULT_FILE_BUFFER_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
 
     public static final String DEFAULT_BUFFER_SIZE_STRING = DEFAULT_FILE_BUFFER_SIZE_IN_BYTES + "";
-
-    private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
     /**
      * 返回文件流
@@ -82,12 +77,12 @@ public class FileUtil {
                     public void close() throws IOException {
                         in.close();
                         if (deleteFileAfterClose && file.exists()) {
-                            LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
+                            log.info("删除文件" + (file.delete() ? "成功" : "失败"));
                             if (deleteDirAfterClose && file.getParentFile().exists() && Optional
                                     .ofNullable(file.getParentFile())
                                     .map(File::listFiles)
                                     .map(e -> e.length == 0).orElse(false)) {
-                                LOG.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
+                                log.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
                             }
                         } // 自动删除文件
                     }
@@ -128,24 +123,22 @@ public class FileUtil {
                  entries.hasMoreElements(); ) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
                 String zipEntryName = entry.getName();
-                try (InputStream in = zip.getInputStream(entry)) {
-                    String outPath = (zipFile.getParentFile().toString() + "/" + zipEntryName).replace("/", File.separator);
-                    if (new File(outPath).isDirectory()) {
-                        continue;
-                    }
-                    try (OutputStream out = new FileOutputStream(outPath)) {
-                        byte[] buf1 = new byte[2048];
-                        int len;
-                        while ((len = in.read(buf1)) > 0) {
-                            out.write(buf1, 0, len);
-                        }
-                        paths.add(outPath);
-                    }
+                @Cleanup var in = zip.getInputStream(entry);
+                String outPath = (zipFile.getParentFile().toString() + "/" + zipEntryName).replace("/", File.separator);
+                if (new File(outPath).isDirectory()) {
+                    continue;
                 }
+                @Cleanup var out = new FileOutputStream(outPath);
+                byte[] buf1 = new byte[2048];
+                int len;
+                while ((len = in.read(buf1)) > 0) {
+                    out.write(buf1, 0, len);
+                }
+                paths.add(outPath);
             }
         } finally {
             if (deleteZipFile && zipFile.exists()) {
-                LOG.info("删除文件" + (zipFile.delete() ? "成功" : "失败"));
+                log.info("删除文件" + (zipFile.delete() ? "成功" : "失败"));
             } // 自动删除文件
         }
         return paths;
@@ -178,7 +171,7 @@ public class FileUtil {
     @SneakyThrows
     public static File asFile(MultipartFile file) {
         File tmp = new File("/tmp/" + SnowflakeId.LocalHolder.idWorker.get() + "/" + file.getOriginalFilename());
-        LOG.info("创建文件" + (tmp.getParentFile().mkdir() ? "成功" : "失败"));
+        log.info("创建文件" + (tmp.getParentFile().mkdir() ? "成功" : "失败"));
         file.transferTo(tmp);
         return tmp;
     }
@@ -189,7 +182,7 @@ public class FileUtil {
     public static void makeDirs(String path) {
         File file = new File(path);
         if (!file.exists() && !file.isDirectory()) {
-            LOG.info("创建文件" + (file.mkdirs() ? "成功" : "失败"));
+            log.info("创建文件" + (file.mkdirs() ? "成功" : "失败"));
         } else {
             System.out.println("创建目录失败：" + path);
         }
@@ -237,9 +230,9 @@ public class FileUtil {
             return new TextFile(sbf.toString(), fileName, md5, file.length());
         } finally {
             if (deleteFileAfterRead && file.exists()) {
-                LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
+                log.info("删除文件" + (file.delete() ? "成功" : "失败"));
                 if (file.getParentFile().exists() && Objects.requireNonNull(file.getParentFile().listFiles()).length == 0) {
-                    LOG.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
+                    log.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
                 }
             }
         }
@@ -248,24 +241,23 @@ public class FileUtil {
     public static void deleteTextFile(String fileName) {
         File file = new File(fileName);
         if (file.exists()) {
-            LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
+            log.info("删除文件" + (file.delete() ? "成功" : "失败"));
             if (file.getParentFile().exists() && Objects.requireNonNull(file.getParentFile().listFiles()).length == 0) {
-                LOG.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
+                log.info("删除文件夹" + (file.getParentFile().delete() ? "成功" : "失败"));
             }
         }
     }
 
     public static byte[] toByteArray(InputStream in) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        @Cleanup var out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024 * 4];
         int n;
         while ((n = in.read(buffer)) != -1) {
             out.write(buffer, 0, n);
         }
-        try (ByteArrayOutputStream ignored = out) {
-            return out.toByteArray();
-        }
+        return out.toByteArray();
     }
+
 
     @Data
     @AllArgsConstructor
@@ -283,17 +275,15 @@ public class FileUtil {
      * https://blog.csdn.net/lidai352710967/article/details/89887978
      * 压缩本地文件
      */
+    @SneakyThrows
     public static void toZip(String srcDir, OutputStream out, boolean KeepDirStructure) {
         long start = System.currentTimeMillis();
-        try (ZipOutputStream zos = new ZipOutputStream(out)) {
-            File sourceFile = new File(srcDir);
-            compress(sourceFile, zos, sourceFile.getName(), KeepDirStructure);
-            long end = System.currentTimeMillis();
-            delTempChild(sourceFile);
-            System.out.println("压缩完成，耗时：" + (end - start) + " ms");
-        } catch (Exception e) {
-            throw new RuntimeException("zip error from ZipUtils", e);
-        }
+        @Cleanup ZipOutputStream zos = new ZipOutputStream(out);
+        File sourceFile = new File(srcDir);
+        compress(sourceFile, zos, sourceFile.getName(), KeepDirStructure);
+        long end = System.currentTimeMillis();
+        delTempChild(sourceFile);
+        System.out.println("压缩完成，耗时：" + (end - start) + " ms");
     }
 
     /**
@@ -306,7 +296,7 @@ public class FileUtil {
                 delTempChild(new File(file, child));
             }
         }
-        LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
+        log.info("删除文件" + (file.delete() ? "成功" : "失败"));
     }
 
     private static void compress(File sourceFile,
@@ -356,16 +346,15 @@ public class FileUtil {
                 System.out.println("创建文件失败");
             }
         }
-        try (var fos = new FileOutputStream(file)) {
-            var b = new byte[1024 * 4];
-            for (var i = 0; i < 1024; i++) {
-                b[i] = (byte) (i % 2);
-            }
-            for (var i = 1; i < size / b.length; i++) {
-                fos.write(b);
-            }
-            fos.flush();
+        @Cleanup var fos = new FileOutputStream(file);
+        var b = new byte[1024 * 4];
+        for (var i = 0; i < 1024; i++) {
+            b[i] = (byte) (i % 2);
         }
+        for (var i = 1; i < size / b.length; i++) {
+            fos.write(b);
+        }
+        fos.flush();
     }
 
     /**
@@ -381,35 +370,34 @@ public class FileUtil {
                 System.out.println("创建文件失败");
             }
         }
-        try (var fos = new FileOutputStream(file)) {
-            var channel = fos.getChannel();
-            var buffer = ByteBuffer.allocate(200 * 1024 * 1024);
-            int i = 1;
-            while (buffer.position() < buffer.limit() - 50) {
-                buffer.putInt(i++);
-            }
-            buffer.flip();
-            channel.write(buffer);
-            fos.flush();
+        @Cleanup var fos = new FileOutputStream(file);
+        var channel = fos.getChannel();
+        var buffer = ByteBuffer.allocate(200 * 1024 * 1024);
+        int i = 1;
+        while (buffer.position() < buffer.limit() - 50) {
+            buffer.putInt(i++);
         }
+        buffer.flip();
+        channel.write(buffer);
+        fos.flush();
     }
 
     public static void copyFileUseNIO(String src, String dst) throws IOException {
-        try (var fi = new FileInputStream(new File(src));
-             var fo = new FileOutputStream(new File(dst));
-             var inChannel = fi.getChannel();//获得传输通道channel
-             var outChannel = fo.getChannel()) {
-            var buffer = ByteBuffer.allocate(1024); //创建buffer
-            while (true) {
-                int eof = inChannel.read(buffer);
-                if (eof == -1) {
-                    break;
-                }
-                buffer.flip(); //重设一下buffer的position=0，limit=position
-                outChannel.write(buffer);
-                buffer.clear();//写完要重置buffer，重设position=0,limit=capacity
+        @Cleanup var fi = new FileInputStream(new File(src));
+        @Cleanup var fo = new FileOutputStream(new File(dst));
+        @Cleanup var inChannel = fi.getChannel();//获得传输通道channel
+        @Cleanup var outChannel = fo.getChannel();
+        var buffer = ByteBuffer.allocate(1024); //创建buffer
+        while (true) {
+            int eof = inChannel.read(buffer);
+            if (eof == -1) {
+                break;
             }
+            buffer.flip(); //重设一下buffer的position=0，limit=position
+            outChannel.write(buffer);
+            buffer.clear();//写完要重置buffer，重设position=0,limit=capacity
         }
+
     }
 
     /**
@@ -423,11 +411,11 @@ public class FileUtil {
         if (!file.isFile()) {
             throw new CodeStackException(String.format("%s isn't a file.", src));
         }
-        try (var is = new FileInputStream(src); var os = outputStream) {
-            FileUtil.copyInputStream2OutputStream(is, os);
-        }
+        @Cleanup var is = new FileInputStream(src);
+        @Cleanup var os = outputStream;
+        FileUtil.copyInputStream2OutputStream(is, os);
         if (delSrc) {
-            LOG.info("删除文件" + (file.delete() ? "成功" : "失败"));
+            log.info("删除文件" + (file.delete() ? "成功" : "失败"));
         }
     }
 

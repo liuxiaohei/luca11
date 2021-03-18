@@ -44,11 +44,7 @@ public class ThreadInterruptDemo {
         var a = CompletableFuture.runAsync(() -> {
             executeMap.computeIfAbsent("key", key -> new FutureThreadBean<>());
             System.out.println("HelloWorld");
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                throw CodeStackException.of(e);
-            }
+            SleepUtil.sleep(10000);
             System.out.println("HelloWorld1");
             System.out.println("HelloWorld2");
             System.out.println("HelloWorld3");
