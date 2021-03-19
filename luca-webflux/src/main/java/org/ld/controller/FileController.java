@@ -1,5 +1,6 @@
 package org.ld.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ld.exception.CodeStackException;
 import org.ld.utils.SnowflakeId;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -24,6 +25,7 @@ import java.util.Optional;
 /**
  * @author ld
  */
+@Slf4j
 @RestController
 @RequestMapping("/file")
 public class FileController {
@@ -45,26 +47,15 @@ public class FileController {
 
     @RequestMapping(value = "/upload/single", method = RequestMethod.POST)
     public Mono<String> single(@RequestPart("file") Mono<FilePart> file) {
-        //此时已转换为File类，具体的业务逻辑我就忽略了
         return file.map(filePart -> {
-            Path tempFile = null;
             try {
-                tempFile = Files.createTempFile("test", filePart.filename());
-            } catch (IOException e) {
-                e.printStackTrace();
+                var tempFile = Files.createTempFile("test", filePart.filename());
+                var channel = AsynchronousFileChannel.open(tempFile, StandardOpenOption.WRITE);
+                DataBufferUtils.write(filePart.content(), channel, 0).doOnComplete(() -> log.info("finish")).subscribe();
+                return tempFile;
+            } catch (Exception e) {
+                throw CodeStackException.of(e);
             }
-            AsynchronousFileChannel channel = null;
-            try {
-                assert tempFile != null;
-                channel = AsynchronousFileChannel.open(tempFile, StandardOpenOption.WRITE);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            assert channel != null;
-            DataBufferUtils.write(filePart.content(), channel, 0).doOnComplete(() -> {
-                System.out.println("finish");
-            }).subscribe();
-            return tempFile;
         })
                 .map(Path::toFile)
                 .flatMap(fileSinge -> file.map(FilePart::filename));
@@ -86,7 +77,7 @@ public class FileController {
                 .flatMap(fileSinge -> file.map(FilePart::filename)).collectList();
     }
 
-    @RequestMapping(value = "/get",produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/get", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
     public byte[] getImage() throws IOException {
         File file = new File("D:/test.jpg");
