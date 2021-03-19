@@ -104,6 +104,6 @@ public class SnowflakeId {
     }
 
     private long timeGen() {
-        return System.currentTimeMillis();
+        return SystemClock.now();
     }
 }
