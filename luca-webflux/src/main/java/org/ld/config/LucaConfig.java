@@ -278,15 +278,6 @@ public class LucaConfig {
 
     }
 
-//    @Bean
-//    @Autowired
-//    @Primary
-//    public ObjectRedisTemplate<Object> objectTemplate(RedisConnectionFactory redisConnectionFactory) {
-//        return new ObjectRedisTemplate<Object>(redisConnectionFactory) {
-//        };
-//    }
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static class MethodParameterHolder {

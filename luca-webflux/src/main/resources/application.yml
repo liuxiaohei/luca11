@@ -35,6 +35,9 @@ spring:
     multipart:
       maxRequestSize: 50MB
       maxFileSize: 50MB
+  cloud:
+    zookeeper:
+      connect-string: 127.0.0.1:2181
   quartz:
     properties:
       org:
@@ -71,18 +74,18 @@ ribbon:
   MaxAutoRetriesNextServer: 3
   OkToRetryOnAllOperations: true
   ServerListRefreshInterval: 10000
-  eureka:
-    enabled: true
-eureka:
-  instance:
-    lease-expiration-duration-in-seconds: 10
-    lease-renewal-interval-in-seconds: 5
-    preferIpAddress: true
-  client:
-    serviceUrl:
-      defaultZone: http://127.0.0.1:9998/eureka/
-    fetchRegistry: true
-    registerWithEureka: true
+#  eureka:
+#    enabled: true
+#eureka:
+#  instance:
+#    lease-expiration-duration-in-seconds: 10
+#    lease-renewal-interval-in-seconds: 5
+#    preferIpAddress: true
+#  client:
+#    serviceUrl:
+#      defaultZone: http://127.0.0.1:9998/eureka/
+#    fetchRegistry: true
+#    registerWithEureka: true
 #  datasource:
 #    driver-class-name: com.mysql.jdbc.Driver        # 配置MySQL的驱动程序类
 #    url: jdbc:mysql://127.0.0.1:3306/luca?useSSL=false # 数据库连接地址

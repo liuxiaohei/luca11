@@ -1,19 +1,16 @@
 package org.ld.grpc.server;
 
 import com.google.common.collect.Lists;
-import com.netflix.appinfo.ApplicationInfoManager;
 import io.grpc.ServerInterceptor;
 import lombok.Getter;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.cloud.zookeeper.discovery.ZookeeperDiscoveryProperties;
 import org.springframework.util.SocketUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
+
+//import com.netflix.appinfo.ApplicationInfoManager;
 
 @Getter
 public class GlobalServerInterceptorRegistry {
@@ -21,8 +18,14 @@ public class GlobalServerInterceptorRegistry {
     private final List<ServerInterceptor> serverInterceptors = Lists.newArrayList();
     @Resource
     private GrpcServerProperties grpcProperties;
+
+
+    // eureka
+//    @Resource
+//    private ApplicationInfoManager instance;
+
     @Resource
-    private ApplicationInfoManager instance;
+    private ZookeeperDiscoveryProperties instance;
 
     /**
      * 初始化方法、注册监听ip、端口
@@ -31,9 +34,13 @@ public class GlobalServerInterceptorRegistry {
     public void init() {
         var port = SocketUtils.findAvailableTcpPort();
         grpcProperties.setPort(port);
-        grpcProperties.setAddress(instance.getEurekaInstanceConfig().getIpAddress());
-        //将grpc监听端口放入注册中心
-        instance.getInfo().getMetadata().put("grpcPort", String.valueOf(port));
+        // eureka方式
+//        grpcProperties.setAddress(instance.getEurekaInstanceConfig().getIpAddress());
+//        instance.getInfo().getMetadata().put("grpcPort", String.valueOf(port));
+        // zk 方式
+        grpcProperties.setAddress(instance.getInstanceHost());
+        instance.getMetadata().put("grpcPort", String.valueOf(port));
+
     }
 
     public GlobalServerInterceptorRegistry addServerInterceptors(ServerInterceptor interceptor) {
