@@ -1,7 +1,7 @@
 package org.ld.controller;
 
 import org.ld.beans.JobQuery;
-import org.ld.grpc.schedule.ScheduleJob;
+import org.ld.schedule.ScheduleJob;
 import org.ld.service.JobService;
 import org.ld.utils.NumberUtil;
 import org.quartz.SchedulerException;

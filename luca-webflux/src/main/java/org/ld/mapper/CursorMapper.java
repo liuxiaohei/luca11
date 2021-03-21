@@ -4,7 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.cursor.Cursor;
-import org.ld.grpc.schedule.ScheduleJob;
+import org.ld.schedule.ScheduleJob;
 
 @Mapper
 public interface CursorMapper {

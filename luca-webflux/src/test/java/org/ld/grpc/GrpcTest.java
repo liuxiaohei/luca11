@@ -6,29 +6,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ld.LucaApplication;
-import org.ld.beans.GrpcServer;
-import org.ld.grpc.grpc.LucaGrpcClient;
-import org.ld.grpc.schedule.ScheduleJob;
-import org.ld.grpc.server.GrpcServerProperties;
 import org.ld.mapper.CursorMapper;
+import org.ld.schedule.client.ScheduleClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
-@Import(GrpcServer.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {LucaApplication.class})
 @Slf4j
 public class GrpcTest {
 
     @Resource
-    private GrpcServerProperties grpcProperties;
+    private CursorMapper cursorMapper;
 
     @Resource
-    private CursorMapper cursorMapper;
+    private ScheduleClient scheduleClient;
 
     @Test
     @Transactional
@@ -40,19 +35,19 @@ public class GrpcTest {
 
     @Test
     public void test() {
-        LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
-                ScheduleJob.builder()
-                        .beanName("grpcServer")
-                        .methodName("run")
-                        .params("demo")
-                        .id(1)
-                        .build());
-        var a = LucaGrpcClient.sendMessage(grpcProperties.getAddress(), grpcProperties.getPort(),
-                ScheduleJob.builder()
-                        .beanName("grpcServer")
-                        .methodName("run")
-                        .params("ceshi")
-                        .id(2)
-                        .build());
+//        scheduleClient.send(
+//                ScheduleJob.builder()
+//                        .beanName("grpcServer")
+//                        .methodName("run")
+//                        .params("demo")
+//                        .id(1)
+//                        .build());
+//        scheduleClient.send(
+//                ScheduleJob.builder()
+//                        .beanName("grpcServer")
+//                        .methodName("run")
+//                        .params("ceshi")
+//                        .id(2)
+//                        .build());
     }
 }

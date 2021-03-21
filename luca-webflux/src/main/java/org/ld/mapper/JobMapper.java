@@ -2,8 +2,8 @@ package org.ld.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.ld.grpc.schedule.ScheduleJob;
 import org.ld.pojo.JobExample;
+import org.ld.schedule.ScheduleJob;
 
 import java.util.List;
 

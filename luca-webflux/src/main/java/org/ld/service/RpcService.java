@@ -1,17 +1,16 @@
 package org.ld.service;
 
-import io.grpc.StatusRuntimeException;
-import org.ld.grpc.grpc.LucaGrpcClient;
-import org.ld.grpc.schedule.ScheduleJob;
+import lombok.extern.slf4j.Slf4j;
+
 import org.ld.task.RefreshServiceTask;
+import org.ld.schedule.ScheduleJob;
+import org.ld.schedule.client.ScheduleClient;
 import org.ld.utils.StringUtil;
-import org.ld.utils.ZLogger;
-import org.quartz.Scheduler;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+@Slf4j
 @Service
 public class RpcService {
 
@@ -19,37 +18,18 @@ public class RpcService {
     private RefreshServiceTask refreshServiceTask;
     @Resource
     JobService jobService;
-
-    private final Logger log = ZLogger.newInstance();
+    @Resource
+    ScheduleClient scheduleClient;
 
     public void sendClient(ScheduleJob job) {
         var jobs = refreshServiceTask.getServiceInstance(job.getServiceName());
+        String host = null;
+        Integer port = null;
         if (StringUtil.isNotEmpty(jobs)) {
-            job.setHost(jobs.get(0).getHost());
-            job.setPort(jobs.get(0).getPort());
             RefreshServiceTask.servicesMap.put(job.getServiceName(), jobs);
+            scheduleClient.send(job,jobs.get(0).getHost(),jobs.get(0).getPort());
         }
-        try {
-            LucaGrpcClient.sendMessage(job.getHost(), job.getPort(), job);
-        } catch (StatusRuntimeException e) {
-            var jobServices = RefreshServiceTask.servicesMap.get(job.getServiceName());
-            if (StringUtil.isNotEmpty(jobServices) && jobServices.size() > 1) {
-                jobServices.remove(0);
-                job.setHost(jobServices.get(0).getHost());
-                job.setPort(jobServices.get(0).getPort());
-                RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
-                jobService.update(job);
-            } else {
-                jobServices = refreshServiceTask.getServiceInstance(job.getServiceName());
-                if (StringUtil.isNotEmpty(jobServices)) {
-                    job.setHost(jobServices.get(0).getHost());
-                    job.setPort(jobServices.get(0).getPort());
-                    RefreshServiceTask.servicesMap.put(job.getServiceName(), jobServices);
-                    jobService.update(job);
-                }
-            }
-            log.info(e.getMessage());
-        }
+
     }
 
 }

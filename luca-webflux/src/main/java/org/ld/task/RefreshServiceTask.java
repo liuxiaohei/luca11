@@ -1,6 +1,6 @@
 package org.ld.task;
 
-import org.ld.grpc.schedule.ScheduleJob;
+import org.ld.schedule.ScheduleJob;
 import org.ld.utils.StringUtil;
 import org.ld.utils.ZLogger;
 import org.slf4j.Logger;
