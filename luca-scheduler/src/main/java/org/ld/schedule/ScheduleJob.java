@@ -1,33 +1,43 @@
 package org.ld.schedule;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.util.Date;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Schema(name = "任务")
-public class ScheduleJob {
+public class ScheduleJob implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private Integer id;
 
-    private String name;
+    private String host;
 
-    private String serviceName;
+    private Integer port;
 
     private String beanName;
 
     private String methodName;
 
-    private String params;
+    private String name;
 
     private String cronExpression;
 
+    private String params;
+
     private Integer status;
 
-    private Boolean aSync = false;
+    private Integer deleted;
+
+    private Date createTime;
+
+    private String serviceName;
 
 }
