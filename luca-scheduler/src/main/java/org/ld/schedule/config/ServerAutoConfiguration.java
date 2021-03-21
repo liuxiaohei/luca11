@@ -4,9 +4,13 @@ import org.ld.schedule.client.ScheduleClient;
 import org.ld.schedule.server.ScheduleServer;
 import org.ld.schedule.endpoint.GreeterHttpController;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.zookeeper.discovery.ZookeeperDiscoveryProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 @Configuration
 @EnableConfigurationProperties
@@ -21,6 +25,26 @@ public class ServerAutoConfiguration {
     @Bean
     public GreeterHttpController greeterHttpController() {
         return new GreeterHttpController();
+    }
+
+    // eureka
+//    @Resource
+//    private ApplicationInfoManager instance;
+
+    @Resource
+    private ZookeeperDiscoveryProperties instance;
+
+    /**
+     * 初始化方法、注册监听ip、端口
+     */
+    @PostConstruct
+    public void init() {
+//        var port = SocketUtils.findAvailableTcpPort();
+        // eureka方式
+//        grpcProperties.setAddress(instance.getEurekaInstanceConfig().getIpAddress());
+//        instance.getInfo().getMetadata().put("grpcPort", String.valueOf(port));
+        // zk 方式
+        instance.getMetadata().put("tag", "master");
     }
 
 }
