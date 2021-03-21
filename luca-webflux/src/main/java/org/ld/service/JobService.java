@@ -52,7 +52,7 @@ public class JobService {
         JobExample.Criteria criteria = jobExample.createCriteria();
         criteria.andNameEqualTo(jobBean.getName());
         criteria.andDeletedEqualTo(0);
-        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new RuntimeException("error_job_name"));
+        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new CodeStackException("error_job_name"));
         List<ServiceInstance> instanceList = discoveryClient.getInstances(jobBean.getServiceName());
         for (ServiceInstance instance : instanceList) {
             Map<String, String> metadata = instance.getMetadata();
@@ -63,10 +63,10 @@ public class JobService {
             }
         }
         if (jobBean.getHost() == null || jobBean.getPort() == null) {
-            throw new RuntimeException("error_service_rpc_null");
+            throw new CodeStackException("error_service_rpc_null");
         }
         int count = jobMapper.insertSelective(jobBean);
-        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_save"));
+        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new CodeStackException("error_job_save"));
         JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class)
                 .withIdentity(getJobKey(jobBean.getId())).build();
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder
@@ -84,7 +84,7 @@ public class JobService {
         ScheduleJob job = getAndCheckJob(jobId);
         job.setDeleted(1);
         int count = jobMapper.updateByPrimaryKeySelective(job);
-        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_delete"));
+        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new CodeStackException("error_job_delete"));
         scheduler.deleteJob(getJobKey(jobId));
     }
 
@@ -98,10 +98,10 @@ public class JobService {
         criteria.andNameEqualTo(jobBean.getName());
         criteria.andDeletedEqualTo(0);
         criteria.andIdNotEqualTo(jobBean.getId());
-        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new RuntimeException("error_job_name"));
+        Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new CodeStackException("error_job_name"));
         validate(jobBean);
         int count = jobMapper.updateByPrimaryKeySelective(jobBean);
-        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
+        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new CodeStackException("error_job_update"));
         updateScheduleJob(scheduler, jobBean);
     }
 
@@ -120,9 +120,6 @@ public class JobService {
         JobQuery query = new JobQuery();
         query.jobId = jobId;
         PageData<ScheduleJob> data = queryJobList(query);
-        if (StringUtil.isEmpty(data.getList())) {
-            throw new RuntimeException();
-        }
         return data.getList().get(0);
     }
 
@@ -168,7 +165,7 @@ public class JobService {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         job.setStatus(STATUS);
         int count = jobMapper.updateByPrimaryKeySelective(job);
-        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new RuntimeException("error_job_update"));
+        Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new CodeStackException("error_job_update"));
         scheduler.pauseJob(getJobKey(jobId));
     }
 
@@ -183,19 +180,19 @@ public class JobService {
     public void validate(ScheduleJob jobBean) {
         Optional.ofNullable(jobBean.getBeanName())
                 .filter(StringUtil::isNotBlank)
-                .orElseThrow(() -> new RuntimeException("error_job_name_null"));
+                .orElseThrow(() -> new CodeStackException("error_job_name_null"));
         Optional.ofNullable(jobBean.getServiceName())
                 .filter(StringUtil::isNotBlank)
-                .orElseThrow(() -> new RuntimeException("error_service_name_null"));
+                .orElseThrow(() -> new CodeStackException("error_service_name_null"));
         Optional.ofNullable(jobBean.getBeanName())
                 .filter(StringUtil::isNotBlank)
-                .orElseThrow(() -> new RuntimeException("error_bean_name_null"));
+                .orElseThrow(() -> new CodeStackException("error_bean_name_null"));
         Optional.ofNullable(jobBean.getMethodName())
                 .filter(StringUtil::isNotBlank)
-                .orElseThrow(() -> new RuntimeException("error_method_name_null"));
+                .orElseThrow(() -> new CodeStackException("error_method_name_null"));
         Optional.ofNullable(jobBean.getCronExpression())
                 .filter(StringUtil::isNotBlank)
-                .orElseThrow(() -> new RuntimeException("error_cron_expression_null"));
+                .orElseThrow(() -> new CodeStackException("error_cron_expression_null"));
 
     }
 
@@ -203,7 +200,7 @@ public class JobService {
         ScheduleJob job = jobMapper.selectByPrimaryKey(jobId);
         Optional.of(job)
                 .filter(e -> job.getDeleted().equals(0))
-                .orElseThrow(() -> new RuntimeException("error_job_delete_status"));
+                .orElseThrow(() -> new CodeStackException("error_job_delete_status"));
         return job;
     }
 

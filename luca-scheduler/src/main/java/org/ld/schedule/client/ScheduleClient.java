@@ -19,7 +19,7 @@ public class ScheduleClient {
     private RestTemplate restTemplate;
 
     @SneakyThrows
-    public String send(ScheduleJob job, String ip, long port) {
-        return restTemplate.postForObject("http://" + ip + ":" + port + "/job/message", job, String.class);
+    public Object send(ScheduleJob job, String ip, long port) {
+        return restTemplate.postForObject("http://" + ip + ":" + port + "/job/message", job, Object.class);
     }
 }

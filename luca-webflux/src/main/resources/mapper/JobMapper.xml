@@ -116,7 +116,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.ld.grpc.schedule.ScheduleJob" useGeneratedKeys="true">
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.ld.schedule.ScheduleJob" useGeneratedKeys="true">
     insert into job (host, port, bean_name,
       method_name, name, cron_expression,
       params, status, deleted,
@@ -126,7 +126,7 @@
       #{params,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{deleted,jdbcType=INTEGER},
       #{createTime,jdbcType=TIMESTAMP}, #{serviceName,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.ld.grpc.schedule.ScheduleJob" useGeneratedKeys="true">
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.ld.schedule.ScheduleJob" useGeneratedKeys="true">
     insert into job
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="host != null">
@@ -267,7 +267,7 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="org.ld.grpc.schedule.ScheduleJob">
+  <update id="updateByPrimaryKeySelective" parameterType="org.ld.schedule.ScheduleJob">
     update job
     <set>
       <if test="host != null">
@@ -306,7 +306,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="org.ld.grpc.schedule.ScheduleJob">
+  <update id="updateByPrimaryKey" parameterType="org.ld.schedule.ScheduleJob">
     update job
     set host = #{host,jdbcType=VARCHAR},
       port = #{port,jdbcType=INTEGER},
