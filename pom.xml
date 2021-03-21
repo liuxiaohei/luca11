@@ -52,6 +52,7 @@
         <module>luca-fsm</module>
         <module>luca-gateway</module>
         <module>luca-molecule</module>
+        <module>luca-scheduler</module>
     </modules>
         <dependencyManagement>
             <dependencies>
