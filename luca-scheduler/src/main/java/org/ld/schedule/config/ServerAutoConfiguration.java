@@ -41,7 +41,6 @@ public class ServerAutoConfiguration {
     public void init() {
 //        var port = SocketUtils.findAvailableTcpPort();
         // eureka方式
-//        grpcProperties.setAddress(instance.getEurekaInstanceConfig().getIpAddress());
 //        instance.getInfo().getMetadata().put("grpcPort", String.valueOf(port));
         // zk 方式
         instance.getMetadata().put("tag", "master");
