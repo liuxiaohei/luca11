@@ -50,7 +50,7 @@ public class DemoTest {
      */
     @Test
     public void infiniteStream() {
-        Stream.generate(() -> snowflakeId.get().toString()).limit(1000000).forEach(e -> ZLogger.newInstance().info("" + e));
+        Stream.generate(() -> snowflakeId.get().toString()).limit(1000000).forEach(e -> log.info("" + e));
     }
 
     /**
@@ -58,7 +58,7 @@ public class DemoTest {
      */
     @Test
     public void infiniteStream1() {
-        Stream.iterate(0, i -> ++i).limit(1000).forEach(e -> ZLogger.newInstance().info("" + e));
+        Stream.iterate(0, i -> ++i).limit(1000).forEach(e -> log.info("" + e));
     }
 
     public static void main(String... args) throws InterruptedException {

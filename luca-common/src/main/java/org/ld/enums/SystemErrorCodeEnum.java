@@ -1,9 +1,9 @@
 package org.ld.enums;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
 import org.ld.exception.CodeStackException;
 import org.ld.exception.ErrorCode;
-import org.ld.utils.ZLogger;
 import org.springframework.dao.DataAccessException;
 
 import java.io.FileNotFoundException;
@@ -17,6 +17,7 @@ import java.util.stream.Stream;
  * 系统级ErrorCode
  * https://www.cnblogs.com/qlqwjy/p/7816290.html
  */
+@Slf4j
 public enum SystemErrorCodeEnum {
     UNKNOWN(-1, Integer.class, "未知异常"),
     NULL_POINTER_EXCEPTION(1, NullPointerException.class, "空指针异常"),
@@ -70,7 +71,6 @@ public enum SystemErrorCodeEnum {
     int code;
     Class<?> clazz;
     String msg;
-    private static final org.slf4j.Logger logger = ZLogger.newInstance();
 
     <T> SystemErrorCodeEnum(int code, Class<T> clazz, String msg) {
         this.code = code;
@@ -90,7 +90,7 @@ public enum SystemErrorCodeEnum {
         if (t instanceof CodeStackException) return ((CodeStackException) t).getErrorCode();
         return Stream.of(values()).filter(e -> e.clazz.isInstance(t)).findFirst()
                 .map(e -> {
-                    logger.info("ErrorCode:" + e.code + " Reason:" + e.msg);
+                    log.info("ErrorCode:" + e.code + " Reason:" + e.msg);
                     return new ErrorCode(e);
                 })
                 .orElseGet(() -> new ErrorCode(SystemErrorCodeEnum.UNKNOWN).setMsg(t.getMessage()));

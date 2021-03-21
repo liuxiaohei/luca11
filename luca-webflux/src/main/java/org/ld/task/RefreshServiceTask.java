@@ -1,9 +1,8 @@
 package org.ld.task;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ld.schedule.ScheduleJob;
 import org.ld.utils.StringUtil;
-import org.ld.utils.ZLogger;
-import org.slf4j.Logger;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
@@ -18,12 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+@Slf4j
 @Component
 @EnableScheduling
 public class RefreshServiceTask {
 
-    private final Logger logger = ZLogger.newInstance();
     @Resource
     private DiscoveryClient discoveryClient;
 
@@ -37,7 +35,7 @@ public class RefreshServiceTask {
      */
     @PostConstruct
     public synchronized void initServices() {
-        logger.info("定时刷新服务列表");
+        log.info("定时刷新服务列表");
         List<String> services = discoveryClient.getServices();
         for (String serviceName : services) {
             List<ScheduleJob> jobs = getServiceInstance(serviceName);

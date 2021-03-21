@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.ld.annotation.NeedToken;
 import org.ld.beans.Flush;
 import org.ld.beans.Queue;
@@ -16,7 +16,6 @@ import org.ld.beans.SetTarget;
 import org.ld.pool.IOExecutor;
 import org.ld.utils.AkkaUtil;
 import org.ld.utils.JwtUtils;
-import org.ld.utils.ZLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.http.MediaType;
@@ -42,7 +41,7 @@ import java.util.stream.IntStream;
  *
  */
 @Api(tags = {"样例API"})
-@Log4j2
+@Slf4j
 @RestController
 @SuppressWarnings("unused")
 public class DemoController {
@@ -119,8 +118,8 @@ public class DemoController {
                         .build();
                 var tempFile = Files.createTempFile("consol-labs-home", ".html");
                 var response = client.send(request, HttpResponse.BodyHandlers.ofFile(tempFile));
-                log.info(response.statusCode());
-                log.info(response.body());
+                log.info(response.statusCode() + "");
+                log.info(response.body().toString());
             } catch (URISyntaxException | IOException | InterruptedException e) {
                 e.printStackTrace();
             }
@@ -194,7 +193,7 @@ public class DemoController {
     // WebFlux(返回的是Mono)
     @GetMapping("/hi")
     private Mono<String> get2() {
-        ZLogger.newInstance().info("get2 start");
+        log.info("get2 start");
         Mono<String> result = Mono.fromSupplier(() -> {
             try {
                 Thread.sleep(1000L);
@@ -203,7 +202,7 @@ public class DemoController {
             }
             return "demo";
         });
-        ZLogger.newInstance().info("get2 end.");
+        log.info("get2 end.");
         return result;
     }
 
@@ -215,7 +214,7 @@ public class DemoController {
                         TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException ignored) {
                     }
-                    ZLogger.newInstance().info("flux data--" + i);
+                    log.info("flux data--" + i);
                     return "flux data--" + i;
                 }));
     }

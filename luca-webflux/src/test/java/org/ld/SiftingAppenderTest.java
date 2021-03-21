@@ -1,7 +1,6 @@
 package org.ld;
 
-import org.ld.utils.ZLogger;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 import java.util.concurrent.CompletableFuture;
@@ -9,9 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
+@Slf4j
 public class SiftingAppenderTest {
-
-    public static Logger logger = ZLogger.newInstance();
 
     public static void main(String[] args) throws InterruptedException {
         ExecutorService taskExecutors = Executors.newCachedThreadPool();
@@ -20,7 +18,7 @@ public class SiftingAppenderTest {
                 CompletableFuture.runAsync(() -> {
                     try {
                         MDC.put("LogUuid", i + "");
-                        logger.info("taskId={}, threadNo={}", i, Thread.currentThread());
+                        log.info("taskId={}, threadNo={}", i, Thread.currentThread());
                     } finally {
                         MDC.remove(i + "");
                     }

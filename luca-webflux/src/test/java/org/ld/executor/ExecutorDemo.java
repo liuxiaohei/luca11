@@ -1,10 +1,11 @@
 package org.ld.executor;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.ld.utils.ZLogger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.*;
 
+@Slf4j
 public class ExecutorDemo {
 
     public static void main(String[] args) {
@@ -46,7 +47,7 @@ public class ExecutorDemo {
                             " rejected from " +
                             e.toString());
                 });
-        var cf2 = CompletableFuture.runAsync(() -> ZLogger.newInstance().info("又又一个样例"), executorService2);
+        var cf2 = CompletableFuture.runAsync(() -> log.info("又又一个样例"), executorService2);
         cf2.join();
     }
 }
