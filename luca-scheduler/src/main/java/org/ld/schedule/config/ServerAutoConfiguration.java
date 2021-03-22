@@ -34,6 +34,8 @@ public class ServerAutoConfiguration {
     @Resource
     private ZookeeperDiscoveryProperties instance;
 
+    public static final String METADATA_LABEL = "label";
+
     /**
      * 初始化方法、注册监听ip、端口
      */
@@ -43,7 +45,7 @@ public class ServerAutoConfiguration {
         // eureka方式
 //        instance.getInfo().getMetadata().put("grpcPort", String.valueOf(port));
         // zk 方式
-        instance.getMetadata().put("tag", "master");
+        instance.getMetadata().put(METADATA_LABEL, "master");
     }
 
 }

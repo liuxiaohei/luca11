@@ -11,7 +11,6 @@ import org.ld.schedule.ScheduleJob;
 import org.ld.utils.JsonUtil;
 import org.ld.utils.StringUtil;
 import org.quartz.*;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,18 +51,6 @@ public class JobService {
         criteria.andNameEqualTo(jobBean.getName());
         criteria.andDeletedEqualTo(0);
         Optional.of(jobMapper.countByExample(jobExample)).filter(e -> e == 0).orElseThrow(() -> new CodeStackException("error_job_name"));
-        List<ServiceInstance> instanceList = discoveryClient.getInstances(jobBean.getServiceName());
-        for (ServiceInstance instance : instanceList) {
-            Map<String, String> metadata = instance.getMetadata();
-            if (metadata.get("grpcPort") != null) {
-                jobBean.setHost(instance.getHost());
-                jobBean.setPort(Integer.valueOf(metadata.get("grpcPort")));
-                break;
-            }
-        }
-        if (jobBean.getHost() == null || jobBean.getPort() == null) {
-            throw new CodeStackException("error_service_rpc_null");
-        }
         int count = jobMapper.insertSelective(jobBean);
         Optional.of(count).filter(e -> e > 0).orElseThrow(() -> new CodeStackException("error_job_save"));
         JobDetail jobDetail = JobBuilder.newJob(JobRunnable.class)
@@ -112,8 +98,6 @@ public class JobService {
         jobBean.setCronExpression(Optional.ofNullable(jobBean.getCronExpression()).orElse(job.getCronExpression()));
         jobBean.setParams(Optional.ofNullable(jobBean.getParams()).orElse(job.getParams()));
         jobBean.setStatus(job.getStatus());
-        jobBean.setHost(job.getHost());
-        jobBean.setPort(job.getPort());
     }
 
     public ScheduleJob queryJob(Integer jobId) {

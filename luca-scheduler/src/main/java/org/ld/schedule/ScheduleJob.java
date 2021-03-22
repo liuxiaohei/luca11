@@ -18,10 +18,6 @@ public class ScheduleJob implements Serializable {
 
     private Integer id;
 
-    private String host;
-
-    private Integer port;
-
     private String beanName;
 
     private String methodName;
@@ -35,8 +31,6 @@ public class ScheduleJob implements Serializable {
     private Integer status;
 
     private Integer deleted;
-
-    private Date createTime;
 
     private String serviceName;
 
