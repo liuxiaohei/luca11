@@ -1,8 +1,8 @@
 package org.ld.schedule.config;
 
 import org.ld.schedule.client.ScheduleClient;
-import org.ld.schedule.server.ScheduleServer;
 import org.ld.schedule.endpoint.GreeterHttpController;
+import org.ld.schedule.server.ScheduleServer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperDiscoveryProperties;
 import org.springframework.context.annotation.Bean;

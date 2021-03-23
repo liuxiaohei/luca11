@@ -1,6 +1,9 @@
 package org.ld.config;
 
 import akka.actor.ActorSystem;
+import com.netflix.loadbalancer.IRule;
+import com.netflix.loadbalancer.RandomRule;
+import io.jmnarloch.spring.cloud.ribbon.support.RibbonFilterContextHolder;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -11,6 +14,7 @@ import org.ld.enums.ResponseMessageEnum;
 import org.ld.enums.UserErrorCodeEnum;
 import org.ld.exception.CodeStackException;
 import org.ld.utils.*;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
@@ -125,9 +129,19 @@ public class LucaConfig {
      * 在Spring 环境下优先使用 RestTemplate 来发送Http请求
      */
     @Bean
+    @LoadBalanced
     RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+    /**
+     * 定义负载均衡策略
+     * https://blog.csdn.net/johnf_nash/article/details/89045566
+     */
+//    @Bean
+//    public IRule ribbonRule() {
+//        return new RandomRule();
+//    }
 
     /**
      * Spring 的方式获取线程池
@@ -233,6 +247,16 @@ public class LucaConfig {
                     }
                     var token = tokenHeader.get(0).replace(JwtUtils.TOKEN_PREFIX, "");
                     JwtUtils.verify(token);
+                }
+
+                // https://perkins4j2.github.io/posts/25628/
+                //清除现有数据，防止干扰
+                RibbonFilterContextHolder.clearCurrentContext();
+                var prod = request.getHeaders().get("prod");
+                var version = request.getHeaders().get("version");
+                if (null != prod && null != version && prod.size() > 0 && version.size() > 0) {
+                    RibbonFilterContextHolder.getCurrentContext().add("prod", prod.get(0));
+                    RibbonFilterContextHolder.getCurrentContext().add("version", version.get(0));
                 }
             }
             return chain.filter(exchange);
