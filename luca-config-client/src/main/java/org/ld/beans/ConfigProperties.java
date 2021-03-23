@@ -1,12 +1,20 @@
 package org.ld.beans;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
  * Table: config_properties
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ConfigProperties implements Serializable {
-
     /**
      * Nullable:  false
      */
@@ -68,103 +76,10 @@ public class ConfigProperties implements Serializable {
      */
     private String unit;
 
-    private String updateSql;
-
-    private static final long serialVersionUID = 1L;
-
-    public String getUpdateSql() {
-        return this.updateSql;
-    }
-
-    public void setUpdateSql(String updateSql) {
-        this.updateSql = updateSql;
-    }
-
-    public ConfigProperties() {
-    }
-
-    public ConfigProperties(Long id, String key1, String value1, String application, String profile, String label, Boolean editable, String desc, String unit) {
-        this.id = id;
-        this.key1 = key1;
-        this.value1 = value1;
-        this.application = application;
-        this.profile = profile;
-        this.label = label;
-        this.editable = editable;
-        this.desc = desc;
-        this.unit = unit;
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getKey1() {
-        return key1;
-    }
-
-    public void setKey1(String key1) {
-        this.key1 = key1;
-    }
-
-    public String getValue1() {
-        return value1;
-    }
-
-    public void setValue1(String value1) {
-        this.value1 = value1;
-    }
-
-    public String getApplication() {
-        return application;
-    }
-
-    public void setApplication(String application) {
-        this.application = application;
-    }
-
-    public String getProfile() {
-        return profile;
-    }
-
-    public void setProfile(String profile) {
-        this.profile = profile;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public Boolean getEditable() {
-        return editable;
-    }
-
-    public void setEditable(Boolean editable) {
-        this.editable = editable;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
+    /**
+     * 是否被禁用
+     *
+     * Nullable:  false
+     */
+    private Boolean disable;
 }

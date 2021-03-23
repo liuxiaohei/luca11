@@ -1,5 +1,6 @@
 package org.ld;
 
+//import com.purgeteam.dynamic.config.starter.annotation.EnableDynamicConfigEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,10 +20,10 @@ public class ConfigClientApplication {
     }
 
     @Value("${foo}")
-    String foo;
+    private String foo;
 
     @Value("${demo}")
-    String demo;
+    private String demo;
 
     @GetMapping(value = "/foo")
     public String hi(){

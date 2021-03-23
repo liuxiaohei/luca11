@@ -1,0 +1,16 @@
+[
+  {
+    "desc": "样例1",
+    "key1": "foo1",
+    "editable": true,
+    "unit": "",
+    "disable": false
+  },
+  {
+    "desc": "样例2",
+    "key1": "foo2",
+    "editable": true,
+    "unit": "",
+    "disable": false
+  }
+]

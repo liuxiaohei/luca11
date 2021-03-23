@@ -5,5 +5,19 @@ spring:
     config:
       uri: http://localhost:8769
       fail-fast: true
+      allowOverride: true
+      overrideNone: true
+      overrideSystemProperties: false
+
   profiles:
     active: dev
+eureka:
+  instance:
+    lease-expiration-duration-in-seconds: 10
+    lease-renewal-interval-in-seconds: 5
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://node221:28182/eureka/,http://node222:28182/eureka/
+    fetchRegistry: true
+    registerWithEureka: true
