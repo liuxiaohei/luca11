@@ -1,7 +1,7 @@
 package org.ld.config;
 
 import akka.actor.ActorSystem;
-import org.ld.gray.support.RibbonFilterContextHolder;
+import org.ld.gray.RibbonFilterContext;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -249,13 +249,12 @@ public class LucaConfig {
 
                 // https://perkins4j2.github.io/posts/25628/
                 //清除现有数据，防止干扰
-                RibbonFilterContextHolder.clearCurrentContext();
+                RibbonFilterContext.clearCurrentContext();
                 var prod = request.getHeaders().get("prod");
                 var version = request.getHeaders().get("version");
                 if (null != prod && null != version && prod.size() > 0 && version.size() > 0) {
-                    RibbonFilterContextHolder.getCurrentContext()
-                            .add("prod", prod.get(0))
-                            .add("version", version.get(0));
+                    RibbonFilterContext.add("prod", prod.get(0));
+                    RibbonFilterContext.add("version", version.get(0));
                 }
             }
             return chain.filter(exchange);

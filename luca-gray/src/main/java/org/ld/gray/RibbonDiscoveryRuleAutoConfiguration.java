@@ -1,6 +1,5 @@
-package org.ld.gray.support;
+package org.ld.gray;
 
-import org.ld.gray.rule.MetadataAwareRule;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.cloud.netflix.ribbon.RibbonClientConfiguration;

@@ -1,7 +1,6 @@
-package org.ld.gray.rule;
+package org.ld.gray;
 
 import com.netflix.loadbalancer.*;
-import org.ld.gray.support.RibbonFilterContextHolder;
 import lombok.Getter;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperServer;
 
@@ -22,7 +21,7 @@ public class MetadataAwareRule extends PredicateBasedRule {
                                 .getPayload()
                                 .getMetadata().entrySet()
                                 .containsAll(
-                                        RibbonFilterContextHolder.getCurrentContext().getAttributes().entrySet()
+                                        RibbonFilterContext.getAttributes().entrySet()
                                 );
                     }
                 },
