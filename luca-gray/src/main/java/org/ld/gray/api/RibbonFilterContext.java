@@ -1,4 +1,4 @@
-package io.jmnarloch.spring.cloud.ribbon.api;
+package org.ld.gray.api;
 
 import java.util.Map;
 

@@ -1,9 +1,7 @@
 package org.ld.config;
 
 import akka.actor.ActorSystem;
-import com.netflix.loadbalancer.IRule;
-import com.netflix.loadbalancer.RandomRule;
-import io.jmnarloch.spring.cloud.ribbon.support.RibbonFilterContextHolder;
+import org.ld.gray.support.RibbonFilterContextHolder;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -255,8 +253,9 @@ public class LucaConfig {
                 var prod = request.getHeaders().get("prod");
                 var version = request.getHeaders().get("version");
                 if (null != prod && null != version && prod.size() > 0 && version.size() > 0) {
-                    RibbonFilterContextHolder.getCurrentContext().add("prod", prod.get(0));
-                    RibbonFilterContextHolder.getCurrentContext().add("version", version.get(0));
+                    RibbonFilterContextHolder.getCurrentContext()
+                            .add("prod", prod.get(0))
+                            .add("version", version.get(0));
                 }
             }
             return chain.filter(exchange);
