@@ -2,7 +2,7 @@ package org.ld.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ld.exception.CodeStackException;
-import org.ld.utils.SnowflakeId;
+import org.ld.utils.Snowflake;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -31,7 +31,7 @@ import java.util.Optional;
 public class FileController {
 
     @Resource
-    SnowflakeId snowflakeId;
+    Snowflake snowflakeId;
 
     /**
      * 上传文件

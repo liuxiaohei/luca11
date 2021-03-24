@@ -43,7 +43,7 @@ public class DemoTest {
     }
 
     @Resource
-    SnowflakeId snowflakeId;
+    Snowflake snowflakeId;
 
     /**
      * 无限流

@@ -1,9 +1,8 @@
 package org.ld.engine;
 
 import lombok.SneakyThrows;
-import org.ld.exception.CodeStackException;
 import org.ld.uc.UCRunnable;
-import org.ld.utils.SnowflakeId;
+import org.ld.utils.Snowflake;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +18,7 @@ public class ExecutorEngine {
     private Scheduler scheduler;
 
     @Resource
-    private SnowflakeId snowflakeId;
+    private Snowflake snowflakeId;
 
     /**
      * runnable 中的任务 会立刻被调度执行

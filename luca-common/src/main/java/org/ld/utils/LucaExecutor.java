@@ -16,6 +16,9 @@ import java.util.function.Consumer;
  * 相同的Executor对象的执行都只会在同一个异步线程内执行 可保证异步的同时具有顺序性
  * 并且可以通过这个对象中的cancel方法外部取消；
  */
+/**
+ * todo 递归转循环
+ */
 @Slf4j
 public class LucaExecutor implements Executor {
 

@@ -16,7 +16,7 @@ import org.ld.uc.UCSupplier;
  * SnowFlake的优点是，整体上按照时间自增排序，并且整个分布式系统内不会产生ID碰撞(由数据中心ID和机器ID作区分)，并且效率较高，经测试，SnowFlake每秒能够产生26万ID左右。
  */
 @SuppressWarnings("unused")
-public class SnowflakeId {
+public class Snowflake {
 
     /**
      * 工作机器ID(0~31)
@@ -39,10 +39,10 @@ public class SnowflakeId {
     private long lastTimestamp = -1L;
 
     public static class LocalHolder {
-        static final SnowflakeId idWorker = new SnowflakeId(() -> 0L);
+        static final Snowflake idWorker = new Snowflake(() -> 0L);
     }
 
-    public SnowflakeId(UCSupplier<Long> idGetter) {
+    public Snowflake(UCSupplier<Long> idGetter) {
         var makerId = idGetter.get();
         this.workerId = makerId % 32;
         this.datacenterId = makerId / 32;

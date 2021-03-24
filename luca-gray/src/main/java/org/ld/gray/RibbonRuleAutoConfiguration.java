@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Scope;
  */
 @Configuration
 @AutoConfigureBefore(RibbonClientConfiguration.class)
-public class RibbonDiscoveryRuleAutoConfiguration {
+public class RibbonRuleAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean

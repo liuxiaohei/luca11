@@ -170,7 +170,7 @@ public class FileUtil {
      */
     @SneakyThrows
     public static File asFile(MultipartFile file) {
-        File tmp = new File("/tmp/" + SnowflakeId.LocalHolder.idWorker.get() + "/" + file.getOriginalFilename());
+        File tmp = new File("/tmp/" + Snowflake.LocalHolder.idWorker.get() + "/" + file.getOriginalFilename());
         log.info("创建文件" + (tmp.getParentFile().mkdir() ? "成功" : "失败"));
         file.transferTo(tmp);
         return tmp;

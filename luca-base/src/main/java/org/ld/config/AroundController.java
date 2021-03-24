@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.ld.utils.SnowflakeId;
+import org.ld.utils.Snowflake;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -18,7 +18,7 @@ public class AroundController {
     public static final ThreadLocal<String> UUIDS = new ThreadLocal<>();
 
     @Resource
-    SnowflakeId snowflakeId;
+    Snowflake snowflakeId;
 
     /**
      * 打印日志等操作

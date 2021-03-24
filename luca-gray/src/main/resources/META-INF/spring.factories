@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.ld.gray.RibbonDiscoveryRuleAutoConfiguration
+org.ld.gray.RibbonRuleAutoConfiguration

@@ -81,7 +81,7 @@ public class LucaConfig {
     private DataSourceConfig dataSourceConfig;
 
     @Resource
-    private SnowflakeId snowflakeId;
+    private Snowflake snowflakeId;
 
     /**
      * https://blog.csdn.net/lilinhai548/article/details/107394670

@@ -22,7 +22,7 @@ public class MetadataAwareRule extends PredicateBasedRule {
                                 .getMetadata().entrySet()
                                 .containsAll(
                                         RibbonFilterContext.getAttributes().entrySet()
-                                );
+                                ); // 要求返回匹配所有header标签的 服务
                     }
                 },
                 new AvailabilityPredicate(this, null)).build();
