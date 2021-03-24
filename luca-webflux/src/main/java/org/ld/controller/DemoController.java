@@ -13,6 +13,7 @@ import org.ld.beans.Flush;
 import org.ld.beans.Queue;
 import org.ld.beans.RespBean;
 import org.ld.beans.SetTarget;
+import org.ld.config.FunctionConfig;
 import org.ld.pool.IOExecutor;
 import org.ld.utils.AkkaUtil;
 import org.ld.utils.JwtUtils;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -52,6 +54,9 @@ public class DemoController {
     @Autowired
     private ForkJoinPool forkJoinPool;
 
+    @Resource
+    private FunctionConfig functionConfig;
+
     @ApiOperation(value = "事例", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "demo")
     public Mono<Map<Object, Object>> postDemo(@RequestBody RespBean<String> aaa) {
@@ -69,6 +74,16 @@ public class DemoController {
         @Id
         private Long id;
         private String name;
+    }
+
+    @ApiOperation(value = "yml事例", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "yml")
+    public Mono<Object> ymlDemo() {
+        return Mono.fromSupplier(() -> {
+                    var a = functionConfig;
+                    return null;
+                }
+        );
     }
 
     @ApiOperation(value = "错误事例", produces = MediaType.APPLICATION_JSON_VALUE)

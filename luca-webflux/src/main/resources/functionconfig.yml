@@ -1,0 +1,196 @@
+obj:
+ functiontypes:
+  - code: ArithmeticOperator
+    name: 算数运算符
+    functions:
+      - name: 加
+        rule: "%s + %s"
+      - name: 减
+        rule: "%s - %s"
+      - name: 乘
+        rule: "%s * %s"
+      - name: 除
+        rule: "%s / %s"
+      - name: 按位或
+        rule: "%s | %s"
+      - name: 按位异或
+        rule: "%s ^ %s"
+      - name: 按位取反
+        rule: "~%s"
+
+  - code: LogicalOperators
+    name: 逻辑运算符
+    functions:
+      - name: 与
+        rule: "%s AND %s"
+      - name: 或
+        rule: "%s OR %s"
+      - name: 非
+        rule: "%NOT %s"
+      - name: 除
+        rule: "%s / %s"
+      - name: 判断子查询中是否有结果
+        rule: "[NOT] EXISTS (%s)"
+
+  - code: MathematicalFunction
+    name: 数学函数
+    functions:
+      - name: 四舍五入
+        rule: "round(%s,%s)"
+      - name: 返回不大于a的最大整数
+        rule: "floor(s%)"
+      - name: 返回不小于a的最小整数
+        rule: "ceil(%s)"
+      - name: 生成0-1的随机数
+        rule: "rand(s%)"
+      - name: 返回a的绝对值
+        rule: "abs(s%)"
+      - name: 返回正的取模，公式(a%b+b)%b
+        rule: "pmod(%s,%s)"
+      - name: 直接返回a
+        rule: "positive(s%)"
+      - name: 返回-a
+        rule: "negative(%s)"
+      - name: 判断正负
+        rule: "sign(s%)"
+      - name: 返回pi的值
+        rule: "pi()"
+      - name: 返回自然常数e
+        rule: "e()"
+      - name: 返回正的取模，公式(a%b+b)%b
+        rule: "pmod(%s,%s)"
+      - name: 返回a除以b的商（整数部分）
+        rule: "s% div s%"
+      - name: 返回小于等于参数 <int> 的最大质数
+        rule: "prime(%s)"
+      - name: 返回n的阶乘。如果n的值不是属于[0,20]的整数，返回null
+        rule: "factorial(s%)"
+      - name: 返回e的n次方
+        rule: "exp(s%)"
+      - name: 返回指定值的自然对数
+        rule: "ln(%s)"
+      - name: 返回a以10为底的对数
+        rule: "log10(s%)"
+      - name: 返回a以2为底的对数
+        rule: "log2(s%)"
+      - name: 返回a以base为底的对数
+        rule: "log(%s,%s)"
+      - name: 返回a的p次幂
+        rule: "pow(s%,s%)"
+      - name: 返回a的平方根
+        rule: "sqrt(s%)"
+      - name: 返回返回二进制格式
+        rule: "bin(%s)"
+      - name: 返回十六进制格式
+        rule: "hex(s%)"
+      - name: 正弦
+        rule: "sin(s%)"
+
+  - code: TypeConversionFunction
+    name: 类型转换函数
+    functions:
+      - name: 将参数转换成BINARY类型
+        rule: "BINARY(%s)"
+      - name: 将参数转换一个指定类型
+        rule: "CAST(%s AS %s)"
+      - name: 将指定形式的STRING转换为DATE类型
+        rule: "DATE(%s)"
+
+  - code: DateFunction
+    name: 日期函数
+    functions:
+      - name: 把日期格式转化为UNIX时间戳
+        rule: "TO_UNIX_TIMESTAMP(%s,%s)"
+      - name: 把UNIX时间戳转化为时间格式
+        rule: "FROM_UNIXTIME(%s,%s)"
+      - name: 把日期<date>转化为指定格式<pattern>
+        rule: "TO_CHAR(%s,%s)"
+      - name: 把字符串或者日期字符转化为 yyyy-MM-dd 的日期格式。
+        rule: "TO_DATE(%s,%s)"
+      - name: 返回指定时间是该月的第几天
+        rule: "DAY(%s)"
+      - name: 返回指定日期是该年的第几天
+        rule: "DAYOFYEAR(%s)"
+      - name: 返回指定日期是该年的第几季度
+        rule: "QUARTER(%s)"
+      - name: 返回指定时间是该日的第几个小时
+        rule: "HOUR(%s)"
+      - name: 返回指定时间是该小时的第多少分钟
+        rule: "MINUTE(%s)"
+      - name: 返回指定时间是该分钟的第多少秒
+        rule: "SECOND(%s)"
+      - name: 返回指定日期是该年的第几周
+        rule: "WEEKOFYEAR(%s)"
+      - name: 返回两个日期的相差天数
+        rule: "DATEDIFF(%s，%s)"
+      - name: 返回指定时间之后的第num_days天的日期或时间
+        rule: "DATE_ADD(%s,%s)"
+      - name: 返回指定时间之前的第num_days天的时间
+        rule: "DATE_SUB(%s，%s)"
+      - name: 根据指定的格式来解析日期并转化为标准格式
+        rule: "STR_TO_DATE(%s,%s)"
+      - name: 返回当前系统时间
+        rule: "SYSDATE"
+      - name: LAST_DAY
+        rule: "LAST_DAY(%s)"
+      - name: 将参数转换成一个INTERVAL DAY类型返回
+        rule: "TO_DAY_INTERVAL(%s)"
+      - name: 将参数转换成一个INTERVAL MONTH类型返回
+        rule: "TO_MONTH_INTERVAL(%s)"
+      - name: 将参数转换成一个INTERVAL YEAR类型返回
+        rule: "TO_YEAR_INTERVAL(%s)"
+      - name: 返回当前系统TIMESTAMP
+        rule: "SYSTIMESTAMP"
+
+  - code: StringFunction
+    name: 字符串函数
+    functions:
+      - name: 返回A第一个字符的ascii值。A可以是除了Binary之外的任何基本类型，返回A第一个字符的ascii值。如果输入为Binary类型则报错
+        rule: "ascii(%s)"
+      - name: 返回指定格式的number。A必须是数字类型，格式必须是Int、TinyInt、BigInt的一种。d表示number小数点后的位数
+        rule: "format_number(%s,%s)"
+      - name: 返回A的长度，A可以是任何基本类型
+        rule: "length(%s)"
+      - name: 返回输入字符串str或者对应字段长度，单位为字符。系统将一个多字节字符（例如，汉字）均当作一个字符处理。 此函数也可写作 character_length()，输入值为STRING或BINARY类型。\n
+        rule: "char_length(%s)"
+      - name: 返回字符串string以字节为单位的最大长度，或者对应字段byte数组的长度，对于一个汉字输入将返回3。输入值为STRING或BINARY类型
+        rule: "octet_length(%s)"
+      - name: md5
+        rule: "md5(%s)"
+      - name: 生成str的32位循环冗余校验码多项式。通常用于可靠性较高的数据传输中，检查传输的数据是否完整。str 参数为STRING或BINARY类型
+        rule: "crc32(%s)"
+
+  - code: DesensitizationCorrelationFunction
+    name: 脱敏相关函数
+    functions:
+      - name: 用于隐藏电话号码。使用 mask_string 替代 data_string 中的字符。保留前面 pre_length 长度的字符；可选择保留尾部 post_length 长度的字符。默认的 mask_string 为 ，默认的 post_length* 值为 0
+        rule: "mask(%s,%s,%s,%s)"
+      - name: 用于隐藏email。使用 mask_string 替代 data_string 中 @ 符号之前的字符，@ 后面的域名不会被隐藏。可选择保留前面 pre_length 长度的字符，可选择保留尾部（@ 之前） post_length 长度的字符。默认的 mask_string 为 ，默认的 pre_length 值为 1，默认的 post_length* 值为 0
+        rule: "mask_email(%s,%s,%s,%s)"
+      - name: 用于隐藏公司名。使用 mask_string 替代 data_string 中的字符，只保留“有限公司”及其之后的所有字符。默认的 mask_string 为 *
+        rule: "mask_company(%s)"
+      - name: 右移 data_string 中的数字和字母字符（只有数字和字母会被右移），可以使用 shift_value 设置偏移量。如“abc123”中的数字和字母右移1位得到“bcd234”。默认的 shift_value 为3
+        rule: "caesar_cipher(%s,%s)"
+
+ conditionRules:
+   - name: 等于
+     rule: "%s = %s"
+   - name: 不等于
+     rule: "%s <> %s"
+   - name: 大于
+     rule: "%s > %s"
+   - name: 大于等于
+     rule: "%s >= %s"
+   - name: 小于
+     rule: "%s < %s"
+   - name: 小于等于
+     rule: "%s <= %s"
+   - name: 为空
+     rule: "%s IS NULL"
+   - name: 不为空
+     rule: "%s NOT NULL"
+   - name: 开头为
+     rule: "%s like %s%"
+   - name: 结尾为
+     rule: "%s like %%s"
+
