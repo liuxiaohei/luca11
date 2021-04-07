@@ -1,6 +1,5 @@
 package org.ld.config;
 
-import io.transwarp.guardian.federation.org.yaml.snakeyaml.Yaml;
 import org.ld.api.ConfigPropertiesApi;
 import org.ld.beans.ConfigProperties;
 import org.ld.utils.IOUtil;
@@ -14,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.net.URL;
