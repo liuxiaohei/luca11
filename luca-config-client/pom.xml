@@ -57,12 +57,6 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <version>2.0.4.RELEASE</version>
         </dependency>
-
-        <dependency>
-            <groupId>io.transwarp.guardian.federation</groupId>
-            <artifactId>federation-utils</artifactId>
-            <version>guardian-3.1.0</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-openfeign-core</artifactId>

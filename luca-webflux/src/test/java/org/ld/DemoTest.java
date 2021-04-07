@@ -111,7 +111,7 @@ public class DemoTest {
                                 .orElse("")));
         imageIdMap.forEach((name, imageId) -> {
             try {
-                final var fullTag = "172.16.1.99/transwarp/" + name + ":" + tag;
+                final var fullTag = "172.16.1.99/xxxx/" + name + ":" + tag;
                 System.out.println("docker tag " + imageId + " " + fullTag);
                 var p = Runtime.getRuntime().exec("docker tag " + imageId + " " + fullTag);
                 p.waitFor();
@@ -164,7 +164,7 @@ public class DemoTest {
                                 .orElse("")));
         imageIdMap.forEach((name, imageId) -> {
             try {
-                final var fullTag = "172.16.1.99/transwarp/" + name + ":" + tag;
+                final var fullTag = "172.16.1.99/xxxx/" + name + ":" + tag;
                 System.out.println("docker tag " + imageId + " " + fullTag);
                 var p = Runtime.getRuntime().exec("docker tag " + imageId + " " + fullTag);
                 p.waitFor();
